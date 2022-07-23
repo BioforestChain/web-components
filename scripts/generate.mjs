@@ -1,0 +1,168 @@
+// @ts-check
+import chalk from "chalk";
+import fs from "node:fs";
+import path from "node:path";
+import readline from "node:readline";
+import { createResolveTo } from "./util/resolveTo.mjs";
+import { trimLines } from "./util/trim.mjs";
+import { walkFiles } from "./util/walkFiles.mjs";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const treeify = require("treeify");
+
+const resolveTo = createResolveTo(import.meta.url);
+
+const generateComponent = async () => {
+  const ROOTDIR = resolveTo("../");
+  const PACKAGE_TPL_DIR = resolveTo("../src/components/template");
+  let baseName = process.argv.slice(2).pop() || "";
+  if (!baseName) {
+    throw new Error("no found component name");
+  }
+
+  if (baseName.includes(".") || baseName.includes("_")) {
+    throw new Error("invalid name, should not include '.' or '_'");
+  }
+
+  baseName = baseName
+    // 将大写字符转成 小写并在前面加上分隔符
+    .replace(/[A-Z]/g, uw => {
+      return `-${uw.toLowerCase()}`;
+    })
+    /// 将多个分隔符或者特殊符号转成一个分隔符
+    .replace(/[\-\/]+/g, s => (s.includes("/") ? "/" : "-"))
+    .replace(/^\-/, "")
+    .replace(/[\-\_]$/, "");
+
+  if (baseName === "template") {
+    throw new Error("invalid name, should no be 'template'");
+  }
+
+  let dirname = baseName;
+  {
+    const nsList = dirname.split("/");
+    switch (nsList.length) {
+      case 1:
+      case 2:
+        dirname = nsList[0];
+        break;
+      default:
+        throw new Error("too many namespace");
+    }
+  }
+  baseName = baseName.replace(/\//g, "-");
+
+  const PACKAGE_TARGET_DIR = resolveTo(`../src/components/${dirname}`);
+  // if()
+  const npmName = baseName.replace(/_/g, "-");
+  const packageName = `@ccc-web-component/${npmName}`;
+  const tagName = `ccc-${npmName}`;
+  const classBaseName = npmName.replace(/^\w/, s => s.toUpperCase()).replace(/-\w/g, s => s[1].toUpperCase());
+  const className = `Ccc${classBaseName}`;
+  const classInstanceName = `ccc${classBaseName}`;
+  const storyTitle = `Component/${baseName
+    .replace(/^\w/, s => s.toUpperCase())
+    .replace(/-\w/g, s => "/" + s[1].toUpperCase())
+    .replace(/_\w/g, s => s[1].toUpperCase())}`;
+
+  const q = readline.createInterface(process.stdin, process.stdout);
+  const question = ask =>
+    new Promise(resolve => {
+      q.question(ask, anwser => {
+        resolve(anwser);
+      });
+    });
+
+  const mirco = str =>
+    str
+      // .replace(/PACKAGE-NAME/g, packageName)
+      .replace(/template/g, baseName)
+      .replace(/ccc-template/g, tagName)
+      .replace(/CccTemplate/g, className)
+      .replace(/cccTemplate/g, classInstanceName)
+      .replace(/Template/g, classBaseName)
+      .replace(/STORY_TITLE/g, storyTitle);
+
+  // `${chalk.gray("package name")}:\t${chalk.blue(packageName)}
+  let needCoverFile = false;
+  const YorN = await question(
+    [
+      `${chalk.gray("html tag")}:\t${chalk.green(`<${tagName} />`)} `,
+      `${chalk.gray("class name")}:\t${chalk.red(`${className}`)} `,
+      `${chalk.gray("story title")}:\t${chalk.blueBright(`${storyTitle}`)}`,
+      `${chalk.gray("write files")}:\t${chalk.cyan(path.relative(ROOTDIR, PACKAGE_TARGET_DIR).replace(/\\/g, "/"))}`,
+      `${(() => {
+        const fileTree = {};
+        for (const filepath of walkFiles(PACKAGE_TPL_DIR)) {
+          const targetRelativePath = mirco(path.relative(PACKAGE_TPL_DIR, filepath));
+          const targetPath = path.join(PACKAGE_TARGET_DIR, targetRelativePath);
+          const existFile = fs.existsSync(targetPath);
+          needCoverFile || (needCoverFile = existFile);
+
+          let fileNode = fileTree;
+          targetRelativePath.split(/[\/\\]/).forEach((pair, index, list) => {
+            if (index === list.length - 1) {
+              let info = "";
+              if (pair === "autogen.ts") {
+                info = "storybook writer kit, auto generate!";
+              } else if (pair === "readme.md") {
+                info = "document, auto generate!";
+              } else if (pair.endsWith(".scss")) {
+                info = "component stylesheet";
+              } else if (pair.endsWith(".stories.ts")) {
+                info = "storybook file";
+              } else if (pair.endsWith(".tsx")) {
+                info = "stencli component";
+              }
+              fileNode[existFile ? chalk.bgRed(pair) : pair] = info ? chalk.gray("// " + info) : null;
+            } else {
+              fileNode = fileNode[pair] ??= {};
+            }
+          });
+        }
+        return treeify
+          .asTree(fileTree, true)
+          .split("\n")
+          .map(line => "  " + line.replace(/^\s*([\W]+?)\s/, (p, s) => p.replace(s, chalk.cyan(s))))
+          .join("\n");
+      })()}`,
+
+      `${chalk.cyan`create web-component with stencli style`} ${chalk.underline`Y`}${chalk.gray`/n`}`,
+    ].join("\n"),
+  );
+  if (YorN.toLowerCase().includes("n")) {
+    process.exit(0);
+    return;
+  }
+  if (needCoverFile) {
+    const YorN = await question(
+      `${chalk.bgRed("files will be cover, keep enforce?")}  ${chalk.gray`y/`}${chalk.underline`N`}`,
+    );
+    if (YorN.toLowerCase().includes("y") === false) {
+      process.exit(0);
+      return;
+    }
+  }
+
+  const writeTplFile = (tplFilepath, tplDir, targetDir) => {
+    const targetPath = path.join(targetDir, mirco(path.relative(tplDir, tplFilepath)));
+    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+    fs.writeFileSync(targetPath, mirco(fs.readFileSync(tplFilepath, "utf-8")));
+  };
+
+  for (const filepath of walkFiles(PACKAGE_TPL_DIR)) {
+    writeTplFile(filepath, PACKAGE_TPL_DIR, PACKAGE_TARGET_DIR);
+  }
+
+  console.log("project created at:", chalk.cyan(path.relative(ROOTDIR, PACKAGE_TARGET_DIR)));
+
+  process.exit(0);
+};
+
+generateComponent().catch(e => {
+  if (e instanceof Error) {
+    console.error(e.stack?.replace(e.message, chalk.red(e.message)) ?? chalk.red(e.message));
+  } else {
+    console.error(e);
+  }
+});
