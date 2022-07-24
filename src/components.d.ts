@@ -11,6 +11,14 @@ export namespace Components {
     interface CccButtonQwq {
     }
     interface CccTemplate {
+        /**
+          * click count
+         */
+        "data": number;
+        /**
+          * inc methid
+         */
+        "inc": () => Promise<void>;
     }
     interface MyComponent {
         /**
@@ -42,6 +50,10 @@ export namespace Components {
     }
     interface MyName {
     }
+}
+export interface CccTemplateCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLCccTemplateElement;
 }
 export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -103,6 +115,11 @@ declare namespace LocalJSX {
     interface CccButtonQwq {
     }
     interface CccTemplate {
+        /**
+          * click count
+         */
+        "data"?: number;
+        "onCountChanged"?: (event: CccTemplateCustomEvent<number>) => void;
     }
     interface MyComponent {
         /**

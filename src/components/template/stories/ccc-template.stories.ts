@@ -2,16 +2,16 @@ import { html } from "lit-html";
 import { cccTemplateKit } from "./autogen";
 
 export default {
-  title: "STORY_TITLE",
+  title: "Template/ComponentTitle",
   argTypes: cccTemplateKit.argsFactory.toArgTypes(),
 };
 
-export const My_Component = cccTemplateKit.storyFactory(
+export const Base_Usage = cccTemplateKit.storyFactory(
   () =>
-    html`<!-- push some child element -->
-      <h1>qaq</h1>`,
+    // push some child element
+    html`<span>template demo</span>`,
   {
-    /* init property/attribute */
-    last: "qaq",
+    // init property/attribute
+    // data: 0,
   },
 );

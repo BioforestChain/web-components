@@ -1,7 +1,7 @@
-import '../dist/ccc-web-component-stencil/ccc-web-component-stencil.esm';
+import "../dist/ccchain-web-component/ccchain-web-component.esm";
 
 export const parameters = {
-  actions: { argTypesRegex: '^on[A-Z].*' },
+  actions: { argTypesRegex: "^on[A-Z].*" },
   controls: {
     matchers: {
       color: /(background|color)$/i,

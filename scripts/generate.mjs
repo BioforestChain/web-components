@@ -53,17 +53,19 @@ const generateComponent = async () => {
   baseName = baseName.replace(/\//g, "-");
 
   const PACKAGE_TARGET_DIR = resolveTo(`../src/components/${dirname}`);
-  // if()
   const npmName = baseName.replace(/_/g, "-");
-  const packageName = `@ccc-web-component/${npmName}`;
+  // const packageName = `@ccc-web-component/${npmName}`;
   const tagName = `ccc-${npmName}`;
   const classBaseName = npmName.replace(/^\w/, s => s.toUpperCase()).replace(/-\w/g, s => s[1].toUpperCase());
   const className = `Ccc${classBaseName}`;
   const classInstanceName = `ccc${classBaseName}`;
-  const storyTitle = `Component/${baseName
+
+  const storyBaseTitle = baseName
     .replace(/^\w/, s => s.toUpperCase())
     .replace(/-\w/g, s => "/" + s[1].toUpperCase())
-    .replace(/_\w/g, s => s[1].toUpperCase())}`;
+    .replace(/_\w/g, s => s[1].toUpperCase());
+  const storyComponentTitle = `Component/${storyBaseTitle}`;
+  const storyDocumentTitle = `Document/${storyBaseTitle}`;
 
   const q = readline.createInterface(process.stdin, process.stdout);
   const question = ask =>
@@ -80,8 +82,9 @@ const generateComponent = async () => {
       .replace(/ccc-template/g, tagName)
       .replace(/CccTemplate/g, className)
       .replace(/cccTemplate/g, classInstanceName)
-      .replace(/Template/g, classBaseName)
-      .replace(/STORY_TITLE/g, storyTitle);
+      .replace(/Template\/ComponentTitle/g, storyComponentTitle)
+      .replace(/Template\/DocumentTitle/g, storyDocumentTitle)
+      .replace(/Template/g, classBaseName);
 
   // `${chalk.gray("package name")}:\t${chalk.blue(packageName)}
   let needCoverFile = false;
@@ -89,7 +92,7 @@ const generateComponent = async () => {
     [
       `${chalk.gray("html tag")}:\t${chalk.green(`<${tagName} />`)} `,
       `${chalk.gray("class name")}:\t${chalk.red(`${className}`)} `,
-      `${chalk.gray("story title")}:\t${chalk.blueBright(`${storyTitle}`)}`,
+      `${chalk.gray("story title")}:\t${chalk.blueBright(`${storyComponentTitle}`)}`,
       `${chalk.gray("write files")}:\t${chalk.cyan(path.relative(ROOTDIR, PACKAGE_TARGET_DIR).replace(/\\/g, "/"))}`,
       `${(() => {
         const fileTree = {};

@@ -52,7 +52,7 @@ export class ArgFactory<T> {
     this._setOpts(key, { type: 'string' }, opts);
     return this;
   }
-  defineNumber<K extends keyof T & string>(key: K, opts?: DefineArgOptions<boolean>) {
+  defineNumber<K extends keyof T & string>(key: K, opts?: DefineArgOptions<number>) {
     this._setOpts(key, { type: 'number' }, opts);
     return this;
   }

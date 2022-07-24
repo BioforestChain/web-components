@@ -107,7 +107,7 @@ export const config: Config = {
                   }
                   try {
                     const defineOpts = `{
-                      defaultValue: ${JSON.stringify(prop.default)},
+                      defaultValue: ${prop.default},
                       description: ${JSON.stringify(prop.docs || "")},
                     }`;
                     const defineName = JSON.stringify(prop.name);

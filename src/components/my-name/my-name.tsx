@@ -10,7 +10,7 @@ export class MyName {
     return (
       <Host>
         <h1>
-          ~~~!!Oh Hi Nxxame:
+          ~~~!!xxxxOh Hi Nxxame:
           <slot></slot>
         </h1>
       </Host>

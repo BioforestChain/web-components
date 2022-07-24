@@ -49,8 +49,9 @@
    ```
 2. 启动开发编译，并启动 storybook 预览组件，并进行实时预览
    ```shell
-   yarn start # 启动 stencil 内部的 ts+rollup 编译，导出js、并实时生成类型源文件、与文档
-   yarn storybook # 启动 storybook 来对组件进行预览开发
+   yarn dev
+   # 启动 stencil 内部的 ts+rollup 编译，导出js、并实时生成类型源文件、与文档
+   # 启动 storybook 来对组件进行预览开发
    ```
    > 如果你同时在开发 Crabon-App 的 Angular 项目，那么他们是可以联动开发
 3. 编译输出
@@ -73,3 +74,9 @@ yarn g YOUR_COMPONENT_NAME
     > 最终你的组件会在 `button/ccc-button-some-feature.tsx`中定义出`<ccc-button-some-feature/>`的组件
 
 与此同时，组件中会自动生成 `stories` 文件夹下会出现一个对应的“故事文件”，比如`your-component.stories.ts`。在该文件中，也同样享有严格的类型检查。前提是你要安装 vscode-lit 插件
+
+## 📦 贡献者·一些已知的问题
+
+1. 在 Angular 项目开发时，的 HMR 模式下（通过`yarn dev:hmr`）启动，webcomponet 是无法正确重载的（因为 WebComponent 无法重新注册）。所以建议是：
+   1. 如果在编写 Angular-HTML 或者是开发调试 WebComponent，那么关闭 HMR，等将元素的结构放置完成后，再进入 .scss 的编写
+   1. 如果再编写 Angular-SCSS，那么开启 HMR，.scss 文件可以动态重载，但是这时候如果有修改到 .html 文件的时候，可能需要手动刷新才能让 WebComponent 正确渲染
