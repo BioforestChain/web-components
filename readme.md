@@ -45,6 +45,10 @@
 
 1. 安装依赖
    ```shell
+   # 你可能需要以下这些指令帮助你完成依赖的安装
+   # $env:PUPPETEER_DOWNLOAD_HOST="https://npm.taobao.org/mirrors/"
+   # $env:PUPPETEER_SKIP_DOWNLOAD=1
+   # $env:PUPPETEER_DOWNLOAD_HOST="http://192.168.110.154:8080/puppeteer/"
    yarn install # 确保依赖安装完毕
    ```
 2. 启动开发编译，并启动 storybook 预览组件，并进行实时预览
