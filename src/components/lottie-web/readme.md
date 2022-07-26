@@ -34,17 +34,15 @@
  - [ccc-dislike-button](../button)
  - [ccc-like-button](../button)
  - [ccc-lottie-web](.)
- - [ccc-lottie-web-toggle-button](.)
 
 ### Depends on
 
 - [ccc-lottie-web](.)
-- [ccc-lottie-web-toggle-button](.)
 
 ### Graph
 ```mermaid
 graph TD;
-  ccc-lottie-web-toggle-button --> ccc-lottie-web-toggle-button
+  ccc-lottie-web-toggle-button --> ccc-lottie-web
   ccc-lottie-web --> ccc-lottie-web-toggle-button
   ccc-collect-button --> ccc-lottie-web-toggle-button
   ccc-dislike-button --> ccc-lottie-web-toggle-button

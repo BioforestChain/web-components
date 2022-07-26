@@ -27,7 +27,6 @@
 graph TD;
   ccc-like-button --> ccc-lottie-web-toggle-button
   ccc-lottie-web-toggle-button --> ccc-lottie-web
-  ccc-lottie-web-toggle-button --> ccc-lottie-web-toggle-button
   ccc-lottie-web --> ccc-lottie-web-toggle-button
   style ccc-like-button fill:#f9f,stroke:#333,stroke-width:4px
 ```

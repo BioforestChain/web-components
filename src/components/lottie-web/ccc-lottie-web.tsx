@@ -100,7 +100,9 @@ export class CccLottieWeb implements ComponentInterface {
     this.defaultActivedColorChange.emit(this.defaultActivedColor);
     // this._hostEle.style.setProperty("--default-actived-color", colors.checked);
     // 在初始化完毕的时候，如果处于激活状态，那么将之激活
-    this._doPlay(lottieAniIns);
+    if (this.actived) {
+      lottieAniIns.goToAndPlay(lottieAniIns.totalFrames, true);
+    }
     // this.data_ready.emit();
   }
 

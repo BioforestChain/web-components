@@ -12,8 +12,11 @@
   ::slotted(*) {
     font-size: var(--label-font-size, 1em);
   }
-  .label:empty {
-    display: none;
+  .label {
+    font-size: var(--label-font-size, 1em);
+    :empty {
+      display: none;
+    }
   }
 }
 

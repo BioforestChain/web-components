@@ -1,6 +1,6 @@
-import { Component, ComponentInterface, Event, EventEmitter, h, Host, Prop, State, Watch } from "@stencil/core";
+import { Component, ComponentInterface, Event, EventEmitter, h, Host, Prop, Watch } from "@stencil/core";
 import { bindThis } from "../../utils/utils";
-import { $Direction, forceGetColors } from "./ccc-lottie-web-toggle-button.const";
+import { $Direction } from "./ccc-lottie-web-toggle-button.const";
 
 @Component({
   tag: "ccc-lottie-web-toggle-button",
@@ -29,18 +29,6 @@ export class CccLottieWebToggleButton implements ComponentInterface {
       return;
     }
     this.checked = !this.checked;
-  }
-
-  @State()
-  private colors: ReturnType<typeof forceGetColors> | undefined;
-  @Watch("animationData")
-  initColors(animationData: object) {
-    this.colors = forceGetColors(animationData);
-  }
-  componentWillLoad() {
-    if (this.animationData) {
-      this.initColors(this.animationData);
-    }
   }
 
   @bindThis
