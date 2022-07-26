@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+  ::slotted(*),
+  slot {
+    --actived-color: var(--default-actived-color);
+  }
+}

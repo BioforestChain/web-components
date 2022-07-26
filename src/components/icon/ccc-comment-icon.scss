@@ -1,0 +1,29 @@
+:host {
+  display: flex;
+
+  .box {
+    height: var(--icon-height, 2em);
+    width: var(--icon-width, 2em);
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  ::slotted(*) {
+    font-size: var(--label-font-size, 1em);
+  }
+  .label:empty {
+    display: none;
+  }
+}
+
+:host([direction="lr"]) {
+  flex-direction: row;
+  align-items: center;
+  line-height: var(--row-line-height, inherit);
+}
+:host([direction="tb"]) {
+  flex-direction: column;
+  align-items: center;
+  line-height: var(--column-line-height, inherit);
+}

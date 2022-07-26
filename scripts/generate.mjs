@@ -15,55 +15,68 @@ const resolveTo = createResolveTo(import.meta.url);
 const generateComponent = async () => {
   const ROOTDIR = resolveTo("../");
   const PACKAGE_TPL_DIR = resolveTo("../src/components/template");
-  let baseName = process.argv.slice(2).pop() || "";
-  if (!baseName) {
+  let inputName = process.argv.slice(2).pop() || "";
+  if (!inputName) {
     throw new Error("no found component name");
   }
 
-  if (baseName.includes(".") || baseName.includes("_")) {
+  if (inputName.includes(".") || inputName.includes("_")) {
     throw new Error("invalid name, should not include '.' or '_'");
   }
 
-  baseName = baseName
+  inputName = inputName
     // 将大写字符转成 小写并在前面加上分隔符
     .replace(/[A-Z]/g, uw => {
       return `-${uw.toLowerCase()}`;
     })
     /// 将多个分隔符或者特殊符号转成一个分隔符
-    .replace(/[\-\/]+/g, s => (s.includes("/") ? "/" : "-"))
+    .replace(/[\-\_\/]+/g, s => (s.includes("/") ? "/" : "-"))
+    /// 移除开头和末尾的特殊符号
     .replace(/^\-/, "")
     .replace(/[\-\_]$/, "");
 
-  if (baseName === "template") {
+  if (inputName === "template") {
     throw new Error("invalid name, should no be 'template'");
   }
 
-  let dirname = baseName;
+  let dirname = inputName;
+  let basename = inputName;
   {
     const nsList = dirname.split("/");
     switch (nsList.length) {
       case 1:
+        dirname = nsList[0];
+        basename = nsList[0];
+        break;
       case 2:
         dirname = nsList[0];
+        basename = nsList[1];
         break;
       default:
         throw new Error("too many namespace");
     }
   }
-  baseName = baseName.replace(/\//g, "-");
+  // inputName = inputName.replace(/\//g, "-");
 
   const PACKAGE_TARGET_DIR = resolveTo(`../src/components/${dirname}`);
-  const npmName = baseName.replace(/_/g, "-");
-  // const packageName = `@ccc-web-component/${npmName}`;
-  const tagName = `ccc-${npmName}`;
-  const classBaseName = npmName.replace(/^\w/, s => s.toUpperCase()).replace(/-\w/g, s => s[1].toUpperCase());
+  const tagBaseName = [...new Set([...basename.split(/[\_\-]/), ...dirname.split(/[\_\-]/)])].join("-");
+
+  const tagName = `ccc-${tagBaseName}`;
+  const classBaseName = tagBaseName
+    // 首字母大写
+    .replace(/^\w/, s => s.toUpperCase())
+    // 转驼峰
+    .replace(/-\w/g, s => s[1].toUpperCase());
   const className = `Ccc${classBaseName}`;
   const classInstanceName = `ccc${classBaseName}`;
 
-  const storyBaseTitle = baseName
+  const storyBaseTitle = inputName
+    // 首字母大写
     .replace(/^\w/, s => s.toUpperCase())
-    .replace(/-\w/g, s => "/" + s[1].toUpperCase())
-    .replace(/_\w/g, s => s[1].toUpperCase());
+    // 斜杠后面的字母大写
+    .replace(/\/\w/, s => "/" + s[1].toUpperCase())
+    // 分隔符+字母 转 空格+大写
+    .replace(/-\w/g, s => " " + s[1].toUpperCase());
   const storyComponentTitle = `Component/${storyBaseTitle}`;
   const storyDocumentTitle = `Document/${storyBaseTitle}`;
 
@@ -78,7 +91,7 @@ const generateComponent = async () => {
   const mirco = str =>
     str
       // .replace(/PACKAGE-NAME/g, packageName)
-      .replace(/template/g, baseName)
+      .replace(/template/g, tagBaseName)
       .replace(/ccc-template/g, tagName)
       .replace(/CccTemplate/g, className)
       .replace(/cccTemplate/g, classInstanceName)

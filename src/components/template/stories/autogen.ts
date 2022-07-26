@@ -4,9 +4,10 @@ import { ArgFactory, defineStory } from "../../../stories/util";
 
 export const cccTemplateKit = (() => {
   const argsFactory = new ArgFactory<JSX.CccTemplate>()
-    .defineNumber("data", {
+    .defineNumber("count", {
       defaultValue: 0,
       description: "click count",
+      required: false,
     })
     .defineAction("onCountChanged", {
       description: "",
@@ -17,11 +18,11 @@ export const cccTemplateKit = (() => {
     args?: Partial<JSX.CccTemplate>,
   ) => {
     return defineStory<JSX.CccTemplate>(args => {
-      return html`<ccc-template .data=${args.data} @countChanged=${args.onCountChanged}>
+      return html`<ccc-template .count=${args.count} @countChanged=${args.onCountChanged}>
         <!-- custom child elements -->
         ${slot(args)}
       </ccc-template>`;
     }, argsFactory.toArgs(args));
   };
-  return { argsFactory, storyFactory };
+  return { argsFactory, storyFactory, $Args: {} as Partial<JSX.CccTemplate> };
 })();

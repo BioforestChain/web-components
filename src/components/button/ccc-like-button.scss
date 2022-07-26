@@ -1,0 +1,43 @@
+:host {
+  display: inline-block;
+}
+
+.ani-count {
+  display: grid;
+  grid: 1fr/1fr;
+  grid-template-areas: "count";
+  font-size: var(--count-font-size, var(--label-font-size, 1em));
+
+  &.lr {
+    justify-items: start;
+    .count {
+      transform-origin: left;
+    }
+  }
+  &.tb {
+    line-height: var(--column-line-height);
+    .count {
+      left: -0.25em;
+    }
+  }
+
+  .count {
+    grid-area: count;
+    transition: inherit;
+
+    &.top {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    &.bottom {
+      transform: translateY(100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    &.checked {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}

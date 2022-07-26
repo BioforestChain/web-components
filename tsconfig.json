@@ -13,8 +13,10 @@
     "target": "es2017",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "resolveJsonModule": true,
     "jsx": "react",
     "jsxFactory": "h",
+    "strict": true,
   },
   "include": [
     "src"

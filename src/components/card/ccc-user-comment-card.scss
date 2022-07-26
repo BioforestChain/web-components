@@ -1,0 +1,101 @@
+:host {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  font-size: inherit;
+  // gap: 0.5em;
+}
+.avator {
+  display: flex;
+  flex-shrink: 0;
+  margin-right: 0.5em; //替换gap不生效
+  img {
+    width: var(--avator-size, 2.3em);
+    height: var(--avator-size, 2.3em);
+    border-radius: 50%;
+    overflow: hidden;
+  }
+}
+.comment {
+  flex-grow: 1;
+}
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  > .user {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    // gap: 0.5em;
+    > .name {
+      font-size: 0.9em;
+      font-weight: 600;
+      margin-right: 0.5em; //替换gap不生效
+    }
+    > .flag {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      .flag-badge {
+        border: 0.55px solid #acb5bf;
+        border-radius: 1em;
+        padding: 0.2em 0.6em;
+        font-size: 0.6em;
+        line-height: 1em;
+        color: #acb5bf;
+        &:empty {
+          display: none;
+        }
+      }
+    }
+  }
+  > .time {
+    color: #acb5bf;
+    font-size: 0.8em;
+  }
+}
+
+.text-wrapper {
+  font-size: 1em;
+  margin-top: 0.3em;
+  --line-clamp: 5;
+  --line-height: 1.25em;
+
+  .text {
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: var(--line-height);
+    line-break: anywhere;
+    &.fold {
+      text-overflow: ellipsis;
+      text-align: justify;
+
+      -webkit-line-clamp: var(--line-clamp);
+      -webkit-box-orient: vertical;
+
+      /* 虽然已经有line-clamp了，但是为了兼容，还是要加上max-height */
+      max-height: calc(var(--line-clamp) * var(--line-height));
+    }
+  }
+}
+
+.actions-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.8em;
+  > .right-actions {
+    display: flex;
+    // gap: 0.5em;
+  }
+}
+.fold-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #3e93fa;
+}

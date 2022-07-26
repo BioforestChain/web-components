@@ -5,76 +5,141 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { $Direction } from "./components/lottie-web/ccc-lottie-web-toggle-button.const";
+import { AnimationItem, RendererType } from "lottie-web";
 export namespace Components {
-    interface CccButtonQaq {
+    interface CccCollectButton {
+        "checkLabel": string;
+        "checked": boolean;
+        "direction": $Direction;
+        "disabled": boolean;
+        "icononly": boolean;
+        "unCheckLabel": string;
     }
-    interface CccButtonQwq {
+    interface CccCommentIcon {
+        "direction": $Direction;
+        "label": string;
+    }
+    interface CccDislikeButton {
+        "checked": boolean;
+        "count": number;
+        "direction": $Direction;
+        "disabled": boolean;
+        "icononly": boolean;
+    }
+    interface CccLikeButton {
+        "checked": boolean;
+        "count": number;
+        "direction": $Direction;
+        "disabled": boolean;
+        "icononly": boolean;
+    }
+    interface CccLottieWeb {
+        /**
+          * 是否要将动画至于末尾帧？
+         */
+        "actived": boolean;
+        "autoplay": boolean;
+        "data": object | undefined;
+        "defaultActivedColor": string;
+        "direction": 1 | -1;
+        "getDuration": (isFrame?: boolean | undefined) => Promise<number | undefined>;
+        "getInstance": () => Promise<AnimationItem | undefined>;
+        "getPrimaryColor": () => Promise<string>;
+        "goToAndPlay": (value: number, isFrame?: boolean | undefined, name?: string | undefined) => Promise<void | undefined>;
+        "goToAndStop": (value: number, isFrame?: boolean | undefined, name?: string | undefined) => Promise<void | undefined>;
+        "loop": boolean;
+        "name": string;
+        "pause": (name?: string | undefined) => Promise<void | undefined>;
+        "play": (name?: string | undefined) => Promise<void | undefined>;
+        /**
+          * 渲染类型
+         */
+        "renderer": RendererType;
+        "src": string | undefined;
+        "togglePause": (name?: string | undefined) => Promise<void | undefined>;
+    }
+    interface CccLottieWebToggleButton {
+        "animationData": object | undefined;
+        "checked": boolean;
+        "direction": $Direction;
+        "disabled": boolean;
+        "icononly": boolean;
+        "label": string;
+        "labelColor": string;
+        "name": string;
     }
     interface CccTemplate {
         /**
           * click count
          */
-        "data": number;
+        "count": number;
         /**
           * inc methid
          */
         "inc": () => Promise<void>;
     }
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first": string;
-        /**
-          * The last name
-         */
-        "last": string;
-        /**
-          * The middle name
-         */
-        "middle": string;
+    interface CccUserCommentCard {
+        "lineClamp": number;
+        "text": string;
+        "time": string;
+        "userAvator": string;
+        "userFlag": string;
+        "userName": string;
     }
-    interface MyComponent2 {
-        /**
-          * The first name
-         */
-        "first2": string;
-        /**
-          * The last name
-         */
-        "last2": string;
-        /**
-          * The middle name
-         */
-        "middle2": string;
-    }
-    interface MyName {
-    }
+}
+export interface CccLottieWebCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLCccLottieWebElement;
+}
+export interface CccLottieWebToggleButtonCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLCccLottieWebToggleButtonElement;
 }
 export interface CccTemplateCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLCccTemplateElement;
 }
-export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
+export interface CccUserCommentCardCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLMyComponentElement;
-}
-export interface MyComponent2CustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLMyComponent2Element;
+    target: HTMLCccUserCommentCardElement;
 }
 declare global {
-    interface HTMLCccButtonQaqElement extends Components.CccButtonQaq, HTMLStencilElement {
+    interface HTMLCccCollectButtonElement extends Components.CccCollectButton, HTMLStencilElement {
     }
-    var HTMLCccButtonQaqElement: {
-        prototype: HTMLCccButtonQaqElement;
-        new (): HTMLCccButtonQaqElement;
+    var HTMLCccCollectButtonElement: {
+        prototype: HTMLCccCollectButtonElement;
+        new (): HTMLCccCollectButtonElement;
     };
-    interface HTMLCccButtonQwqElement extends Components.CccButtonQwq, HTMLStencilElement {
+    interface HTMLCccCommentIconElement extends Components.CccCommentIcon, HTMLStencilElement {
     }
-    var HTMLCccButtonQwqElement: {
-        prototype: HTMLCccButtonQwqElement;
-        new (): HTMLCccButtonQwqElement;
+    var HTMLCccCommentIconElement: {
+        prototype: HTMLCccCommentIconElement;
+        new (): HTMLCccCommentIconElement;
+    };
+    interface HTMLCccDislikeButtonElement extends Components.CccDislikeButton, HTMLStencilElement {
+    }
+    var HTMLCccDislikeButtonElement: {
+        prototype: HTMLCccDislikeButtonElement;
+        new (): HTMLCccDislikeButtonElement;
+    };
+    interface HTMLCccLikeButtonElement extends Components.CccLikeButton, HTMLStencilElement {
+    }
+    var HTMLCccLikeButtonElement: {
+        prototype: HTMLCccLikeButtonElement;
+        new (): HTMLCccLikeButtonElement;
+    };
+    interface HTMLCccLottieWebElement extends Components.CccLottieWeb, HTMLStencilElement {
+    }
+    var HTMLCccLottieWebElement: {
+        prototype: HTMLCccLottieWebElement;
+        new (): HTMLCccLottieWebElement;
+    };
+    interface HTMLCccLottieWebToggleButtonElement extends Components.CccLottieWebToggleButton, HTMLStencilElement {
+    }
+    var HTMLCccLottieWebToggleButtonElement: {
+        prototype: HTMLCccLottieWebToggleButtonElement;
+        new (): HTMLCccLottieWebToggleButtonElement;
     };
     interface HTMLCccTemplateElement extends Components.CccTemplate, HTMLStencilElement {
     }
@@ -82,102 +147,121 @@ declare global {
         prototype: HTMLCccTemplateElement;
         new (): HTMLCccTemplateElement;
     };
-    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    interface HTMLCccUserCommentCardElement extends Components.CccUserCommentCard, HTMLStencilElement {
     }
-    var HTMLMyComponentElement: {
-        prototype: HTMLMyComponentElement;
-        new (): HTMLMyComponentElement;
-    };
-    interface HTMLMyComponent2Element extends Components.MyComponent2, HTMLStencilElement {
-    }
-    var HTMLMyComponent2Element: {
-        prototype: HTMLMyComponent2Element;
-        new (): HTMLMyComponent2Element;
-    };
-    interface HTMLMyNameElement extends Components.MyName, HTMLStencilElement {
-    }
-    var HTMLMyNameElement: {
-        prototype: HTMLMyNameElement;
-        new (): HTMLMyNameElement;
+    var HTMLCccUserCommentCardElement: {
+        prototype: HTMLCccUserCommentCardElement;
+        new (): HTMLCccUserCommentCardElement;
     };
     interface HTMLElementTagNameMap {
-        "ccc-button-qaq": HTMLCccButtonQaqElement;
-        "ccc-button-qwq": HTMLCccButtonQwqElement;
+        "ccc-collect-button": HTMLCccCollectButtonElement;
+        "ccc-comment-icon": HTMLCccCommentIconElement;
+        "ccc-dislike-button": HTMLCccDislikeButtonElement;
+        "ccc-like-button": HTMLCccLikeButtonElement;
+        "ccc-lottie-web": HTMLCccLottieWebElement;
+        "ccc-lottie-web-toggle-button": HTMLCccLottieWebToggleButtonElement;
         "ccc-template": HTMLCccTemplateElement;
-        "my-component": HTMLMyComponentElement;
-        "my-component2": HTMLMyComponent2Element;
-        "my-name": HTMLMyNameElement;
+        "ccc-user-comment-card": HTMLCccUserCommentCardElement;
     }
 }
 declare namespace LocalJSX {
-    interface CccButtonQaq {
+    interface CccCollectButton {
+        "checkLabel"?: string;
+        "checked"?: boolean;
+        "direction"?: $Direction;
+        "disabled"?: boolean;
+        "icononly"?: boolean;
+        "unCheckLabel"?: string;
     }
-    interface CccButtonQwq {
+    interface CccCommentIcon {
+        "direction"?: $Direction;
+        "label"?: string;
+    }
+    interface CccDislikeButton {
+        "checked"?: boolean;
+        "count"?: number;
+        "direction"?: $Direction;
+        "disabled"?: boolean;
+        "icononly"?: boolean;
+    }
+    interface CccLikeButton {
+        "checked"?: boolean;
+        "count"?: number;
+        "direction"?: $Direction;
+        "disabled"?: boolean;
+        "icononly"?: boolean;
+    }
+    interface CccLottieWeb {
+        /**
+          * 是否要将动画至于末尾帧？
+         */
+        "actived"?: boolean;
+        "autoplay"?: boolean;
+        "data"?: object | undefined;
+        "defaultActivedColor"?: string;
+        "direction"?: 1 | -1;
+        "loop"?: boolean;
+        "name"?: string;
+        "onCountChanged"?: (event: CccLottieWebCustomEvent<number>) => void;
+        "onDefaultActivedColorChange"?: (event: CccLottieWebCustomEvent<string>) => void;
+        "onEndFrame"?: (event: CccLottieWebCustomEvent<void>) => void;
+        "onStartFrame"?: (event: CccLottieWebCustomEvent<void>) => void;
+        /**
+          * 渲染类型
+         */
+        "renderer"?: RendererType;
+        "src"?: string | undefined;
+    }
+    interface CccLottieWebToggleButton {
+        "animationData"?: object | undefined;
+        "checked"?: boolean;
+        "direction"?: $Direction;
+        "disabled"?: boolean;
+        "icononly"?: boolean;
+        "label"?: string;
+        "labelColor"?: string;
+        "name"?: string;
+        "onCheckedChange"?: (event: CccLottieWebToggleButtonCustomEvent<boolean>) => void;
     }
     interface CccTemplate {
         /**
           * click count
          */
-        "data"?: number;
+        "count"?: number;
         "onCountChanged"?: (event: CccTemplateCustomEvent<number>) => void;
     }
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first"?: string;
-        /**
-          * The last name
-         */
-        "last"?: string;
-        /**
-          * The middle name
-         */
-        "middle"?: string;
-        /**
-          * name changed!
-         */
-        "onNamed"?: (event: MyComponentCustomEvent<string>) => void;
-    }
-    interface MyComponent2 {
-        /**
-          * The first name
-         */
-        "first2"?: string;
-        /**
-          * The last name
-         */
-        "last2"?: string;
-        /**
-          * The middle name
-         */
-        "middle2"?: string;
-        /**
-          * name changed!
-         */
-        "onNamed2"?: (event: MyComponent2CustomEvent<string>) => void;
-    }
-    interface MyName {
+    interface CccUserCommentCard {
+        "lineClamp"?: number;
+        "onClickUser"?: (event: CccUserCommentCardCustomEvent<void>) => void;
+        "text"?: string;
+        "time"?: string;
+        "userAvator"?: string;
+        "userFlag"?: string;
+        "userName"?: string;
     }
     interface IntrinsicElements {
-        "ccc-button-qaq": CccButtonQaq;
-        "ccc-button-qwq": CccButtonQwq;
+        "ccc-collect-button": CccCollectButton;
+        "ccc-comment-icon": CccCommentIcon;
+        "ccc-dislike-button": CccDislikeButton;
+        "ccc-like-button": CccLikeButton;
+        "ccc-lottie-web": CccLottieWeb;
+        "ccc-lottie-web-toggle-button": CccLottieWebToggleButton;
         "ccc-template": CccTemplate;
-        "my-component": MyComponent;
-        "my-component2": MyComponent2;
-        "my-name": MyName;
+        "ccc-user-comment-card": CccUserCommentCard;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "ccc-button-qaq": LocalJSX.CccButtonQaq & JSXBase.HTMLAttributes<HTMLCccButtonQaqElement>;
-            "ccc-button-qwq": LocalJSX.CccButtonQwq & JSXBase.HTMLAttributes<HTMLCccButtonQwqElement>;
+            "ccc-collect-button": LocalJSX.CccCollectButton & JSXBase.HTMLAttributes<HTMLCccCollectButtonElement>;
+            "ccc-comment-icon": LocalJSX.CccCommentIcon & JSXBase.HTMLAttributes<HTMLCccCommentIconElement>;
+            "ccc-dislike-button": LocalJSX.CccDislikeButton & JSXBase.HTMLAttributes<HTMLCccDislikeButtonElement>;
+            "ccc-like-button": LocalJSX.CccLikeButton & JSXBase.HTMLAttributes<HTMLCccLikeButtonElement>;
+            "ccc-lottie-web": LocalJSX.CccLottieWeb & JSXBase.HTMLAttributes<HTMLCccLottieWebElement>;
+            "ccc-lottie-web-toggle-button": LocalJSX.CccLottieWebToggleButton & JSXBase.HTMLAttributes<HTMLCccLottieWebToggleButtonElement>;
             "ccc-template": LocalJSX.CccTemplate & JSXBase.HTMLAttributes<HTMLCccTemplateElement>;
-            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-            "my-component2": LocalJSX.MyComponent2 & JSXBase.HTMLAttributes<HTMLMyComponent2Element>;
-            "my-name": LocalJSX.MyName & JSXBase.HTMLAttributes<HTMLMyNameElement>;
+            "ccc-user-comment-card": LocalJSX.CccUserCommentCard & JSXBase.HTMLAttributes<HTMLCccUserCommentCardElement>;
         }
     }
 }

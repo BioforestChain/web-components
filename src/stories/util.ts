@@ -1,19 +1,17 @@
-import { HTMLTemplateResult, render } from 'lit-html';
-import type { ArgTypes, Conditional } from '@storybook/csf';
+import type { ArgTypes, Conditional, InputType } from "@storybook/csf";
+import { HTMLTemplateResult, render } from "lit-html";
+// import { SBScalarType } from "@storybook/client-api";
 // export const defineArgsType = () => {};
-export const defineStory = <T>(
-  tpl: (args: Partial<T>) => HTMLTemplateResult,
-  defaultArgs?: Partial<T>
-) => {
+export const defineStory = <T>(tpl: (args: Partial<T>) => HTMLTemplateResult, defaultArgs?: Partial<T>) => {
   const Tpl = Object.assign(
     (args: Partial<T>) => {
-      const wrapper = document.createElement('div');
+      const wrapper = document.createElement("div");
       render(tpl(args), wrapper);
       return wrapper;
     },
     {
       args: defaultArgs,
-    }
+    },
   );
   return Tpl;
 };
@@ -23,53 +21,59 @@ type DefineArgOptions<V> = {
   description?: string;
   defaultValue?: V;
   if?: Conditional;
+  required?: boolean;
 };
 
 export class ArgFactory<T> {
   private argTypes = {} as ArgTypes<T>;
   private args = {} as T;
-  private _setOpts(key: string, base: object, opts?: DefineArgOptions<any>) {
+  private _setOpts(key: string, base: Partial<InputType>, opts?: DefineArgOptions<any>) {
+    let argType: InputType = base;
     if (opts) {
-      this.argTypes[key] = {
+      argType = {
         name: opts.name,
         description: opts.description,
-        defaultValue: opts.defaultValue,
         if: opts.if,
         ...base,
       };
       if (opts.defaultValue != undefined) {
         this.args[key] = opts.defaultValue;
       }
-    } else {
-      this.argTypes[key] = base;
+      if (opts.required === false) {
+        argType.type =
+          typeof argType.type === "string"
+            ? { name: argType.type, required: false }
+            : ({ ...argType.type, required: false } as any);
+      }
     }
+    this.argTypes[key] = argType;
   }
   defineBoolean<K extends keyof T & string>(key: K, opts?: DefineArgOptions<boolean>) {
-    this._setOpts(key, { type: 'boolean' }, opts);
+    this._setOpts(key, { type: "boolean" }, opts);
     return this;
   }
-  defineString<K extends keyof T & string>(key: K, opts?: DefineArgOptions<boolean>) {
-    this._setOpts(key, { type: 'string' }, opts);
+  defineString<K extends keyof T & string>(key: K, opts?: DefineArgOptions<string>) {
+    this._setOpts(key, { type: "string" }, opts);
     return this;
   }
   defineNumber<K extends keyof T & string>(key: K, opts?: DefineArgOptions<number>) {
-    this._setOpts(key, { type: 'number' }, opts);
+    this._setOpts(key, { type: "number" }, opts);
+    return this;
+  }
+  defineObject<K extends keyof T & string>(key: K, opts?: DefineArgOptions<object>) {
+    this._setOpts(key, { type: { name: "object", value: {} } }, opts);
+    return this;
+  }
+  defineArray<K extends keyof T & string>(key: K, opts?: DefineArgOptions<object>) {
+    this._setOpts(key, { type: { name: "array", value: { name: "other", value: "any" } } }, opts);
     return this;
   }
   defineAction<K extends keyof T & string>(key: K, opts?: DefineArgOptions<Function>) {
-    this._setOpts(
-      key,
-      { action: key.toString().replace(/^on([A-Z])/, (_, c) => c.toLowerCase()) },
-      opts
-    );
+    this._setOpts(key, { action: key.toString().replace(/^on([A-Z])/, (_, c) => c.toLowerCase()) }, opts);
     return this;
   }
-  defineEnum<K extends keyof T & string, O extends string>(
-    key: K,
-    options: O[],
-    opts?: DefineArgOptions<O>
-  ) {
-    this._setOpts(key, { options, control: 'select' }, opts);
+  defineEnum<K extends keyof T & string, O extends unknown>(key: K, options: O[], opts?: DefineArgOptions<O>) {
+    this._setOpts(key, { options, control: "select" }, opts);
     return this;
   }
   toArgTypes() {

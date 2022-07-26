@@ -1,9 +1,11 @@
 import { angularOutputTarget } from "@stencil/angular-output-target";
 import { Config } from "@stencil/core";
+import { sass } from "@stencil/sass";
 import { execFile } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import prettier from "prettier";
+import { inlineSvg } from "stencil-inline-svg";
 import prettierConfig from "./.prettierrc.json"; // assert {type:"json"}
 import packageJson from "./package.json";
 
@@ -12,7 +14,7 @@ const resolveTo = (to: string) => path.join(__dirname, to);
 export const config: Config = {
   namespace: packageJson.name.replace("@", "").replace("/", "-"),
   hashFileNames: true,
-  plugins: [],
+  plugins: [sass(), inlineSvg()],
   rollupPlugins: {
     after: [
       ...(process.argv.includes("--dev")
@@ -109,23 +111,35 @@ export const config: Config = {
                     const defineOpts = `{
                       defaultValue: ${prop.default},
                       description: ${JSON.stringify(prop.docs || "")},
+                      required: ${prop.required},
                     }`;
                     const defineName = JSON.stringify(prop.name);
                     let code: string | undefined;
                     switch (prop.type) {
                       case "string":
+                      case "string | undefined":
                         code = `.defineString(${defineName}, ${defineOpts})`;
                         break;
                       case "boolean":
+                      case "boolean | undefined":
                         code = `.defineBoolean(${defineName}, ${defineOpts})`;
                         break;
                       case "number":
+                      case "number | undefined":
                         code = `.defineNumber(${defineName}, ${defineOpts})`;
+                        break;
+                      case "object":
+                      case "object | undefined":
+                        code = `.defineObject(${defineName}, ${defineOpts})`;
+                        break;
+                      case "array":
+                      case "array | undefined":
+                        code = `.defineArray(${defineName}, ${defineOpts})`;
                         break;
                       default:
                         if (prop.type.includes("|")) {
                           try {
-                            const options = Function(`return [${prop.type.replace(/|/g, ",")}]`)();
+                            const options = Function(`return [${prop.type.replace(/\|/g, ",")}]`)();
                             code = `.defineEnum(${defineName}, ${JSON.stringify(options)}, ${defineOpts})`;
                             break;
                           } catch {}
@@ -180,7 +194,7 @@ export const config: Config = {
                   </${component.tag}>\`;
                 }, argsFactory.toArgs(args));
               };
-              return { argsFactory, storyFactory };
+              return { argsFactory, storyFactory, $Args: {} as Partial<JSX.${className}> };
             })();
           `;
           const contentList = autoGen_Map.get(storiesAutogenTsFilepath) ?? [];

@@ -9,7 +9,7 @@
 
 | Property | Attribute | Description | Type     | Default |
 | -------- | --------- | ----------- | -------- | ------- |
-| `data`   | `data`    | click count | `number` | `0`     |
+| `count`  | `count`   | click count | `number` | `0`     |
 
 
 ## Events

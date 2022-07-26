@@ -1,7 +1,7 @@
 # CCC 前端组件库
 
 希望大家养成组件化开发的习惯，这个仓库提供了一套标准来让大家进行开发。
-该项目使用 svelte 作为组件标准进行开发，因为它默认没有携带运行时且是响应式框架。
+该项目使用 stencil 作为组件标准进行开发，它提供了很多便捷的开箱即用的标准，以及高度可定制的编译工具链，使得我们可以跟 angular 项目的编译实时联动。
 
 > 如果确定要使用其它框架或者标准，请联系 [@kzf] 进行搭建，或者自己学习 storybook 自行搭建并分享
 
@@ -71,7 +71,7 @@ yarn g YOUR_COMPONENT_NAME
 1.  `yarn g your-component`，`-`用于替代空格
     > 最终你的组件会在 `your-component/ccc-your-component.tsx`中定义出`<ccc-your-component/>`的组件
 1.  `yarn g button/some-feature`，`-`用于替代空格，`/`用于定义文件夹
-    > 最终你的组件会在 `button/ccc-button-some-feature.tsx`中定义出`<ccc-button-some-feature/>`的组件
+    > 最终你的组件会在 `button/ccc-some-feature-button.tsx`中定义出`<ccc-some-feature-button/>`的组件
 
 与此同时，组件中会自动生成 `stories` 文件夹下会出现一个对应的“故事文件”，比如`your-component.stories.ts`。在该文件中，也同样享有严格的类型检查。前提是你要安装 vscode-lit 插件
 
@@ -80,3 +80,8 @@ yarn g YOUR_COMPONENT_NAME
 1. 在 Angular 项目开发时，的 HMR 模式下（通过`yarn dev:hmr`）启动，webcomponet 是无法正确重载的（因为 WebComponent 无法重新注册）。所以建议是：
    1. 如果在编写 Angular-HTML 或者是开发调试 WebComponent，那么关闭 HMR，等将元素的结构放置完成后，再进入 .scss 的编写
    1. 如果再编写 Angular-SCSS，那么开启 HMR，.scss 文件可以动态重载，但是这时候如果有修改到 .html 文件的时候，可能需要手动刷新才能让 WebComponent 正确渲染
+
+## TODO
+
+- [ ] 一个文件夹中放置多个组件的支持不够好，readme 只会有一个。
+  > 正确的操作是将这些组件的文档的内容分别放在对应的 stories.mdx 中。同时 readme.md 归纳了所有组件的文档，并提供 readme 该有的信息
