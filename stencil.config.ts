@@ -10,7 +10,7 @@ import prettierConfig from "./.prettierrc.json"; // assert {type:"json"}
 import packageJson from "./package.json";
 
 const resolveTo = (to: string) => path.join(__dirname, to);
-
+debugger
 export const config: Config = {
   namespace: packageJson.name.replace("@", "").replace("/", "-"),
   hashFileNames: true,
