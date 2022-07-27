@@ -186,5 +186,5 @@ export const querySelectorAll = <T>(root: Element | DocumentFragment | null | un
 };
 
 export const querySelector = <T>(root: Element | DocumentFragment | null | undefined, selector: string) => {
-  return root?.querySelector(selector) as T | null;
+  return (root?.querySelector(selector) || undefined) as T | undefined;
 };

@@ -2,6 +2,154 @@ import { html, HTMLTemplateResult } from "lit-html";
 import type { JSX } from "../../../components";
 import { ArgFactory, defineStory } from "../../../stories/util";
 
+export const cccAnimationIconKit = (() => {
+  const argsFactory = new ArgFactory<JSX.CccAnimationIcon>()
+    .defineBoolean("actived", {
+      defaultValue: false,
+      description: "动画的状态",
+      required: false,
+    })
+    .defineEnum("direction", ["bt", "lr", "rl", "tb"], {
+      defaultValue: "lr",
+      description: "动画步进方向",
+      required: false,
+    })
+    .defineString("duration", {
+      defaultValue: undefined,
+      description: "动画时长",
+      required: true,
+    })
+    .defineNumber("frames", {
+      defaultValue: undefined,
+      description: "帧数",
+      required: true,
+    })
+    .defineString("height", {
+      defaultValue: undefined,
+      description: "画框高度",
+      required: false,
+    })
+    .defineNumber("ratio", {
+      defaultValue: undefined,
+      description: "画框比例",
+      required: false,
+    })
+    .defineString("src", {
+      defaultValue: undefined,
+      description: "图片地址",
+      required: true,
+    })
+    .defineString("width", {
+      defaultValue: undefined,
+      description: "画框宽度",
+      required: false,
+    });
+
+  const storyFactory = (
+    slot: (args: Partial<Partial<JSX.CccAnimationIcon>>) => HTMLTemplateResult,
+    args?: Partial<JSX.CccAnimationIcon>,
+  ) => {
+    return defineStory<JSX.CccAnimationIcon>(args => {
+      return html`<ccc-animation-icon
+        ?actived=${args.actived}
+        .direction=${args.direction}
+        .duration=${args.duration}
+        .frames=${args.frames}
+        .height=${args.height}
+        .ratio=${args.ratio}
+        .src=${args.src}
+        .width=${args.width}
+      >
+        <!-- custom child elements -->
+        ${slot(args)}
+      </ccc-animation-icon>`;
+    }, argsFactory.toArgs(args));
+  };
+  return { argsFactory, storyFactory, $Args: {} as Partial<JSX.CccAnimationIcon> };
+})();
+
+export const cccImageToggleButtonKit = (() => {
+  const argsFactory = new ArgFactory<JSX.CccImageToggleButton>()
+    .defineBoolean("checked", {
+      defaultValue: false,
+      description: "",
+      required: false,
+    })
+    .defineString("checkedColor", {
+      defaultValue: "",
+      description: "",
+      required: false,
+    })
+    .defineEnum("color", ["black", "white"], {
+      defaultValue: "black",
+      description: "",
+      required: false,
+    })
+    .defineEnum("direction", ["lr", "tb"], {
+      defaultValue: "lr",
+      description: "",
+      required: false,
+    })
+    .defineBoolean("disabled", {
+      defaultValue: false,
+      description: "",
+      required: false,
+    })
+    .defineString("duration", {
+      defaultValue: undefined,
+      description: "",
+      required: true,
+    })
+    .defineNumber("frames", {
+      defaultValue: undefined,
+      description: "",
+      required: true,
+    })
+    .defineBoolean("icononly", {
+      defaultValue: false,
+      description: "",
+      required: false,
+    })
+    .defineString("label", {
+      defaultValue: "",
+      description: "",
+      required: false,
+    })
+    .defineString("src", {
+      defaultValue: undefined,
+      description: "",
+      required: true,
+    })
+    .defineAction("onCheckedChange", {
+      description: "",
+    });
+
+  const storyFactory = (
+    slot: (args: Partial<Partial<JSX.CccImageToggleButton>>) => HTMLTemplateResult,
+    args?: Partial<JSX.CccImageToggleButton>,
+  ) => {
+    return defineStory<JSX.CccImageToggleButton>(args => {
+      return html`<ccc-image-toggle-button
+        ?checked=${args.checked}
+        .checkedColor=${args.checkedColor}
+        .color=${args.color}
+        .direction=${args.direction}
+        ?disabled=${args.disabled}
+        .duration=${args.duration}
+        .frames=${args.frames}
+        ?icononly=${args.icononly}
+        .label=${args.label}
+        .src=${args.src}
+        @checkedChange=${args.onCheckedChange}
+      >
+        <!-- custom child elements -->
+        ${slot(args)}
+      </ccc-image-toggle-button>`;
+    }, argsFactory.toArgs(args));
+  };
+  return { argsFactory, storyFactory, $Args: {} as Partial<JSX.CccImageToggleButton> };
+})();
+
 export const cccLottieWebKit = (() => {
   const argsFactory = new ArgFactory<JSX.CccLottieWeb>()
     .defineBoolean("actived", {

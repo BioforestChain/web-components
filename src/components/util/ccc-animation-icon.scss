@@ -1,0 +1,58 @@
+:host {
+  display: inline-block;
+}
+.img-viewbox {
+  display: block;
+  --size: 2em;
+  --ratio: 1;
+  width: var(--width, calc(var(--height, var(--size)) * var(--ratio)));
+  height: var(--height, calc(var(--width, var(--size)) / var(--ratio)));
+  // aspect-ratio: ;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  animation-fill-mode: forwards;
+  animation-play-state: paused;
+  &.playing {
+    animation-play-state: running;
+  }
+
+  &.lr,
+  &.rl {
+    /// 铺满高度，宽度溢出
+    background-size: auto 100%;
+    animation-name: ani-row;
+  }
+
+  &.rl {
+    animation-direction: reverse;
+  }
+
+  &.tb,
+  &.bt {
+    /// 铺满宽度，高度溢出
+    background-size: 100% auto;
+    animation-name: ani-column;
+  }
+
+  &.bt {
+    animation-direction: reverse;
+  }
+}
+
+@keyframes ani-row {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: 100%;
+  }
+}
+
+@keyframes ani-column {
+  0% {
+    background-position-y: 0;
+  }
+  100% {
+    background-position-y: 100%;
+  }
+}

@@ -3,14 +3,20 @@ import { HTMLTemplateResult, render } from "lit-html";
 // import { SBScalarType } from "@storybook/client-api";
 // export const defineArgsType = () => {};
 export const defineStory = <T>(tpl: (args: Partial<T>) => HTMLTemplateResult, defaultArgs?: Partial<T>) => {
+  let onMount: (frag: DocumentFragment) => void | undefined;
   const Tpl = Object.assign(
     (args: Partial<T>) => {
-      const wrapper = document.createElement("div");
+      const wrapper = document.createDocumentFragment();
       render(tpl(args), wrapper);
+      onMount?.(wrapper);
       return wrapper;
     },
     {
       args: defaultArgs,
+      onMount(cb: NonNullable<typeof onMount>) {
+        onMount = cb;
+        return Tpl;
+      },
     },
   );
   return Tpl;
@@ -79,7 +85,7 @@ export class ArgFactory<T> {
   toArgTypes() {
     return { ...this.argTypes };
   }
-  toArgs(mixinArgs?: T) {
+  toArgs(mixinArgs?: Partial<T>) {
     return { ...this.args, ...mixinArgs };
   }
 }

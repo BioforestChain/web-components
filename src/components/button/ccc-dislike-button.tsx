@@ -1,14 +1,15 @@
-import { Component, ComponentInterface, h, Prop, State, Watch } from "@stencil/core";
+import { Component, ComponentInterface, getAssetPath, h, Prop, State, Watch } from "@stencil/core";
 import { bindThis } from "../../utils/utils";
-import { $Direction, toggleButtonRender } from "../lottie-web/ccc-lottie-web-toggle-button.const";
-import dislikeAnimationData from "./assets/dislike.animation.json";
+import { $Color, $Direction, toggleButtonRender } from "../util/ccc-image-toggle-button.const";
 
 @Component({
   tag: "ccc-dislike-button",
   styleUrl: "ccc-dislike-button.scss",
   shadow: true,
+  assetsDirs: ["./assets"],
 })
 export class CccButtonDislike implements ComponentInterface {
+  @Prop({ reflect: true }) color: $Color = "black";
   @Prop({ reflect: true }) disabled = false;
   @Prop({ reflect: true }) icononly = false;
   @Prop({ mutable: true }) count = 0;
@@ -25,7 +26,6 @@ export class CccButtonDislike implements ComponentInterface {
   @bindThis
   onChange(event: CustomEvent<boolean>) {
     this.checked = event.detail;
-    // this.updateCount();
   }
 
   connectedCallback() {
@@ -35,23 +35,32 @@ export class CccButtonDislike implements ComponentInterface {
   updateCount() {
     if (this.checked) {
       this.count_checked = this.count;
-      this.count_uncheck = this.count + 1;
+      this.count_uncheck = this.count - 1;
     } else {
-      this.count_checked = this.count - 1;
+      this.count_checked = this.count + 1;
       this.count_uncheck = this.count;
     }
   }
 
   render() {
-    return toggleButtonRender("dislike-button", dislikeAnimationData, this, () => (
-      <div slot="label" class={`ani-count ${this.direction}`}>
-        <span class={{ count: true, top: true, checked: this.checked }}>
-          <slot name="checked">{this.count_checked}</slot>
-        </span>
-        <span class={{ count: true, bottom: true, checked: !this.checked }}>
-          <slot name="uncheck">{this.count_uncheck}</slot>
-        </span>
-      </div>
-    ));
+    return toggleButtonRender(
+      {
+        src: getAssetPath("./assets/dislike.webp"),
+        frames: 48,
+        duration: "2s",
+        checkedColor: `#549deb`,
+      },
+      this,
+      () => (
+        <div slot="label" class={`ani-count ${this.direction}`}>
+          <span class={{ count: true, top: true, checked: this.checked }}>
+            <slot name="checked">{this.count_checked}</slot>
+          </span>
+          <span class={{ count: true, bottom: true, checked: !this.checked }}>
+            <slot name="uncheck">{this.count_uncheck}</slot>
+          </span>
+        </div>
+      ),
+    );
   }
 }

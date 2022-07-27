@@ -1,14 +1,15 @@
-import { Component, ComponentInterface, h, Prop } from "@stencil/core";
+import { Component, ComponentInterface, getAssetPath, h, Prop } from "@stencil/core";
 import { bindThis } from "../../utils/utils";
-import { $Direction, toggleButtonRender } from "../lottie-web/ccc-lottie-web-toggle-button.const";
-import collectAnimationData from "./assets/collect.animation.json";
+import { $Color, $Direction, toggleButtonRender } from "../util/ccc-image-toggle-button.const";
 
 @Component({
   tag: "ccc-collect-button",
   styleUrl: "ccc-collect-button.scss",
   shadow: true,
+  assetsDirs: ["./assets"],
 })
 export class CccButtonCollect implements ComponentInterface {
+  @Prop({ reflect: true }) color: $Color = "black";
   @Prop({ reflect: true }) disabled = false;
   @Prop({ reflect: true }) icononly = false;
   @Prop() checkLabel: string = "";
@@ -24,15 +25,24 @@ export class CccButtonCollect implements ComponentInterface {
   }
 
   render() {
-    return toggleButtonRender("collect-button", collectAnimationData, this, () => (
-      <div slot="label" class={`ani-count ${this.direction}`}>
-        <span class={{ count: true, top: true, checked: this.checked }}>
-          <slot name="checked">{this.checkLabel || "已收藏"}</slot>
-        </span>
-        <span class={{ count: true, bottom: true, checked: !this.checked }}>
-          <slot name="uncheck">{this.unCheckLabel || "收藏"}</slot>
-        </span>
-      </div>
-    ));
+    return toggleButtonRender(
+      {
+        src: getAssetPath("./assets/collect.webp"),
+        frames: 48,
+        duration: "2s",
+        checkedColor: `#f7bd25`,
+      },
+      this,
+      () => (
+        <div slot="label" class={`ani-count ${this.direction}`}>
+          <span class={{ count: true, top: true, checked: this.checked }}>
+            <slot name="checked">{this.checkLabel || "已收藏"}</slot>
+          </span>
+          <span class={{ count: true, bottom: true, checked: !this.checked }}>
+            <slot name="uncheck">{this.unCheckLabel || "收藏"}</slot>
+          </span>
+        </div>
+      ),
+    );
   }
 }

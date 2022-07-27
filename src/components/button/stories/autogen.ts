@@ -14,6 +14,11 @@ export const cccCollectButtonKit = (() => {
       description: "",
       required: false,
     })
+    .defineEnum("color", ["black", "white"], {
+      defaultValue: "black",
+      description: "",
+      required: false,
+    })
     .defineEnum("direction", ["lr", "tb"], {
       defaultValue: "lr",
       description: "",
@@ -43,6 +48,7 @@ export const cccCollectButtonKit = (() => {
       return html`<ccc-collect-button
         .checkLabel=${args.checkLabel}
         ?checked=${args.checked}
+        .color=${args.color}
         .direction=${args.direction}
         ?disabled=${args.disabled}
         ?icononly=${args.icononly}
@@ -60,6 +66,11 @@ export const cccDislikeButtonKit = (() => {
   const argsFactory = new ArgFactory<JSX.CccDislikeButton>()
     .defineBoolean("checked", {
       defaultValue: false,
+      description: "",
+      required: false,
+    })
+    .defineEnum("color", ["black", "white"], {
+      defaultValue: "black",
       description: "",
       required: false,
     })
@@ -91,6 +102,7 @@ export const cccDislikeButtonKit = (() => {
     return defineStory<JSX.CccDislikeButton>(args => {
       return html`<ccc-dislike-button
         ?checked=${args.checked}
+        .color=${args.color}
         .count=${args.count}
         .direction=${args.direction}
         ?disabled=${args.disabled}
@@ -108,6 +120,11 @@ export const cccLikeButtonKit = (() => {
   const argsFactory = new ArgFactory<JSX.CccLikeButton>()
     .defineBoolean("checked", {
       defaultValue: false,
+      description: "",
+      required: false,
+    })
+    .defineEnum("color", ["black", "white"], {
+      defaultValue: "black",
       description: "",
       required: false,
     })
@@ -139,6 +156,7 @@ export const cccLikeButtonKit = (() => {
     return defineStory<JSX.CccLikeButton>(args => {
       return html`<ccc-like-button
         ?checked=${args.checked}
+        .color=${args.color}
         .count=${args.count}
         .direction=${args.direction}
         ?disabled=${args.disabled}

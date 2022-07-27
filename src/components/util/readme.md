@@ -30,9 +30,6 @@
 
 ### Used by
 
- - [ccc-collect-button](../button)
- - [ccc-dislike-button](../button)
- - [ccc-like-button](../button)
  - [ccc-lottie-web](.)
 
 ### Depends on
@@ -44,9 +41,6 @@
 graph TD;
   ccc-lottie-web-toggle-button --> ccc-lottie-web
   ccc-lottie-web --> ccc-lottie-web-toggle-button
-  ccc-collect-button --> ccc-lottie-web-toggle-button
-  ccc-dislike-button --> ccc-lottie-web-toggle-button
-  ccc-like-button --> ccc-lottie-web-toggle-button
   style ccc-lottie-web-toggle-button fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
