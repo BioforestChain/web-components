@@ -11,29 +11,37 @@
   overflow: hidden;
   background-repeat: no-repeat;
   animation-fill-mode: forwards;
-  animation-play-state: paused;
   &.playing {
-    animation-play-state: running;
+    // animation-play-state: running;
+    &.lr,
+    &.rl {
+      animation-name: ani-row;
+    }
+    &.tb,
+    &.bt {
+      animation-name: ani-column;
+    }
+  }
+  &.pause {
+    animation-play-state: paused;
+  }
+  &.finish {
+    animation-delay: -2s;
   }
 
   &.lr,
   &.rl {
     /// 铺满高度，宽度溢出
     background-size: auto 100%;
-    animation-name: ani-row;
   }
-
-  &.rl {
-    animation-direction: reverse;
-  }
-
   &.tb,
   &.bt {
     /// 铺满宽度，高度溢出
     background-size: 100% auto;
-    animation-name: ani-column;
   }
 
+  /// 逆序动画
+  &.rl,
   &.bt {
     animation-direction: reverse;
   }

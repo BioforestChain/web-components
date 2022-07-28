@@ -39,13 +39,7 @@ export class CccAnimationIcon implements ComponentInterface {
   }
   componentDidLoad() {
     if (this.actived) {
-      for (const ani of this.viewboxEle.getAnimations()) {
-        ani.finish();
-      }
-    } else {
-      for (const ani of this.viewboxEle.getAnimations()) {
-        ani.currentTime = 0;
-      }
+      this.finish();
     }
   }
 
@@ -57,27 +51,24 @@ export class CccAnimationIcon implements ComponentInterface {
 
   @Method()
   async play() {
-    for (const ani of this.viewboxEle.getAnimations()) {
-      ani.play();
-    }
+    this.viewboxEle.classList.add("playing");
   }
 
   @Method()
   async pause() {
-    for (const ani of this.viewboxEle.getAnimations()) {
-      ani.pause();
-    }
+    this.viewboxEle.classList.add("pause");
+  }
+
+  @Method()
+  async finish() {
+    const { viewboxEle } = this;
+    viewboxEle.classList.add("finish", "playing", "pause");
   }
 
   @Method()
   async reset() {
-    if (typeof this.viewboxEle.getAnimations !== "function") {
-      console.error("需要引入 animation api polyfill");
-    }
-    for (const ani of this.viewboxEle.getAnimations()) {
-      ani.pause();
-      ani.currentTime = 0;
-    }
+    const { viewboxEle } = this;
+    viewboxEle.classList.remove("finish", "playing", "pause");
   }
 
   render() {

@@ -86,6 +86,25 @@ yarn g YOUR_COMPONENT_NAME
    1. 如果再编写 Angular-SCSS，那么开启 HMR，.scss 文件可以动态重载，但是这时候如果有修改到 .html 文件的时候，可能需要手动刷新才能让 WebComponent 正确渲染
 2. 当你在组件中配置了 assetDir 的属性后，需要重启编译，否则无法正确进行资源拷贝
 
+## 📦 贡献者·动态图标
+
+lottie 动画图标会占用大量的资源，所以我们新的方案是将之预渲染成图片，使用精灵图+CSS-Animation-API 进行动画控制。
+精灵图的制作方法是：
+
+1.  到 [www.codeandweb.com/free-sprite-sheet-packer] 中，将图片一帧帧“水平”放上去，然后将帧间距 Padding 改成 0（它有 bug，一定要先 1px 再 0px 才能正确生效）
+1.  如果一个动画有多种风格，那么将水平图垂直放置合并在一张精灵图中
+1.  到 [squoosh.app] 中，将合并好的 png 图片导入：
+    1.  选择 webp 格式
+    1.  勾上 Lossless 配置（不然颜色会丢，这对图标动画这种精致的、色调单一的小图片来说并不友好）
+    1.  Effort 拉满
+    1.  Quality 控制在 100%~60%之间，越高越好，前提是不要丢失细节
+
+这样导出的图片跟 lottie-web 的 json 文件差不多大，甚至可以更小，同时渲染效率也会更高。
+
+## 📦 贡献者·静态图标
+
+我们使用 iconmoon 来管理图标
+
 ## TODO
 
 - [ ] 一个文件夹中放置多个组件的支持不够好，readme 只会有一个。

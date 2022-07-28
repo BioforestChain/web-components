@@ -24,6 +24,7 @@ export namespace Components {
           * 动画时长
          */
         "duration": string;
+        "finish": () => Promise<void>;
         /**
           * 帧数
          */
