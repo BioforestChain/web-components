@@ -3,9 +3,14 @@
 :host {
   display: flex;
 
+  /*这里和icon-button保持一致的基本风格*/
   .icon {
-    // height: var(--icon-height, 2em);
-    // width: var(--icon-width, 2em);
+    width: var(--icon-width, 2em);
+    height: var(--icon-height, 2em);
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: center;
   }
   ::slotted(*),
   .label {

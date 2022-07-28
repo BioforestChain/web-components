@@ -17,6 +17,7 @@
   }
   &.tb {
     line-height: var(--column-line-height);
+    justify-items: center;
     .count {
       left: -0.25em;
     }
@@ -42,4 +43,3 @@
     }
   }
 }
-
