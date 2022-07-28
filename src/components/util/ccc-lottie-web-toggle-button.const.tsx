@@ -25,7 +25,7 @@ export const toggleButtonRender = (
   name: string,
   animationData: object,
   button: $ToggleButton,
-  slotRender: () => JSX.Element,
+  slotRender: () => unknown,
 ) => {
   return (
     <ccc-lottie-web-toggle-button

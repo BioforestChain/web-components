@@ -84,6 +84,7 @@ yarn g YOUR_COMPONENT_NAME
 1. 在 Angular 项目开发时，的 HMR 模式下（通过`yarn dev:hmr`）启动，webcomponet 是无法正确重载的（因为 WebComponent 无法重新注册）。所以建议是：
    1. 如果在编写 Angular-HTML 或者是开发调试 WebComponent，那么关闭 HMR，等将元素的结构放置完成后，再进入 .scss 的编写
    1. 如果再编写 Angular-SCSS，那么开启 HMR，.scss 文件可以动态重载，但是这时候如果有修改到 .html 文件的时候，可能需要手动刷新才能让 WebComponent 正确渲染
+2. 当你在组件中配置了 assetDir 的属性后，需要重启编译，否则无法正确进行资源拷贝
 
 ## TODO
 

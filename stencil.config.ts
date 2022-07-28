@@ -8,9 +8,14 @@ import prettier from "prettier";
 import { inlineSvg } from "stencil-inline-svg";
 import prettierConfig from "./.prettierrc.json"; // assert {type:"json"}
 import packageJson from "./package.json";
+import { doCopy } from "./scripts/fix-index.cjs";
+import { walkFiles } from "./scripts/util/walkFiles.cjs";
 
 const resolveTo = (to: string) => path.join(__dirname, to);
-debugger
+
+const angularJsonPath = resolveTo("../app/angular.json");
+const withAngular = fs.existsSync(angularJsonPath);
+
 export const config: Config = {
   namespace: packageJson.name.replace("@", "").replace("/", "-"),
   hashFileNames: true,
@@ -23,11 +28,7 @@ export const config: Config = {
               let checkTi: any;
               const CHECK_MAX_TIMES = 10;
               let checkTimes = 0;
-              const doCopy = () => {
-                const p = execFile("node", [resolveTo("./scripts/fix-index.mjs"), "dev-copy"], {});
-                p.stdout?.pipe(process.stdout);
-                p.stderr?.pipe(process.stderr);
-              };
+
               return {
                 name: "fix-input",
                 buildStart() {
@@ -52,13 +53,43 @@ export const config: Config = {
             })(),
           ]
         : []),
+
+      ...(withAngular
+        ? (() => {
+            const srcDir = resolveTo("dist/ccchain-web-component/assets");
+            fs.mkdirSync(srcDir, { recursive: true });
+            const destDir = resolveTo("../app/src/assets/ccchain-web-component/assets");
+            fs.mkdirSync(destDir, { recursive: true });
+            console.log("copy assets to", destDir);
+            return [
+              {
+                name: "copy-component-assets-to-angular-project",
+                generateBundle() {
+                  for (const filepath of walkFiles(srcDir)) {
+                    fs.copyFileSync(filepath, path.join(destDir, path.relative(srcDir, filepath)));
+                  }
+                },
+              },
+            ];
+          })()
+        : []),
     ],
   },
   outputTargets: [
     {
       type: "dist",
       esmLoaderPath: "../loader", // for old browser
-      // copy: [{ src: "../assets/copy", dest: ".." }],
+      // copy: (() => {
+      //   if (withAngular === false) {
+      //     return [];
+      //   }
+      //   const srcDir = resolveTo("dist/ccchain-web-component/assets");
+      //   fs.mkdirSync(srcDir, { recursive: true });
+      //   const destDir = resolveTo("../app/src/assets/ccchain-web-component/assets");
+      //   fs.mkdirSync(destDir, { recursive: true });
+      //   console.log("copy assets to", destDir);
+      //   return [{ src: resolveTo("dist/ccchain-web-component/assets"), dest: destDir }];
+      // })(),
     },
     // {
     //   type: "dist-custom-elements",
@@ -224,8 +255,7 @@ export const config: Config = {
     },
     ...(() => {
       /// 寻找angular项目
-      const angularJsonPath = resolveTo("../app/angular.json");
-      if (fs.existsSync(angularJsonPath) === false) {
+      if (withAngular === false) {
         return [];
       }
       return [

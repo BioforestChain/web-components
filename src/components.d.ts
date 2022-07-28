@@ -7,8 +7,9 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { $SpritDirection } from "./components/util/ccc-animation-icon";
 import { $Color, $Direction } from "./components/util/ccc-image-toggle-button.const";
+import { $Direction as $Direction1, $IconName } from "./components/icon/ccc-icon.const";
 import { AnimationItem, RendererType } from "lottie-web";
-import { $Direction as $Direction1 } from "./components/util/ccc-lottie-web-toggle-button.const";
+import { $Direction as $Direction2 } from "./components/util/ccc-lottie-web-toggle-button.const";
 export namespace Components {
     interface CccAnimationIcon {
         /**
@@ -56,9 +57,13 @@ export namespace Components {
         "icononly": boolean;
         "unCheckLabel": string;
     }
-    interface CccCommentIcon {
-        "direction": $Direction;
-        "label": string;
+    interface CccConfigUtil {
+        /**
+          * click count
+         */
+        "assetPath"?: string;
+        "getAssetPath": (path?: string) => Promise<string>;
+        "setAssetPath": (path: string) => Promise<void>;
     }
     interface CccDislikeButton {
         "checked": boolean;
@@ -67,6 +72,11 @@ export namespace Components {
         "direction": $Direction;
         "disabled": boolean;
         "icononly": boolean;
+    }
+    interface CccIcon {
+        "direction": $Direction;
+        "label": string;
+        "name": $IconName;
     }
     interface CccImageToggleButton {
         "checked": boolean;
@@ -142,6 +152,10 @@ export namespace Components {
         "userName": string;
     }
 }
+export interface CccIconCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLCccIconElement;
+}
 export interface CccImageToggleButtonCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLCccImageToggleButtonElement;
@@ -175,17 +189,23 @@ declare global {
         prototype: HTMLCccCollectButtonElement;
         new (): HTMLCccCollectButtonElement;
     };
-    interface HTMLCccCommentIconElement extends Components.CccCommentIcon, HTMLStencilElement {
+    interface HTMLCccConfigUtilElement extends Components.CccConfigUtil, HTMLStencilElement {
     }
-    var HTMLCccCommentIconElement: {
-        prototype: HTMLCccCommentIconElement;
-        new (): HTMLCccCommentIconElement;
+    var HTMLCccConfigUtilElement: {
+        prototype: HTMLCccConfigUtilElement;
+        new (): HTMLCccConfigUtilElement;
     };
     interface HTMLCccDislikeButtonElement extends Components.CccDislikeButton, HTMLStencilElement {
     }
     var HTMLCccDislikeButtonElement: {
         prototype: HTMLCccDislikeButtonElement;
         new (): HTMLCccDislikeButtonElement;
+    };
+    interface HTMLCccIconElement extends Components.CccIcon, HTMLStencilElement {
+    }
+    var HTMLCccIconElement: {
+        prototype: HTMLCccIconElement;
+        new (): HTMLCccIconElement;
     };
     interface HTMLCccImageToggleButtonElement extends Components.CccImageToggleButton, HTMLStencilElement {
     }
@@ -226,8 +246,9 @@ declare global {
     interface HTMLElementTagNameMap {
         "ccc-animation-icon": HTMLCccAnimationIconElement;
         "ccc-collect-button": HTMLCccCollectButtonElement;
-        "ccc-comment-icon": HTMLCccCommentIconElement;
+        "ccc-config-util": HTMLCccConfigUtilElement;
         "ccc-dislike-button": HTMLCccDislikeButtonElement;
+        "ccc-icon": HTMLCccIconElement;
         "ccc-image-toggle-button": HTMLCccImageToggleButtonElement;
         "ccc-like-button": HTMLCccLikeButtonElement;
         "ccc-lottie-web": HTMLCccLottieWebElement;
@@ -280,9 +301,11 @@ declare namespace LocalJSX {
         "icononly"?: boolean;
         "unCheckLabel"?: string;
     }
-    interface CccCommentIcon {
-        "direction"?: $Direction;
-        "label"?: string;
+    interface CccConfigUtil {
+        /**
+          * click count
+         */
+        "assetPath"?: string;
     }
     interface CccDislikeButton {
         "checked"?: boolean;
@@ -291,6 +314,12 @@ declare namespace LocalJSX {
         "direction"?: $Direction;
         "disabled"?: boolean;
         "icononly"?: boolean;
+    }
+    interface CccIcon {
+        "direction"?: $Direction;
+        "label"?: string;
+        "name": $IconName;
+        "onCountChanged"?: (event: CccIconCustomEvent<number>) => void;
     }
     interface CccImageToggleButton {
         "checked"?: boolean;
@@ -364,8 +393,9 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "ccc-animation-icon": CccAnimationIcon;
         "ccc-collect-button": CccCollectButton;
-        "ccc-comment-icon": CccCommentIcon;
+        "ccc-config-util": CccConfigUtil;
         "ccc-dislike-button": CccDislikeButton;
+        "ccc-icon": CccIcon;
         "ccc-image-toggle-button": CccImageToggleButton;
         "ccc-like-button": CccLikeButton;
         "ccc-lottie-web": CccLottieWeb;
@@ -380,8 +410,9 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ccc-animation-icon": LocalJSX.CccAnimationIcon & JSXBase.HTMLAttributes<HTMLCccAnimationIconElement>;
             "ccc-collect-button": LocalJSX.CccCollectButton & JSXBase.HTMLAttributes<HTMLCccCollectButtonElement>;
-            "ccc-comment-icon": LocalJSX.CccCommentIcon & JSXBase.HTMLAttributes<HTMLCccCommentIconElement>;
+            "ccc-config-util": LocalJSX.CccConfigUtil & JSXBase.HTMLAttributes<HTMLCccConfigUtilElement>;
             "ccc-dislike-button": LocalJSX.CccDislikeButton & JSXBase.HTMLAttributes<HTMLCccDislikeButtonElement>;
+            "ccc-icon": LocalJSX.CccIcon & JSXBase.HTMLAttributes<HTMLCccIconElement>;
             "ccc-image-toggle-button": LocalJSX.CccImageToggleButton & JSXBase.HTMLAttributes<HTMLCccImageToggleButtonElement>;
             "ccc-like-button": LocalJSX.CccLikeButton & JSXBase.HTMLAttributes<HTMLCccLikeButtonElement>;
             "ccc-lottie-web": LocalJSX.CccLottieWeb & JSXBase.HTMLAttributes<HTMLCccLottieWebElement>;

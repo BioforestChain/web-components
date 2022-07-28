@@ -1,12 +1,11 @@
 // @ts-check
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import fs from "node:fs";
-import { createResolveTo } from "./util/resolveTo.mjs";
-import { walkFiles } from "./util/walkFiles.mjs";
-const resolveTo = createResolveTo(import.meta.url);
+const path = require("node:path");
+const fs = require("node:fs");
+const { createResolveTo } = require("./util/resolveTo.cjs");
+const { walkFiles } = require("./util/walkFiles.cjs");
+const resolveTo = createResolveTo(__dirname);
 
-export const doCopy = (assetSrc = "build-copy") => {
+const doCopy = (assetSrc = "build-copy") => {
   const TPL_DIR = resolveTo(`../assets/${assetSrc}`);
   const TAR_DIR = resolveTo("../dist");
   const SOURCE = "/* SOURCE */";
@@ -37,9 +36,8 @@ export const doCopy = (assetSrc = "build-copy") => {
     }
   }
 };
+exports.doCopy = doCopy;
 
-if (path.resolve(process.cwd(), process.argv[1]) == fileURLToPath(import.meta.url)) {
-  // console.log("do copy", process.argv[2]);
-
+if (require.main === module) {
   doCopy(process.argv[2]);
 }

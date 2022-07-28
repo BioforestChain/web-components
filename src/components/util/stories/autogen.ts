@@ -68,6 +68,27 @@ export const cccAnimationIconKit = (() => {
   return { argsFactory, storyFactory, $Args: {} as Partial<JSX.CccAnimationIcon> };
 })();
 
+export const cccConfigUtilKit = (() => {
+  const argsFactory = new ArgFactory<JSX.CccConfigUtil>().defineString("assetPath", {
+    defaultValue: undefined,
+    description: "click count",
+    required: false,
+  });
+
+  const storyFactory = (
+    slot: (args: Partial<Partial<JSX.CccConfigUtil>>) => HTMLTemplateResult,
+    args?: Partial<JSX.CccConfigUtil>,
+  ) => {
+    return defineStory<JSX.CccConfigUtil>(args => {
+      return html`<ccc-config-util .assetPath=${args.assetPath}>
+        <!-- custom child elements -->
+        ${slot(args)}
+      </ccc-config-util>`;
+    }, argsFactory.toArgs(args));
+  };
+  return { argsFactory, storyFactory, $Args: {} as Partial<JSX.CccConfigUtil> };
+})();
+
 export const cccImageToggleButtonKit = (() => {
   const argsFactory = new ArgFactory<JSX.CccImageToggleButton>()
     .defineBoolean("checked", {

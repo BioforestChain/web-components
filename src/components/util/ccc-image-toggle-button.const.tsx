@@ -19,7 +19,7 @@ export const toggleButtonRender = (
     checkedColor: string;
   },
   button: $ToggleButton,
-  slotRender: () => JSX.Element,
+  slotRender: () => unknown,
 ) => {
   return (
     <ccc-image-toggle-button
