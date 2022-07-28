@@ -6,8 +6,6 @@
   display: grid;
   grid: 1fr/1fr;
   grid-template-areas: "count";
-  font-size: 1em; /// 已经被slot修饰了样式，这里锁定1em就行了
-  // font-size: var(--count-font-size, var(--label-font-size, 1em));
 
   &.lr {
     justify-items: start;
