@@ -21,7 +21,7 @@
   "scripts": {
     "postinstall": "node ./scripts/fix-package.mjs",
     "dev": "concurrently -p \"[{name}]\" --names \"build,storybook\" -c \"bgBlue.bold,bgMagenta.bold\" \"yarn start\" \"yarn storybook\"",
-    "build": "stencil build --docs & node ./scripts/fix-index.mjs",
+    "build": "stencil build --docs & node ./scripts/fix-index.cjs",
     "start": "stencil build --docs --dev --watch",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
