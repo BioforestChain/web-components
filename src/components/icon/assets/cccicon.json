@@ -1,0 +1,1129 @@
+{
+  "ico_address_eye_on": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_address_eye_off": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "listicon_views_normal": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_checkbox_small_on": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "check": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "gallery_chekmark_checked": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(62, 147, 250))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "answer_correct": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "nav_cancel": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_image_small_delete": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(172, 181, 191))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "ico_label_small_cancel": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(255, 255, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(172, 181, 191))"
+      }
+    }
+  ],
+  "inputbar_cancel": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_airdrop_dialog_cancel": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_released": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_label_small_add": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(255, 255, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(172, 181, 191))"
+      }
+    }
+  ],
+  "ico_status_small_nontradable": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "tab_indicator_small_blue": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_boldtext": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_bulletedlist": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_header": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_image": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_italic": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_link": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_numberedlist": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_preview": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "toolbar_quote": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_dpdetails_currency": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_profit": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "big-currency": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_assets_small_currency": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "diamond": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "circle-diamond": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_mark_angle_assets": [
+    {
+      "char": "",
+      "style": {
+        "opacity": 0.2,
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(0, 0, 0))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "ico_navigationbar_circle_share": [
+    {
+      "char": "",
+      "style": {
+        "opacity": 0.4,
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(0, 0, 0))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "share": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_refresh": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "secondarybar_folded": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_secondarybar_retract": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ent_arrow_bg": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_dpdetails_event_down": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_payment_download": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_myevent_small_arrow": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_navigationbar_backward": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_navigationbar_circle_arrow": [
+    {
+      "char": "",
+      "style": {
+        "opacity": 0.4,
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(0, 0, 0))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "ico_me_exchange": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_me_switch": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "guidance_bubble_down": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "guidance_bubble_left": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "guidance_bubble_right": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "guidance_bubble_up": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "list_row_right": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "settings_list_folded": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "settings_list_unfolded": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_wallet": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_navigationbar_mynft": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_book_nor": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_dpmanagement": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_collectcode": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_servers": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_ranking": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_paycode": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_dpdetails_gift": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(0, 0, 0))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "opacity": 0.9,
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "me_invitedgift": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_draft": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_checkin": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_datacenter": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "nav_settings": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "nav-historical-exchange": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "nav_history": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_bell": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "me_myevent": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "searchbar_search": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "nav_search": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "collection": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "nav_more": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_secondarybar_filter": [
+    {
+      "char": "",
+      "style": {
+        "opacity": 0.01,
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(255, 255, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(68, 68, 68))"
+      }
+    }
+  ],
+  "ico_secondarybar_alllabel": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_secondarybar_display_tile": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_inputbar_scanning": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "nav_delete": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "comment": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "like": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "dislike": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "personalinfo_camera": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "logo_tanyuanyu": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "gallery_image_error_bg": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(241, 242, 243))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(223, 226, 230))"
+      }
+    }
+  ],
+  "ico_dpdetails_comment": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_payment_qrcode": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_dpdetails_auction": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(0, 0, 0))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "opacity": 0.9,
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "chat-img-surface": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "chat-img": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "icon_chat_sending": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_dpdetails_validity": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "avatra_default": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(243, 244, 245))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(232, 233, 235))"
+      }
+    }
+  ],
+  "history": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_secondarybar_historicalstate": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "chat-face-surface": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "chat-face": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_me_bfchaintracker": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_transfer_edit": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_video_medium_play": [
+    {
+      "char": "",
+      "style": {
+        "opacity": 0.40960000000000013,
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(255, 255, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "opacity": 0.40960000000000013,
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(0, 0, 0))"
+      }
+    }
+  ],
+  "ico_transfer_accountaddress": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "article_contentreview_tips": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_dpdetails_small_questionmark": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ],
+  "ico_publisher_artcles": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(235, 244, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(62, 147, 250))"
+      }
+    }
+  ],
+  "ico_publisher_assets": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(235, 244, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(62, 147, 250))"
+      }
+    }
+  ],
+  "ico_publisher_posts": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(235, 244, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(62, 147, 250))"
+      }
+    }
+  ],
+  "ent_issue_icon": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(255, 235, 204))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(249, 181, 70))"
+      }
+    }
+  ],
+  "real_name_wait": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(0, 90, 209))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 2,
+        "color": "var(--color-3, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "small-down": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(143, 170, 204))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "paper-plane": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(44, 139, 255))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "cancel": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(247, 69, 69))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "link": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(64, 147, 250))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "warning": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(247, 69, 69))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "eye": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0,
+        "color": "var(--color-1, rgb(255, 179, 65))"
+      }
+    },
+    {
+      "char": "",
+      "style": {
+        "zIndex": 1,
+        "color": "var(--color-2, rgb(255, 255, 255))"
+      }
+    }
+  ],
+  "ico_status_small_notstarted": [
+    {
+      "char": "",
+      "style": {
+        "zIndex": 0
+      }
+    }
+  ]
+}

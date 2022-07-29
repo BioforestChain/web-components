@@ -10,7 +10,7 @@ export default {
 export const Base_Usage = cccAnimationIconKit
   .storyFactory(() => html``, {
     src: "./src/components/button/assets/collect.webp",
-    duration: "2s",
+    duration: "1.6s",
     frames: 48,
   })
   .onMount(frag => {

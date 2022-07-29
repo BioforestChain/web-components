@@ -1,4 +1,6 @@
-import { html, render } from "lit-html";
+import { html } from "lit-html";
+import allIcons from "../assets/cccicon.json";
+import type { $CccIconName } from "../ccc-icon.name";
 import { cccIconKit } from "./autogen";
 
 export default {
@@ -14,27 +16,10 @@ export const Base_Usage = cccIconKit
   .onMount(frag => {
     const iconEle = frag.firstElementChild! as HTMLCccIconElement;
 
-    const allIcons = [
-      "small-down",
-      "paper-plane",
-      "cancel",
-      "link",
-      "warning",
-      "eye",
-      "big-currency",
-      "history",
-      "collection",
-      "circle-diamond",
-      "comment",
-      "share",
-      "check",
-      "dislike",
-      "like",
-    ] as const;
     const allIconEles: HTMLCccIconElement[] = [];
-    for (const name of allIcons) {
+    for (const name in allIcons) {
       const ele = iconEle.cloneNode(true) as HTMLCccIconElement;
-      ele.name = name;
+      ele.name = name as $CccIconName;
       // ele.label = name;
       ele.innerHTML = `<span slot="label">${name}</span>`;
       frag.appendChild(ele);
@@ -54,9 +39,8 @@ export const Base_Usage = cccIconKit
       display: flex;
       flex-wrap: wrap;
       gap: 1em;
-      font-size: 2em;
+      --font-size: 2em;
 
-      --label-font-size: 0.5em;
     }
     ccc-icon {
       outline: 1px solid rgba(255,255,0,0.3);

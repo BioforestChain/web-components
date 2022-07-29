@@ -1,18 +1,20 @@
-import fs from "node:fs";
-import prettier from "prettier";
+const fs = require("node:fs");
+const path = require("node:path");
+const prettier = require("prettier");
 /**
  * @type {<T>(filepath:string)=>T}
  * @param {string} filepath
  */
-export const importJson = filepath => {
+const importJson = filepath => {
   try {
     return Function(`return (${fs.readFileSync(filepath, "utf-8")})`)();
   } catch {}
 };
+exports.importJson = importJson;
 
-import prettierRc from "../../.prettierrc.json" assert { type: "json" };
+const prettierRc = importJson(path.join(__dirname, "../../.prettierrc.json"));
 
-export const exportJson = (filepath, jsonContent, opts = {}) => {
+const exportJson = (filepath, jsonContent, opts = {}) => {
   const { autoRemoveEmptyObjectKeys } = opts;
   if (autoRemoveEmptyObjectKeys) {
     jsonContent = { ...jsonContent };
@@ -35,8 +37,9 @@ export const exportJson = (filepath, jsonContent, opts = {}) => {
     }),
   );
 };
+exports.exportJson = exportJson;
 
-export const exportTs = (filepath, tsContent, opts = {}) => {
+const exportTs = (filepath, tsContent, opts = {}) => {
   fs.writeFileSync(
     filepath,
     prettier.format(tsContent, {
@@ -45,3 +48,5 @@ export const exportTs = (filepath, tsContent, opts = {}) => {
     }),
   );
 };
+
+exports.exportTs = exportTs;

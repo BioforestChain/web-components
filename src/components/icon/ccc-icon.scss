@@ -1,16 +1,16 @@
-@import "variables";
-
 :host {
   display: flex;
 
   /*这里和icon-button保持一致的基本风格*/
   .icon {
-    width: var(--icon-width, 2em);
-    height: var(--icon-height, 2em);
-    display: flex;
+    display: grid;
+    grid: 1fr/1fr;
+    grid-template-areas: "count";
+    justify-items: center;
     align-items: center;
-    flex-wrap: nowrap;
-    justify-content: center;
+    .path {
+      grid-area: count;
+    }
   }
   ::slotted(*),
   .label {
@@ -36,157 +36,5 @@
   ::slotted(*),
   .label {
     --label-line-height: var(--column-line-height, 1);
-  }
-}
-
-.icon {
-  /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: "ccchain-icon" !important;
-  speak: never;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-  display: inline-block;
-
-  /* Better Font Rendering =========== */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-:host([name="small-down"]) .icon {
-  .path1 {
-    &:before {
-      content: $ccc-small-down-path1;
-      color: var(--color-1, rgb(143, 170, 204));
-    }
-  }
-  .path2 {
-    &:before {
-      content: $ccc-small-down-path2;
-      margin-left: -1em;
-      color: var(--color-2, rgb(255, 255, 255));
-    }
-  }
-}
-:host([name="paper-plane"]) .icon {
-  .path1 {
-    &:before {
-      content: $ccc-paper-plane-path1;
-      color: var(--color-1, rgb(44, 139, 255));
-    }
-  }
-  .path2 {
-    &:before {
-      content: $ccc-paper-plane-path2;
-      margin-left: -1em;
-      color: var(--color-2, rgb(255, 255, 255));
-    }
-  }
-}
-:host([name="cancel"]) .icon {
-  .path1 {
-    &:before {
-      content: $ccc-cancel-path1;
-      color: var(--color-1, rgb(247, 69, 69));
-    }
-  }
-  .path2 {
-    &:before {
-      content: $ccc-cancel-path2;
-      margin-left: -1em;
-      color: var(--color-2, rgb(255, 255, 255));
-    }
-  }
-}
-:host([name="link"]) .icon {
-  .path1 {
-    &:before {
-      content: $ccc-link-path1;
-      color: var(--color-1, rgb(64, 147, 250));
-    }
-  }
-  .path2 {
-    &:before {
-      content: $ccc-link-path2;
-      margin-left: -1em;
-      color: var(--color-2, rgb(255, 255, 255));
-    }
-  }
-}
-:host([name="warning"]) .icon {
-  .path1 {
-    &:before {
-      content: $ccc-warning-path1;
-      color: var(--color-1, rgb(247, 69, 69));
-    }
-  }
-  .path2 {
-    &:before {
-      content: $ccc-warning-path2;
-      margin-left: -1em;
-      color: var(--color-2, rgb(255, 255, 255));
-    }
-  }
-}
-:host([name="eye"]) .icon {
-  .path1 {
-    &:before {
-      content: $ccc-eye-path1;
-      color: var(--color-1, rgb(255, 179, 65));
-    }
-  }
-  .path2 {
-    &:before {
-      content: $ccc-eye-path2;
-      margin-left: -1em;
-      color: var(--color-2, rgb(255, 255, 255));
-    }
-  }
-}
-:host([name="big-currency"]) .icon {
-  &:before {
-    content: $ccc-big-currency;
-  }
-}
-:host([name="history"]) .icon {
-  &:before {
-    content: $ccc-history;
-  }
-}
-:host([name="collection"]) .icon {
-  &:before {
-    content: $ccc-collection;
-  }
-}
-:host([name="circle-diamond"]) .icon {
-  &:before {
-    content: $ccc-circle-diamond;
-  }
-}
-:host([name="comment"]) .icon {
-  &:before {
-    content: $ccc-comment;
-  }
-}
-:host([name="share"]) .icon {
-  &:before {
-    content: $ccc-share;
-  }
-}
-:host([name="check"]) .icon {
-  &:before {
-    content: $ccc-check;
-  }
-}
-:host([name="dislike"]) .icon {
-  &:before {
-    content: $ccc-dislike;
-  }
-}
-:host([name="like"]) .icon {
-  &:before {
-    content: $ccc-like;
   }
 }

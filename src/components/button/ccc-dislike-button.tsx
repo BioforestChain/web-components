@@ -47,7 +47,7 @@ export class CccButtonDislike implements ComponentInterface {
       {
         src: getAssetPath("./assets/dislike.webp"),
         frames: 48,
-        duration: "2s",
+        duration: "1.6s",
         checkedColor: `#549deb`,
       },
       this,

@@ -7,7 +7,8 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { $SpritDirection } from "./components/util/ccc-animation-icon";
 import { $Color, $Direction } from "./components/util/ccc-image-toggle-button.const";
-import { $Direction as $Direction1, $IconName } from "./components/icon/ccc-icon.const";
+import { $CccIconName } from "./components/icon/ccc-icon.name";
+import { $Direction as $Direction1 } from "./components/icon/ccc-icon.const";
 import { AnimationItem, RendererType } from "lottie-web";
 import { $Direction as $Direction2 } from "./components/util/ccc-lottie-web-toggle-button.const";
 export namespace Components {
@@ -77,7 +78,8 @@ export namespace Components {
     interface CccIcon {
         "direction": $Direction;
         "label": string;
-        "name": $IconName;
+        "name": $CccIconName;
+        "thin": boolean;
     }
     interface CccImageToggleButton {
         "checked": boolean;
@@ -319,8 +321,9 @@ declare namespace LocalJSX {
     interface CccIcon {
         "direction"?: $Direction;
         "label"?: string;
-        "name": $IconName;
+        "name": $CccIconName;
         "onCountChanged"?: (event: CccIconCustomEvent<number>) => void;
+        "thin"?: boolean;
     }
     interface CccImageToggleButton {
         "checked"?: boolean;

@@ -47,7 +47,7 @@ export class CccButtonLike implements ComponentInterface {
       {
         src: getAssetPath("./assets/like.webp"),
         frames: 48,
-        duration: "2s",
+        duration: "1.6s",
         checkedColor: `#549deb`,
       },
       this,

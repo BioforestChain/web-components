@@ -29,7 +29,7 @@ export class CccButtonCollect implements ComponentInterface {
       {
         src: getAssetPath("./assets/collect.webp"),
         frames: 48,
-        duration: "2s",
+        duration: "1.6s",
         checkedColor: `#f7bd25`,
       },
       this,
