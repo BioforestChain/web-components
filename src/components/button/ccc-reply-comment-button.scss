@@ -4,23 +4,23 @@
 .count {
   color: cyan;
 }
-.reply-button{
-  background: #F1F2F3;
+.reply-button {
+  background: #f1f2f3;
   border-radius: 12px;
-  border: 1px solid #F1F2F3;
+  border: 1px solid #f1f2f3;
   height: 1.714em;
   // width: 6.214em;
   padding: 0 0.86em;
   display: flex;
   justify-content: center;
   align-items: center;
-  span{
+  span {
     font-size: 0.86em;
   }
-  .reply{
-    margin:0 0.285em;
+  .reply {
+    margin: 0 0.285em;
   }
-  ion-icon{
+  ion-icon {
     font-size: 0.86em;
   }
 }

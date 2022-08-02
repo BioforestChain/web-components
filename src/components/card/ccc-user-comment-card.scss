@@ -3,21 +3,26 @@
   flex-direction: row;
   align-items: flex-start;
   font-size: inherit;
-  // gap: 0.5em;
+
+  --line-clamp: 5;
+  --line-height: 1.25em;
+  --avator-size: 2.3em;
 }
 .avator {
   display: flex;
   flex-shrink: 0;
   margin-right: 0.5em; //替换gap不生效
   img {
-    width: var(--avator-size, 2.3em);
-    height: var(--avator-size, 2.3em);
+    width: var(--avator-size);
+    height: var(--avator-size);
     border-radius: 50%;
     overflow: hidden;
   }
 }
 .comment {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 .header {
   display: flex;
@@ -60,14 +65,13 @@
 .text-wrapper {
   font-size: 1em;
   margin-top: 0.3em;
-  --line-clamp: 5;
-  --line-height: 1.25em;
 
   .text {
     display: -webkit-box;
     overflow: hidden;
     line-height: var(--line-height);
     line-break: anywhere;
+    transition-duration: 250ms;
     &.fold {
       text-overflow: ellipsis;
       text-align: justify;
@@ -80,14 +84,35 @@
     }
   }
 }
+.fold-btn {
+  all: unset;
+  align-self: flex-end;
+  display: flex;
+  align-items: flex-end;
+  flex-direction: row-reverse;
+
+  width: 50%;
+  text-align: right;
+  height: calc(1 * var(--line-height));
+
+  cursor: pointer;
+  color: #3e93fa;
+  background-image: linear-gradient(-45deg, #fff, transparent);
+
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  &.fold {
+    height: calc(2 * var(--line-height));
+    margin-top: calc(-2 * var(--line-height));
+  }
+}
 
 .actions-bar {
   display: flex;
   flex-direction: column;
-  .fold {
-    width: 100%;
-    text-align: right;
-  }
+
+  padding-top: 0.5em;
+
   .actions {
     display: flex;
     flex-direction: row;
@@ -102,11 +127,4 @@
       //
     }
   }
-}
-.fold-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: #3e93fa;
 }
