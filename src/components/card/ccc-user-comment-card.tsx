@@ -90,15 +90,20 @@ export class CccUserCommentCard implements ComponentInterface {
             </div>
           </div>
           <div class="actions-bar">
-            <div class="left-actions">
+            <div class="fold">
               {this.canFlod ? (
                 <button class="fold-btn" onClick={this.toggleFold}>
                   {this.isFlod ? <slot name="unfold">展开</slot> : <slot name="fold">收起</slot>}
                 </button>
               ) : undefined}
             </div>
-            <div class="right-actions">
-              <slot name="actions" />
+            <div class="actions">
+              <div class="left-actions">
+                <slot name="reply" />
+              </div>
+              <div class="right-actions">
+                <slot name="actions" />
+              </div>
             </div>
           </div>
         </div>

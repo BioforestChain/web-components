@@ -83,13 +83,24 @@
 
 .actions-bar {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0.8em;
-  > .right-actions {
+  flex-direction: column;
+  .fold {
+    width: 100%;
+    text-align: right;
+  }
+  .actions {
     display: flex;
-    // gap: 0.5em;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5em;
+    > .left-actions {
+      display: flex;
+    }
+    > .right-actions {
+      display: flex;
+      //
+    }
   }
 }
 .fold-btn {

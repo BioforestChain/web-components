@@ -1,4 +1,4 @@
-# ccc-button-collect
+# ccc-reply-comment-button
 
 
 
@@ -7,29 +7,17 @@
 
 ## Properties
 
-| Property    | Attribute   | Description | Type                 | Default   |
-| ----------- | ----------- | ----------- | -------------------- | --------- |
-| `checked`   | `checked`   |             | `boolean`            | `false`   |
-| `color`     | `color`     |             | `"black" \| "white"` | `"black"` |
-| `count`     | `count`     |             | `number`             | `0`       |
-| `direction` | `direction` |             | `"lr" \| "tb"`       | `"lr"`    |
-| `disabled`  | `disabled`  |             | `boolean`            | `false`   |
-| `icononly`  | `icononly`  |             | `boolean`            | `false`   |
+| Property | Attribute | Description | Type     | Default |
+| -------- | --------- | ----------- | -------- | ------- |
+| `count`  | `count`   | click count | `number` | `0`     |
 
 
-## Dependencies
+## Events
 
-### Depends on
+| Event          | Description | Type                  |
+| -------------- | ----------- | --------------------- |
+| `countChanged` |             | `CustomEvent<number>` |
 
-- [ccc-image-toggle-button](../util)
-
-### Graph
-```mermaid
-graph TD;
-  ccc-like-button --> ccc-image-toggle-button
-  ccc-image-toggle-button --> ccc-animation-icon
-  style ccc-like-button fill:#f9f,stroke:#333,stroke-width:4px
-```
 
 ----------------------------------------------
 

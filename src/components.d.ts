@@ -136,6 +136,12 @@ export namespace Components {
         "labelColor": string;
         "name": string;
     }
+    interface CccReplyCommentButton {
+        /**
+          * click count
+         */
+        "count": number;
+    }
     interface CccTemplate {
         /**
           * click count
@@ -170,6 +176,10 @@ export interface CccLottieWebCustomEvent<T> extends CustomEvent<T> {
 export interface CccLottieWebToggleButtonCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLCccLottieWebToggleButtonElement;
+}
+export interface CccReplyCommentButtonCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLCccReplyCommentButtonElement;
 }
 export interface CccTemplateCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -234,6 +244,12 @@ declare global {
         prototype: HTMLCccLottieWebToggleButtonElement;
         new (): HTMLCccLottieWebToggleButtonElement;
     };
+    interface HTMLCccReplyCommentButtonElement extends Components.CccReplyCommentButton, HTMLStencilElement {
+    }
+    var HTMLCccReplyCommentButtonElement: {
+        prototype: HTMLCccReplyCommentButtonElement;
+        new (): HTMLCccReplyCommentButtonElement;
+    };
     interface HTMLCccTemplateElement extends Components.CccTemplate, HTMLStencilElement {
     }
     var HTMLCccTemplateElement: {
@@ -256,6 +272,7 @@ declare global {
         "ccc-like-button": HTMLCccLikeButtonElement;
         "ccc-lottie-web": HTMLCccLottieWebElement;
         "ccc-lottie-web-toggle-button": HTMLCccLottieWebToggleButtonElement;
+        "ccc-reply-comment-button": HTMLCccReplyCommentButtonElement;
         "ccc-template": HTMLCccTemplateElement;
         "ccc-user-comment-card": HTMLCccUserCommentCardElement;
     }
@@ -378,6 +395,13 @@ declare namespace LocalJSX {
         "name"?: string;
         "onCheckedChange"?: (event: CccLottieWebToggleButtonCustomEvent<boolean>) => void;
     }
+    interface CccReplyCommentButton {
+        /**
+          * click count
+         */
+        "count"?: number;
+        "onCountChanged"?: (event: CccReplyCommentButtonCustomEvent<number>) => void;
+    }
     interface CccTemplate {
         /**
           * click count
@@ -404,6 +428,7 @@ declare namespace LocalJSX {
         "ccc-like-button": CccLikeButton;
         "ccc-lottie-web": CccLottieWeb;
         "ccc-lottie-web-toggle-button": CccLottieWebToggleButton;
+        "ccc-reply-comment-button": CccReplyCommentButton;
         "ccc-template": CccTemplate;
         "ccc-user-comment-card": CccUserCommentCard;
     }
@@ -421,6 +446,7 @@ declare module "@stencil/core" {
             "ccc-like-button": LocalJSX.CccLikeButton & JSXBase.HTMLAttributes<HTMLCccLikeButtonElement>;
             "ccc-lottie-web": LocalJSX.CccLottieWeb & JSXBase.HTMLAttributes<HTMLCccLottieWebElement>;
             "ccc-lottie-web-toggle-button": LocalJSX.CccLottieWebToggleButton & JSXBase.HTMLAttributes<HTMLCccLottieWebToggleButtonElement>;
+            "ccc-reply-comment-button": LocalJSX.CccReplyCommentButton & JSXBase.HTMLAttributes<HTMLCccReplyCommentButtonElement>;
             "ccc-template": LocalJSX.CccTemplate & JSXBase.HTMLAttributes<HTMLCccTemplateElement>;
             "ccc-user-comment-card": LocalJSX.CccUserCommentCard & JSXBase.HTMLAttributes<HTMLCccUserCommentCardElement>;
         }

@@ -169,3 +169,28 @@ export const cccLikeButtonKit = (() => {
   };
   return { argsFactory, storyFactory, $Args: {} as Partial<JSX.CccLikeButton> };
 })();
+
+export const cccReplyCommentButtonKit = (() => {
+  const argsFactory = new ArgFactory<JSX.CccReplyCommentButton>()
+    .defineNumber("count", {
+      defaultValue: 0,
+      description: "click count",
+      required: false,
+    })
+    .defineAction("onCountChanged", {
+      description: "",
+    });
+
+  const storyFactory = (
+    slot: (args: Partial<Partial<JSX.CccReplyCommentButton>>) => HTMLTemplateResult,
+    args?: Partial<JSX.CccReplyCommentButton>,
+  ) => {
+    return defineStory<JSX.CccReplyCommentButton>(args => {
+      return html`<ccc-reply-comment-button .count=${args.count} @countChanged=${args.onCountChanged}>
+        <!-- custom child elements -->
+        ${slot(args)}
+      </ccc-reply-comment-button>`;
+    }, argsFactory.toArgs(args));
+  };
+  return { argsFactory, storyFactory, $Args: {} as Partial<JSX.CccReplyCommentButton> };
+})();
