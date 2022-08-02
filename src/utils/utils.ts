@@ -6,7 +6,7 @@ export function bindThis<T extends Function>(
   descriptor: TypedPropertyDescriptor<T>,
 ): TypedPropertyDescriptor<T> | void {
   if (!descriptor || typeof descriptor.value !== "function") {
-    throw new TypeError(`Only methods can be decorated with @bind. <${propertyKey}> is not a method!`);
+    throw new TypeError(`Only methods can be decorated with @bindThis. <${propertyKey}> is not a method!`);
   }
 
   return {
@@ -152,39 +152,265 @@ function _cleanGetterCache<T extends object>(target: T, prop: keyof T, CACHE_VAL
   Reflect.deleteProperty(cacheValue.target, prop);
   return true;
 }
-/*
-// node .\packages\decorator\build\cjs\cacheGetter.js
-class A {
-  b = 1;
-  @cacheGetter
-  get a() {
-    return this.b;
+
+type InnerFinallyArg<T> =
+  | {
+      readonly status: "resolved";
+      readonly result: T;
+    }
+  | {
+      readonly status: "rejected";
+      readonly reason?: unknown;
+    };
+type InnerFinally<T> = (arg: InnerFinallyArg<T>) => unknown;
+type InnerThen<T> = (result: T) => unknown;
+type InnerCatch = (reason?: unknown) => unknown;
+export class PromiseOut<T = unknown> {
+  promise: Promise<T>;
+  is_resolved = false;
+  is_rejected = false;
+  is_finished = false;
+  value?: T;
+  reason?: unknown;
+  resolve!: (value: T | PromiseLike<T>) => void;
+  reject!: (reason?: unknown) => void;
+  private _innerFinally?: InnerFinally<T>[];
+  private _innerFinallyArg?: InnerFinallyArg<T>;
+
+  private _innerThen?: InnerThen<T>[];
+  private _innerCatch?: InnerCatch[];
+
+  constructor() {
+    this.promise = new Promise<T>((resolve, reject) => {
+      this.resolve = async (value: T | PromiseLike<T>) => {
+        try {
+          this.is_resolved = true;
+          this.is_finished = true;
+          resolve((this.value = await value));
+          this._runThen();
+          this._innerFinallyArg = Object.freeze({ status: "resolved", result: this.value });
+          this._runFinally();
+        } catch (err) {
+          this.reject(err);
+        }
+      };
+      this.reject = (reason?: unknown) => {
+        this.is_rejected = true;
+        this.is_finished = true;
+        reject((this.reason = reason));
+        this._runCatch();
+        this._innerFinallyArg = Object.freeze({ status: "rejected", reason: this.reason });
+        this._runFinally();
+      };
+    });
+  }
+  onSuccess(innerThen: InnerThen<T>) {
+    if (this.is_resolved) {
+      this.__callInnerThen(innerThen);
+    } else {
+      (this._innerThen || (this._innerThen = [])).push(innerThen);
+    }
+  }
+  onError(innerCatch: InnerCatch) {
+    if (this.is_rejected) {
+      this.__callInnerCatch(innerCatch);
+    } else {
+      (this._innerCatch || (this._innerCatch = [])).push(innerCatch);
+    }
+  }
+  onFinished(innerFinally: () => unknown) {
+    if (this.is_finished) {
+      this.__callInnerFinally(innerFinally);
+    } else {
+      (this._innerFinally || (this._innerFinally = [])).push(innerFinally);
+    }
+  }
+  private _runFinally() {
+    if (this._innerFinally) {
+      for (const innerFinally of this._innerFinally) {
+        this.__callInnerFinally(innerFinally);
+      }
+      this._innerFinally = undefined;
+    }
+  }
+  private __callInnerFinally(innerFinally: InnerFinally<T>) {
+    queueMicrotask(async () => {
+      try {
+        await innerFinally(this._innerFinallyArg!);
+      } catch (err) {
+        console.error("Unhandled promise rejection when running onFinished", innerFinally, err);
+      }
+    });
+  }
+  private _runThen() {
+    if (this._innerThen) {
+      for (const innerThen of this._innerThen) {
+        this.__callInnerThen(innerThen);
+      }
+      this._innerThen = undefined;
+    }
+  }
+  private _runCatch() {
+    if (this._innerCatch) {
+      for (const innerCatch of this._innerCatch) {
+        this.__callInnerCatch(innerCatch);
+      }
+      this._innerCatch = undefined;
+    }
+  }
+  private __callInnerThen(innerThen: InnerThen<T>) {
+    queueMicrotask(async () => {
+      try {
+        await innerThen(this.value!);
+      } catch (err) {
+        console.error("Unhandled promise rejection when running onSuccess", innerThen, err);
+      }
+    });
+  }
+  private __callInnerCatch(innerCatch: InnerCatch) {
+    queueMicrotask(async () => {
+      try {
+        await innerCatch(this.value!);
+      } catch (err) {
+        console.error("Unhandled promise rejection when running onError", innerCatch, err);
+      }
+    });
   }
 }
-const a = new A();
-a.b = 2;
-console.assert(a.a === 2);
-a.b = 3;
-console.assert(a.a === 2);
 
-cleanGetterCache(a, "a");
-console.assert(a.a === 3);
+export function microtaskQueue<T extends Function>(
+  _target: object,
+  propertyKey: string,
+  descriptor: TypedPropertyDescriptor<T>,
+): TypedPropertyDescriptor<T> | void {
+  if (!descriptor || typeof descriptor.value !== "function") {
+    throw new TypeError(`Only methods can be decorated with @microtaskQueue. <${propertyKey}> is not a method!`);
+  }
+  const sourceFun = descriptor.value;
+  let runned: PromiseOut<unknown> | undefined;
+  const newFun = function (this: any, ...args: unknown[]) {
+    if (runned === undefined) {
+      runned = new PromiseOut();
+      queueMicrotask(() => {
+        try {
+          runned!.resolve(sourceFun.apply(this, args));
+        } catch (err) {
+          runned!.reject(err);
+        }
+        runned = undefined;
+      });
+    }
+    return runned.promise;
+  };
+  descriptor.value = newFun as unknown as T;
 
-a.b = 4;
+  return descriptor;
+}
 
-const a1 = Object.create(a);
-console.assert(a1.a === 3);
-cleanGetterCache(a1, "a");
-console.assert(a1.a === 4);
-a.b = 5;
-console.assert(a1.a === 4);
-console.assert(a.a === 5);
- */
+type DomQueryer = Document | Element | DocumentFragment;
 
-export const querySelectorAll = <T>(root: Element | DocumentFragment | null | undefined, selector: string) => {
+export const querySelectorAll = <T>(root: DomQueryer | null | undefined, selector: string) => {
   return Array.prototype.slice.call(root?.querySelectorAll(selector) ?? { length: 0 }) as T[];
 };
 
-export const querySelector = <T>(root: Element | DocumentFragment | null | undefined, selector: string) => {
+export const querySelector = <T>(root: DomQueryer | null | undefined, selector: string) => {
   return (root?.querySelector(selector) || undefined) as T | undefined;
+};
+
+export const at =
+  "at" in Array.prototype
+    ? <T>(arr: T[], index: number) => {
+        return arr.at(index);
+      }
+    : <T>(arr: T[], index: number) => {
+        index = index % arr.length;
+        return arr[index < 0 ? index + arr.length : index];
+      };
+
+export const enum LOGGER_LEVEL {
+  /// 启用全部
+  enable,
+  debug,
+  info,
+  warn,
+  error,
+  success,
+  /// 禁用全部
+  disable,
+}
+export class Logger {
+  constructor(private hostEle: HTMLElement) {}
+  private _tagName = this.hostEle.tagName.toLocaleLowerCase();
+  private _tagInfo = this._tagName + ":";
+  private _getLogLevel() {
+    switch (this.hostEle.dataset.cccDebug) {
+      case undefined:
+        const globalCccDebug = localStorage.getItem("ccc-debug");
+        if (globalCccDebug === "*" || globalCccDebug?.split(/[,\s]+/).includes(this._tagName)) {
+          return LOGGER_LEVEL.enable;
+        }
+        return LOGGER_LEVEL.disable;
+      case "enable":
+        return LOGGER_LEVEL.enable;
+      case "debug":
+        return LOGGER_LEVEL.debug;
+      case "info":
+        return LOGGER_LEVEL.info;
+      case "warn":
+        return LOGGER_LEVEL.warn;
+      case "error":
+        return LOGGER_LEVEL.error;
+      case "success":
+        return LOGGER_LEVEL.success;
+      case "disable":
+        return LOGGER_LEVEL.disable;
+    }
+    return LOGGER_LEVEL.disable;
+  }
+  isEnable(level: LOGGER_LEVEL) {
+    return this._getLogLevel() <= level;
+  }
+  debug(...args: unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.debug)) {
+      console.debug("%c" + this._tagInfo, "color:grey", ...args);
+    }
+  }
+  log(...args: unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.debug)) {
+      console.debug("%c" + this._tagInfo, "color:grey", ...args);
+    }
+  }
+  info(...args: unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.info)) {
+      console.info(this._tagInfo, ...args);
+    }
+  }
+  warn(...args: unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.warn)) {
+      console.warn(this._tagInfo, ...args);
+    }
+  }
+  error(...args: unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.error)) {
+      console.error(this._tagInfo, ...args);
+    }
+  }
+  success(...args: unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.success)) {
+      console.log("%c" + this._tagInfo, "color:green", ...args);
+    }
+  }
+}
+
+export const cssAnimationDurationToMs = (animationDuration: string) => {
+  let ms = 0;
+  const num = parseFloat(animationDuration);
+  if (animationDuration.endsWith("ms")) {
+    ms = num;
+  } else if (animationDuration.endsWith("s")) {
+    ms = num * 1000;
+  } else {
+    ms = parseFloat(animationDuration) || 0;
+  }
+  return ms;
 };

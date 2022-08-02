@@ -3,19 +3,31 @@ import { HTMLTemplateResult, render } from "lit-html";
 // import { SBScalarType } from "@storybook/client-api";
 // export const defineArgsType = () => {};
 export const defineStory = <T>(tpl: (args: Partial<T>) => HTMLTemplateResult, defaultArgs?: Partial<T>) => {
-  let onMount: (frag: DocumentFragment) => void | undefined;
+  const onMountCbs: Array<(frag: DocumentFragment) => void> = [];
+  const cssTexts: Array<string> = [];
   const Tpl = Object.assign(
     (args: Partial<T>) => {
       const wrapper = document.createDocumentFragment();
       render(tpl(args), wrapper);
-      onMount?.(wrapper);
+      for (const cssText of cssTexts) {
+        const styleEle = document.createElement("style");
+        styleEle.innerHTML = cssText;
+        wrapper.appendChild(styleEle);
+      }
+      for (const onMount of onMountCbs) {
+        onMount(wrapper);
+      }
       return wrapper;
     },
     {
       args: defaultArgs,
-      onMount(cb: NonNullable<typeof onMount>) {
-        onMount = cb;
+      onMount(cb: typeof onMountCbs[0]) {
+        onMountCbs.push(cb);
         return Tpl;
+      },
+      addStyle(cssText: string) {
+        cssTexts.push(cssText);
+        return Tpl
       },
     },
   );

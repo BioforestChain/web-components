@@ -1,6 +1,6 @@
 import { html } from "lit-html";
 import { cccCollectButtonKit } from "./autogen";
-import { insertThemeColorOnMount } from "./theme-helper";
+import { themeStyle } from "./theme-helper";
 
 export default {
   title: "Component/Button/Collect",
@@ -17,4 +17,4 @@ export const Base_Usage = cccCollectButtonKit
       // data: 0,
     },
   )
-  .onMount(insertThemeColorOnMount);
+  .addStyle(themeStyle);

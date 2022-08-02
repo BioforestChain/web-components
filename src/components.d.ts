@@ -142,6 +142,21 @@ export namespace Components {
          */
         "count": number;
     }
+    interface CccSlider {
+    }
+    interface CccSliderTabs {
+        "activedIndex"?: number;
+        /**
+          * 手动绑定或者解绑for元素 从而栏 <ccc-slider> 元素能主动 根据自己的生命周期来与 tabs 进行绑定联动
+          * @param _forEle
+          * @returns
+         */
+        "bindForElement": (_forEle?: HTMLElement | null | undefined) => Promise<void>;
+        /**
+          * the <ccc-silder> element id
+         */
+        "for"?: string;
+    }
     interface CccTemplate {
         /**
           * click count
@@ -180,6 +195,10 @@ export interface CccLottieWebToggleButtonCustomEvent<T> extends CustomEvent<T> {
 export interface CccReplyCommentButtonCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLCccReplyCommentButtonElement;
+}
+export interface CccSliderTabsCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLCccSliderTabsElement;
 }
 export interface CccTemplateCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -250,6 +269,18 @@ declare global {
         prototype: HTMLCccReplyCommentButtonElement;
         new (): HTMLCccReplyCommentButtonElement;
     };
+    interface HTMLCccSliderElement extends Components.CccSlider, HTMLStencilElement {
+    }
+    var HTMLCccSliderElement: {
+        prototype: HTMLCccSliderElement;
+        new (): HTMLCccSliderElement;
+    };
+    interface HTMLCccSliderTabsElement extends Components.CccSliderTabs, HTMLStencilElement {
+    }
+    var HTMLCccSliderTabsElement: {
+        prototype: HTMLCccSliderTabsElement;
+        new (): HTMLCccSliderTabsElement;
+    };
     interface HTMLCccTemplateElement extends Components.CccTemplate, HTMLStencilElement {
     }
     var HTMLCccTemplateElement: {
@@ -273,6 +304,8 @@ declare global {
         "ccc-lottie-web": HTMLCccLottieWebElement;
         "ccc-lottie-web-toggle-button": HTMLCccLottieWebToggleButtonElement;
         "ccc-reply-comment-button": HTMLCccReplyCommentButtonElement;
+        "ccc-slider": HTMLCccSliderElement;
+        "ccc-slider-tabs": HTMLCccSliderTabsElement;
         "ccc-template": HTMLCccTemplateElement;
         "ccc-user-comment-card": HTMLCccUserCommentCardElement;
     }
@@ -402,6 +435,16 @@ declare namespace LocalJSX {
         "count"?: number;
         "onCountChanged"?: (event: CccReplyCommentButtonCustomEvent<number>) => void;
     }
+    interface CccSlider {
+    }
+    interface CccSliderTabs {
+        "activedIndex"?: number;
+        /**
+          * the <ccc-silder> element id
+         */
+        "for"?: string;
+        "onActivedTabChange"?: (event: CccSliderTabsCustomEvent<[HTMLElement | null, number]>) => void;
+    }
     interface CccTemplate {
         /**
           * click count
@@ -429,6 +472,8 @@ declare namespace LocalJSX {
         "ccc-lottie-web": CccLottieWeb;
         "ccc-lottie-web-toggle-button": CccLottieWebToggleButton;
         "ccc-reply-comment-button": CccReplyCommentButton;
+        "ccc-slider": CccSlider;
+        "ccc-slider-tabs": CccSliderTabs;
         "ccc-template": CccTemplate;
         "ccc-user-comment-card": CccUserCommentCard;
     }
@@ -447,6 +492,8 @@ declare module "@stencil/core" {
             "ccc-lottie-web": LocalJSX.CccLottieWeb & JSXBase.HTMLAttributes<HTMLCccLottieWebElement>;
             "ccc-lottie-web-toggle-button": LocalJSX.CccLottieWebToggleButton & JSXBase.HTMLAttributes<HTMLCccLottieWebToggleButtonElement>;
             "ccc-reply-comment-button": LocalJSX.CccReplyCommentButton & JSXBase.HTMLAttributes<HTMLCccReplyCommentButtonElement>;
+            "ccc-slider": LocalJSX.CccSlider & JSXBase.HTMLAttributes<HTMLCccSliderElement>;
+            "ccc-slider-tabs": LocalJSX.CccSliderTabs & JSXBase.HTMLAttributes<HTMLCccSliderTabsElement>;
             "ccc-template": LocalJSX.CccTemplate & JSXBase.HTMLAttributes<HTMLCccTemplateElement>;
             "ccc-user-comment-card": LocalJSX.CccUserCommentCard & JSXBase.HTMLAttributes<HTMLCccUserCommentCardElement>;
         }

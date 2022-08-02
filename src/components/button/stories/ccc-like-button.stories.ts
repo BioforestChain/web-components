@@ -1,6 +1,6 @@
-import { html, render } from "lit-html";
+import { html } from "lit-html";
 import { cccLikeButtonKit } from "./autogen";
-import { insertThemeColorOnMount } from "./theme-helper";
+import { themeStyle } from "./theme-helper";
 
 export default {
   title: "Component/Button/Like",
@@ -17,4 +17,4 @@ export const Base_Usage = cccLikeButtonKit
       // data: 0,
     },
   )
-  .onMount(insertThemeColorOnMount);
+  .addStyle(themeStyle);
