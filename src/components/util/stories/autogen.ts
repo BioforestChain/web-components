@@ -49,7 +49,7 @@ export const cccAnimationIconKit = (() => {
     slot: (args: Partial<Partial<JSX.CccAnimationIcon>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccAnimationIcon>,
   ) => {
-    return defineStory<JSX.CccAnimationIcon>(args => {
+    return defineStory<JSX.CccAnimationIcon, HTMLCccAnimationIconElement>(args => {
       return html`<ccc-animation-icon
         ?actived=${args.actived}
         .direction=${args.direction}
@@ -79,7 +79,7 @@ export const cccConfigUtilKit = (() => {
     slot: (args: Partial<Partial<JSX.CccConfigUtil>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccConfigUtil>,
   ) => {
-    return defineStory<JSX.CccConfigUtil>(args => {
+    return defineStory<JSX.CccConfigUtil, HTMLCccConfigUtilElement>(args => {
       return html`<ccc-config-util .assetPath=${args.assetPath}>
         <!-- custom child elements -->
         ${slot(args)}
@@ -149,7 +149,7 @@ export const cccImageToggleButtonKit = (() => {
     slot: (args: Partial<Partial<JSX.CccImageToggleButton>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccImageToggleButton>,
   ) => {
-    return defineStory<JSX.CccImageToggleButton>(args => {
+    return defineStory<JSX.CccImageToggleButton, HTMLCccImageToggleButtonElement>(args => {
       return html`<ccc-image-toggle-button
         ?checked=${args.checked}
         .checkedColor=${args.checkedColor}
@@ -235,7 +235,7 @@ export const cccLottieWebKit = (() => {
     slot: (args: Partial<Partial<JSX.CccLottieWeb>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccLottieWeb>,
   ) => {
-    return defineStory<JSX.CccLottieWeb>(args => {
+    return defineStory<JSX.CccLottieWeb, HTMLCccLottieWebElement>(args => {
       return html`<ccc-lottie-web
         ?actived=${args.actived}
         ?autoplay=${args.autoplay}
@@ -309,7 +309,7 @@ export const cccLottieWebToggleButtonKit = (() => {
     slot: (args: Partial<Partial<JSX.CccLottieWebToggleButton>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccLottieWebToggleButton>,
   ) => {
-    return defineStory<JSX.CccLottieWebToggleButton>(args => {
+    return defineStory<JSX.CccLottieWebToggleButton, HTMLCccLottieWebToggleButtonElement>(args => {
       return html`<ccc-lottie-web-toggle-button
         .animationData=${args.animationData}
         ?checked=${args.checked}

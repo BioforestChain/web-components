@@ -17,7 +17,7 @@ export const cccTemplateKit = (() => {
     slot: (args: Partial<Partial<JSX.CccTemplate>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccTemplate>,
   ) => {
-    return defineStory<JSX.CccTemplate>(args => {
+    return defineStory<JSX.CccTemplate, HTMLCccTemplateElement>(args => {
       return html`<ccc-template .count=${args.count} @countChanged=${args.onCountChanged}>
         <!-- custom child elements -->
         ${slot(args)}

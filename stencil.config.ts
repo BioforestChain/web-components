@@ -125,6 +125,7 @@ export const config: Config = {
           const className = instanceName
             // 首字母大写
             .replace(/^\w/, s => s[0].toUpperCase());
+          const htmlClassName = `HTML${className}Element`;
 
           type kp = { t: KPT; k: string; p: string };
           const bindNames: kp[] = [];
@@ -216,7 +217,7 @@ export const config: Config = {
                 .join("\n")}
   
               const storyFactory = (slot: (args: Partial<Partial<JSX.${className}>>) => HTMLTemplateResult, args?: Partial<JSX.${className}>) => {
-                return defineStory<JSX.${className}>(args => {
+                return defineStory<JSX.${className}, ${htmlClassName}>(args => {
                   return html\`<${component.tag} ${bindNames
             .map(attrKp => `${attrKp.t}${attrKp.k}=\${args.${attrKp.p}}`)
             .join(" ")}>

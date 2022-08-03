@@ -152,7 +152,7 @@ export const cccIconKit = (() => {
     slot: (args: Partial<Partial<JSX.CccIcon>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccIcon>,
   ) => {
-    return defineStory<JSX.CccIcon>(args => {
+    return defineStory<JSX.CccIcon, HTMLCccIconElement>(args => {
       return html`<ccc-icon
         .direction=${args.direction}
         .label=${args.label}

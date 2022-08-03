@@ -2,20 +2,36 @@ import type { ArgTypes, Conditional, InputType } from "@storybook/csf";
 import { HTMLTemplateResult, render } from "lit-html";
 // import { SBScalarType } from "@storybook/client-api";
 // export const defineArgsType = () => {};
-export const defineStory = <T>(tpl: (args: Partial<T>) => HTMLTemplateResult, defaultArgs?: Partial<T>) => {
-  const onMountCbs: Array<(frag: DocumentFragment) => void> = [];
+export const defineStory = <T, E extends HTMLElement = HTMLElement>(
+  tpl: (args: Partial<T>) => HTMLTemplateResult,
+  defaultArgs?: Partial<T>,
+) => {
+  const onMountCbs: Array<(frag: DocumentFragment, ele: E) => void> = [];
   const cssTexts: Array<string> = [];
+  const htmlTpls: Array<{ tpl: HTMLTemplateResult; pos: "before" | "after" }> = [];
   const Tpl = Object.assign(
     (args: Partial<T>) => {
       const wrapper = document.createDocumentFragment();
       render(tpl(args), wrapper);
+      const ele = wrapper.firstElementChild as unknown as E;
+
       for (const cssText of cssTexts) {
         const styleEle = document.createElement("style");
         styleEle.innerHTML = cssText;
         wrapper.appendChild(styleEle);
       }
+      for (const { tpl, pos } of htmlTpls) {
+        const f = document.createDocumentFragment();
+        render(tpl, f);
+        if (pos == "after") {
+          wrapper.appendChild(f);
+        } else if (pos == "before") {
+          wrapper.insertBefore(f, ele);
+        }
+      }
+
       for (const onMount of onMountCbs) {
-        onMount(wrapper);
+        onMount(wrapper, ele);
       }
       return wrapper;
     },
@@ -27,7 +43,11 @@ export const defineStory = <T>(tpl: (args: Partial<T>) => HTMLTemplateResult, de
       },
       addStyle(cssText: string) {
         cssTexts.push(cssText);
-        return Tpl
+        return Tpl;
+      },
+      addHtmlTpl(tpl: HTMLTemplateResult, pos: "before" | "after" = "after") {
+        htmlTpls.push({ tpl, pos });
+        return Tpl;
       },
     },
   );

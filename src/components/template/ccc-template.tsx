@@ -1,12 +1,16 @@
-import { Component, ComponentInterface, Event, EventEmitter, h, Host, Method, Prop } from "@stencil/core";
-import { bindThis } from "../../utils/utils";
+import { Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Method, Prop } from "@stencil/core";
+import { bindThis, Logger } from "../../utils/utils";
 
+let console!: Logger;
 @Component({
   tag: "ccc-template",
   styleUrl: "ccc-template.scss",
   shadow: true,
 })
 export class CccTemplate implements ComponentInterface {
+  @Element() hostEle!: HTMLElement;
+  readonly logger = (console = new Logger(this.hostEle));
+
   /**
    * click count
    */
@@ -19,6 +23,7 @@ export class CccTemplate implements ComponentInterface {
   @bindThis
   async inc() {
     this.count += 1;
+    console.log("inc", this.count);
     this.countChanged.emit(this.count);
   }
   render() {

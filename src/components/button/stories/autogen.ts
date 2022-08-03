@@ -44,7 +44,7 @@ export const cccCollectButtonKit = (() => {
     slot: (args: Partial<Partial<JSX.CccCollectButton>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccCollectButton>,
   ) => {
-    return defineStory<JSX.CccCollectButton>(args => {
+    return defineStory<JSX.CccCollectButton, HTMLCccCollectButtonElement>(args => {
       return html`<ccc-collect-button
         .checkLabel=${args.checkLabel}
         ?checked=${args.checked}
@@ -99,7 +99,7 @@ export const cccDislikeButtonKit = (() => {
     slot: (args: Partial<Partial<JSX.CccDislikeButton>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccDislikeButton>,
   ) => {
-    return defineStory<JSX.CccDislikeButton>(args => {
+    return defineStory<JSX.CccDislikeButton, HTMLCccDislikeButtonElement>(args => {
       return html`<ccc-dislike-button
         ?checked=${args.checked}
         .color=${args.color}
@@ -153,7 +153,7 @@ export const cccLikeButtonKit = (() => {
     slot: (args: Partial<Partial<JSX.CccLikeButton>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccLikeButton>,
   ) => {
-    return defineStory<JSX.CccLikeButton>(args => {
+    return defineStory<JSX.CccLikeButton, HTMLCccLikeButtonElement>(args => {
       return html`<ccc-like-button
         ?checked=${args.checked}
         .color=${args.color}
@@ -190,7 +190,7 @@ export const cccReplyCommentButtonKit = (() => {
     slot: (args: Partial<Partial<JSX.CccReplyCommentButton>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccReplyCommentButton>,
   ) => {
-    return defineStory<JSX.CccReplyCommentButton>(args => {
+    return defineStory<JSX.CccReplyCommentButton, HTMLCccReplyCommentButtonElement>(args => {
       return html`<ccc-reply-comment-button
         .commentId=${args.commentId}
         .replyNum=${args.replyNum}
