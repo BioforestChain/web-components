@@ -317,15 +317,16 @@ export const querySelector = <T>(root: DomQueryer | null | undefined, selector: 
   return (root?.querySelector(selector) || undefined) as T | undefined;
 };
 
-export const at =
-  "at" in Array.prototype
-    ? <T>(arr: T[], index: number) => {
-        return arr.at(index);
-      }
-    : <T>(arr: T[], index: number) => {
-        index = index % arr.length;
-        return arr[index < 0 ? index + arr.length : index];
-      };
+export const at = <T>(arr: T[], index: number, floor?: boolean) => {
+  index = index % arr.length;
+  index;
+  index = index < 0 ? index + arr.length : index;
+  if (floor) {
+    index = Math.floor(index);
+  }
+
+  return arr[index];
+};
 
 export const enum LOGGER_LEVEL {
   /// 启用全部

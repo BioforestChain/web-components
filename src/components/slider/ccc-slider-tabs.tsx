@@ -53,8 +53,11 @@ export class CccSliderTabs implements ComponentInterface {
     const activedIndex =
       (this.activedIndex === undefined ? -1 : Number.isSafeInteger(this.activedIndex) ? this.activedIndex : -1) %
       this._tabElements.length;
-    const selectedEle = at(this._tabElements, activedIndex);
+    const selectedEle = at(this._tabElements, activedIndex, true);
+    // 尝试选中新的tab对象
     this.selectTab(selectedEle);
+    // 更新插槽的css属性来做出动画，这里不和 selectTab 一起。因为 activedIndex 可能是小数
+    this._effectCursorLayout();
     this._canWriteAttr_activedIndex = true;
   }
 
@@ -91,6 +94,7 @@ export class CccSliderTabs implements ComponentInterface {
       cursorLayouts.push({ left, width });
     }
     this._cursorLayouts = cursorLayouts;
+    // 布局变更，重新绘制
     this._effectCursorLayout();
   }
 
@@ -169,6 +173,8 @@ export class CccSliderTabs implements ComponentInterface {
       return;
     }
     this.selectTab(ele.closest<HTMLElement>(`[slot="tab"]`));
+    // 更新插槽的css属性来做出动画
+    this._effectCursorLayout();
   };
   private selectTab(_newTabEle?: HTMLElement | null) {
     const newTabEle = _newTabEle instanceof HTMLElement ? _newTabEle : null;
@@ -188,9 +194,6 @@ export class CccSliderTabs implements ComponentInterface {
 
     /// 触发事件更新
     this.activedTabChange.emit([newTabEle, activedIndex]);
-
-    /// 更新插槽的css属性来做出动画
-    this._effectCursorLayout();
   }
 
   /**引用游标的插槽布局 */
@@ -201,17 +204,27 @@ export class CccSliderTabs implements ComponentInterface {
     const cursorEle = this._cursorEle;
     if (cursorEle) {
       const cursorEleStyle = cursorEle.style;
-      // const prevCursorLayout = this._cursorLayout;
       /// 获取新的布局目标
       let nextCursorLayout = DEFAULT_CURSOR_LAYOUT;
       const { activedIndex } = this;
+      let useAnimation = true;
+
       if (activedIndex !== undefined) {
-        const cursorLayout = at(this._cursorLayouts, activedIndex);
+        const progress = activedIndex % 1;
+        const cursorLayout = at(this._cursorLayouts, activedIndex, true);
         if (cursorLayout) {
           nextCursorLayout = cursorLayout;
         }
+        /// 如果有特殊的进度，那么不使用动画，直接依赖于属性过去
+        if (progress !== 0) {
+          useAnimation = false;
+          const cursorLayout = at(this._cursorLayouts, activedIndex + 1, true);
+          nextCursorLayout = {
+            left: (cursorLayout.left - nextCursorLayout.left) * progress + nextCursorLayout.left,
+            width: (cursorLayout.width - nextCursorLayout.width) * progress + nextCursorLayout.width,
+          };
+        }
       }
-      // this._cursorLayout = nextCursorLayout;
 
       /// 获取动画配置以及旧的布局目标
 
@@ -241,41 +254,42 @@ export class CccSliderTabs implements ComponentInterface {
       cursorEleStyle.setProperty("--cursor-to-left", nextCursorLayout.left + "px");
       cursorEleStyle.setProperty(
         "--cursor-to-right",
-        widthPx - (nextCursorLayout.left + nextCursorLayout.width) + "px",
+        `${widthPx - (nextCursorLayout.left + nextCursorLayout.width)}px`,
       );
-
-      cursorEle.animate(
-        [
+      if (useAnimation) {
+        cursorEle.animate(
+          [
+            {
+              composite: "replace",
+              paddingLeft: paddingLeft,
+            },
+            {
+              paddingLeft: `var(--cursor-to-left)`,
+            },
+          ],
           {
-            composite: "replace",
-            paddingLeft: paddingLeft,
+            duration: durationMs,
+            easing: diretion === "right" ? leftOut : leftIn,
+            fill: "forwards",
           },
+        );
+        cursorEle.animate(
+          [
+            {
+              composite: "replace",
+              paddingRight: paddingRight,
+            },
+            {
+              paddingRight: `var(--cursor-to-right)`,
+            },
+          ],
           {
-            paddingLeft: `var(--cursor-to-left)`,
+            duration: durationMs,
+            easing: diretion === "left" ? rightIn : rightOut,
+            fill: "forwards",
           },
-        ],
-        {
-          duration: durationMs,
-          easing: diretion === "right" ? leftOut : leftIn,
-          fill: "forwards",
-        },
-      );
-      cursorEle.animate(
-        [
-          {
-            composite: "replace",
-            paddingRight: paddingRight,
-          },
-          {
-            paddingRight: `var(--cursor-to-right)`,
-          },
-        ],
-        {
-          duration: durationMs,
-          easing: diretion === "left" ? rightIn : rightOut,
-          fill: "forwards",
-        },
-      );
+        );
+      }
     }
   }
 
