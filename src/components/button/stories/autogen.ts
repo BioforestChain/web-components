@@ -172,12 +172,17 @@ export const cccLikeButtonKit = (() => {
 
 export const cccReplyCommentButtonKit = (() => {
   const argsFactory = new ArgFactory<JSX.CccReplyCommentButton>()
-    .defineNumber("count", {
-      defaultValue: 0,
-      description: "click count",
+    .defineString("commentId", {
+      defaultValue: "",
+      description: "该条评论的id",
       required: false,
     })
-    .defineAction("onCountChanged", {
+    .defineNumber("replyNum", {
+      defaultValue: 0,
+      description: "评论数",
+      required: false,
+    })
+    .defineAction("onUserClick", {
       description: "",
     });
 
@@ -186,7 +191,11 @@ export const cccReplyCommentButtonKit = (() => {
     args?: Partial<JSX.CccReplyCommentButton>,
   ) => {
     return defineStory<JSX.CccReplyCommentButton>(args => {
-      return html`<ccc-reply-comment-button .count=${args.count} @countChanged=${args.onCountChanged}>
+      return html`<ccc-reply-comment-button
+        .commentId=${args.commentId}
+        .replyNum=${args.replyNum}
+        @userClick=${args.onUserClick}
+      >
         <!-- custom child elements -->
         ${slot(args)}
       </ccc-reply-comment-button>`;

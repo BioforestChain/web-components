@@ -138,9 +138,13 @@ export namespace Components {
     }
     interface CccReplyCommentButton {
         /**
-          * click count
+          * 该条评论的id
          */
-        "count": number;
+        "commentId": string;
+        /**
+          * 评论数
+         */
+        "replyNum": number;
     }
     interface CccSlider {
     }
@@ -430,10 +434,14 @@ declare namespace LocalJSX {
     }
     interface CccReplyCommentButton {
         /**
-          * click count
+          * 该条评论的id
          */
-        "count"?: number;
-        "onCountChanged"?: (event: CccReplyCommentButtonCustomEvent<number>) => void;
+        "commentId"?: string;
+        "onUserClick"?: (event: CccReplyCommentButtonCustomEvent<any>) => void;
+        /**
+          * 评论数
+         */
+        "replyNum"?: number;
     }
     interface CccSlider {
     }
