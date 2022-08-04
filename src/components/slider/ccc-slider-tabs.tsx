@@ -66,7 +66,7 @@ export class CccSliderTabs implements ComponentInterface {
   async getActivedIndex() {
     return this._activedIndex;
   }
-  private _setActivedIndex(activedIndex?: number, behavior: ScrollBehavior = "smooth") {
+  private _setActivedIndex(activedIndex?: number, _behavior: ScrollBehavior = "smooth") {
     if (activedIndex === undefined || Number.isSafeInteger(activedIndex) === false) {
       return;
     }
