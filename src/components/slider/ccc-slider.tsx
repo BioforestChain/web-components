@@ -12,6 +12,8 @@ import {
 } from "@stencil/core";
 import { at, Logger, querySelectorAll, throttle } from "../../utils/utils";
 
+const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
+
 let console!: Logger;
 @Component({
   tag: "ccc-slider",
@@ -81,6 +83,11 @@ export class CccSlider implements ComponentInterface {
   }
   //#endregion
 
+  /**
+   * 是否可以跨越多个slider进行滚动
+   */
+  @Prop({ reflect: true }) cross?: boolean;
+
   private _sliderEles: HTMLElement[] = [];
   public get sliderEles(): HTMLElement[] {
     return this._sliderEles;
@@ -143,15 +150,24 @@ export class CccSlider implements ComponentInterface {
   private async _updateSliderStates(layoutInfo = this._findSliderFrameLayoutInfo()) {
     console.info("updateSliderStates", "this._inScrollInto:", this._inScrollInto);
     const { closestSlider, viewboxCenter } = layoutInfo;
-    if (this._preSliderEles !== this.sliderEles || this._preActivedSlider !== closestSlider.ele) {
+    const { sliderEles } = this;
+    if (this._preSliderEles !== sliderEles || this._preActivedSlider !== closestSlider.ele) {
       this._preActivedSlider = closestSlider.ele;
-      this._preSliderEles = this.sliderEles;
-      for (const sliderEle of this.sliderEles) {
-        if (sliderEle !== closestSlider.ele) {
-          sliderEle.removeAttribute("data-ccc-slider");
+      this._preSliderEles = sliderEles;
+
+      let index = 0;
+      for (const sliderEle of sliderEles) {
+        if (index === closestSlider.index - 1) {
+          sliderEle.setAttribute(SLIDER_STATE_DATASET_KEY, "prev");
+        } else if (index === closestSlider.index) {
+          sliderEle.setAttribute(SLIDER_STATE_DATASET_KEY, "actived");
+        } else if (index === closestSlider.index + 1) {
+          sliderEle.setAttribute(SLIDER_STATE_DATASET_KEY, "next");
         } else {
-          sliderEle.setAttribute("data-ccc-slider", "actived");
+          sliderEle.removeAttribute(SLIDER_STATE_DATASET_KEY);
         }
+      }
+      if (closestSlider.index !== -1) {
       }
     }
 
@@ -171,19 +187,21 @@ export class CccSlider implements ComponentInterface {
     const viewboxCenter = viewboxScrollLeft + viewboxWidth / 2 + scrollLeft;
 
     let closestSlider = {
+      index: -1,
       ele: undefined as HTMLElement | undefined,
       left: 0,
       width: 0,
       center: 0,
     };
+    let index = 0;
     /// 从左往右，寻找中线现在进入到哪一个视图中
     for (const sliderEle of this.sliderEles) {
       const { offsetLeft, offsetWidth } = sliderEle;
       const offsetRight = offsetLeft + offsetWidth;
-
       if (offsetLeft <= viewboxCenter && viewboxCenter <= offsetRight) {
         const { offsetWidth } = sliderEle;
         closestSlider = {
+          index,
           ele: sliderEle,
           left: offsetLeft,
           width: offsetWidth,
@@ -191,6 +209,7 @@ export class CccSlider implements ComponentInterface {
         };
         break;
       }
+      index++;
     }
     return { closestSlider, viewboxCenter, viewboxScrollLeft, viewboxWidth };
   }
