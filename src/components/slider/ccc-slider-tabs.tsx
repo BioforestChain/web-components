@@ -19,6 +19,8 @@ type CursorLayout = {
 const DEFAULT_CURSOR_LAYOUT: CursorLayout = { width: 0, left: 0 };
 let console!: Logger;
 
+const TAB_STATE_DATASET_KEY = "data-ccc-slider-tabs";
+
 @Component({
   tag: "ccc-slider-tabs",
   styleUrl: "ccc-slider-tabs.scss",
@@ -207,7 +209,7 @@ export class CccSliderTabs implements ComponentInterface {
       }
     }
     /// 如果还是找不到，那么点击的区域有问题，直接跳过
-    if (tabEle === null) {
+    if (tabEle === null || tabEle.getAttribute(TAB_STATE_DATASET_KEY) === "disabled") {
       return;
     }
 
@@ -224,8 +226,8 @@ export class CccSliderTabs implements ComponentInterface {
     if (newTabEle === oldTabEle) {
       return;
     }
-    oldTabEle?.removeAttribute("data-ccc-slider-tabs");
-    newTabEle?.setAttribute("data-ccc-slider-tabs", "actived");
+    oldTabEle?.removeAttribute(TAB_STATE_DATASET_KEY);
+    newTabEle?.setAttribute(TAB_STATE_DATASET_KEY, "actived");
     const activedIndex = newTabEle ? this._tabElements.indexOf(newTabEle) : -1;
 
     /// 更新属性
@@ -342,7 +344,6 @@ export class CccSliderTabs implements ComponentInterface {
         <div class="tab-list" part="tabs">
           <slot name="tab"></slot>
         </div>
-        <slot></slot>
         <div class="cursor" part="cursor">
           <div class="spirit" part="spirit"></div>
         </div>
