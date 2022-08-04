@@ -72,10 +72,9 @@
     line-height: var(--line-height);
     line-break: anywhere;
     transition-duration: 250ms;
+    text-align: justify;
     &.fold {
       text-overflow: ellipsis;
-      text-align: justify;
-
       -webkit-line-clamp: var(--line-clamp);
       -webkit-box-orient: vertical;
 
@@ -88,7 +87,7 @@
   all: unset;
   align-self: flex-end;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   flex-direction: row-reverse;
 
   width: 50%;
