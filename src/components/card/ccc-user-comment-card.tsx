@@ -89,12 +89,12 @@ export class CccUserCommentCard implements ComponentInterface {
               <slot name="text">{this.text}</slot>
             </div>
           </div>
-          <div class="actions-bar">
-            {this.canFlod ? (
+          {this.canFlod ? (
               <button class={{ "fold-btn": true, "fold": this.isFlod }} onClick={this.toggleFold}>
                 {this.isFlod ? <slot name="unfold">展开</slot> : <slot name="fold">收起</slot>}
               </button>
             ) : undefined}
+          <div class="actions-bar">
             <div class="actions">
               <div class="left-actions">
                 <slot name="reply" />

@@ -87,12 +87,13 @@
   all: unset;
   align-self: flex-end;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   flex-direction: row-reverse;
 
   width: 50%;
   text-align: right;
   height: calc(1 * var(--line-height));
+  line-height: var(--line-height);
 
   cursor: pointer;
   color: #3e93fa;
