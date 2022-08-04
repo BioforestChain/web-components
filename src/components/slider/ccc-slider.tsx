@@ -188,9 +188,9 @@ export class CccSlider implements ComponentInterface {
     console.success("scroll stop");
     const { closestSlider, viewboxCenter, viewboxWidth } = this._findSliderFrameLayoutInfo();
     console.info(closestSlider);
-    this._inScrollInto = true;
     if (closestSlider.center !== viewboxCenter) {
-      // 校准滚动坐标
+      /// 校准滚动坐标
+      this._inScrollInto = true;
       // 这里不时用 closestSlider.ele.scrollIntoView，因为如果ele在滚动，那么可能久失效
       this.hostEle.scrollTo({ left: closestSlider.center - viewboxWidth / 2, behavior: "smooth" });
     } else {

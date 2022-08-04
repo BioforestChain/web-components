@@ -79,12 +79,14 @@ export class CccSliderTabs implements ComponentInterface {
     event: CustomEvent<[sliderEle: HTMLElement, activedIndex: number, isInControll: boolean]>,
   ) => {
     const [_, activedIndex, isInControll] = event.detail;
-    console.log("ActivedSliderChange", activedIndex, isInControll);
     if (isInControll) {
+      console.success("ActivedSliderChange", activedIndex);
       this._activedIndex = activedIndex;
       this.selectTab(at(this._tabElements, activedIndex, true));
       // 更新插槽的css属性来做出动画
       this._effectCursorLayout();
+    } else {
+      console.info("ActivedSliderChange", activedIndex);
     }
   };
 
@@ -292,7 +294,7 @@ export class CccSliderTabs implements ComponentInterface {
           ],
           {
             duration: durationMs,
-            easing: useAnimation ? (diretion === "right" ? leftOut : leftIn) : "linear",
+            easing: useAnimation ? (diretion === "right" ? leftOut : leftIn) : "ease-out",
             fill: "forwards",
           },
         );
@@ -308,7 +310,7 @@ export class CccSliderTabs implements ComponentInterface {
           ],
           {
             duration: durationMs,
-            easing: useAnimation ? (diretion === "left" ? rightIn : rightOut) : "linear",
+            easing: useAnimation ? (diretion === "left" ? rightIn : rightOut) : "ease-out",
             fill: "forwards",
           },
         );

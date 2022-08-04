@@ -60,6 +60,11 @@ export const With_Tabs = cccSliderKit
     `,
     "before",
   ).addStyle(`
+  #root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
   ccc-slider-tabs > .tab{
    width: 3em;
    text-align:center;
@@ -68,5 +73,8 @@ export const With_Tabs = cccSliderKit
     font-weight: bold;
     transform: scale(1.1);
     transition-duration: 250ms;
+  }
+  ccc-slider {
+    border-radius: 2em;
   }
   `);
