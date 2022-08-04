@@ -112,7 +112,8 @@ export class CccSlider implements ComponentInterface {
     console.info("setActivedIndex", activedIndex, ele);
     if (ele) {
       this._inScrollInto = true;
-      this.hostEle.scrollTo({ left: ele.offsetLeft, behavior });
+      const scrollLeft = ele.offsetLeft - this.hostEle.offsetLeft;
+      this.hostEle.scrollTo({ left: scrollLeft, behavior });
     }
   }
   @Method()
