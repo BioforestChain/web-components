@@ -196,8 +196,23 @@ export class CccSliderTabs implements ComponentInterface {
       return;
     }
     console.info("clicked");
+    let tabEle = ele.closest<HTMLElement>(`[slot="tab"]`);
+    /// 无法在结构上找到，那么只能根据X坐标来寻找
+    if (tabEle === null) {
+      for (const ele of this.tabElements) {
+        if (ele.offsetLeft <= event.clientX && event.clientX <= ele.offsetLeft + ele.offsetWidth) {
+          tabEle = ele;
+          break;
+        }
+      }
+    }
+    /// 如果还是找不到，那么点击的区域有问题，直接跳过
+    if (tabEle === null) {
+      return;
+    }
+
     // 选中点击的tab对象
-    this.selectTab(ele.closest<HTMLElement>(`[slot="tab"]`));
+    this.selectTab(tabEle);
     // 将变动同步到slider上
     this.selectFor();
     // 更新插槽的css属性来做出动画
