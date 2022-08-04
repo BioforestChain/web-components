@@ -40,7 +40,8 @@ export class CccSliderTabs implements ComponentInterface {
   }
   private selectFor() {
     if (this._forEle) {
-      this._forEle.activedIndex = Math.floor(this._activedIndex);
+      console.log("set forEle activedIndex as", this._activedIndex);
+      this._forEle.setActivedIndex(this._activedIndex);
     }
   }
 
@@ -194,6 +195,7 @@ export class CccSliderTabs implements ComponentInterface {
     if (!ele) {
       return;
     }
+    console.info("clicked");
     // 选中点击的tab对象
     this.selectTab(ele.closest<HTMLElement>(`[slot="tab"]`));
     // 将变动同步到slider上
@@ -217,6 +219,7 @@ export class CccSliderTabs implements ComponentInterface {
 
     /// 触发事件更新
     this.activedTabChange.emit([newTabEle, activedIndex]);
+    console.log("activedTabChange", newTabEle, activedIndex);
   }
 
   /**引用游标的插槽布局 */

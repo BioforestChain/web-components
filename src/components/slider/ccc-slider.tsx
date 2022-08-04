@@ -96,18 +96,22 @@ export class CccSlider implements ComponentInterface {
   @Prop({ reflect: true }) activedIndex = 0;
   @Watch("activedIndex")
   watchActivedIndex() {
-    const ele = at(this._sliderEles, this.activedIndex);
-    console.log("watchActivedIndex", this.activedIndex, ele);
-    if (ele) {
-      this._inScrollInto = true;
-      this.hostEle.scrollTo({ left: ele.offsetLeft, behavior: "smooth" });
-      // ele?.scrollIntoView({ behavior: "smooth" });
-    }
+    this.setActivedIndex(this.activedIndex);
   }
   private _activedIndex = 0;
   @Method()
   async getActivedIndex() {
     return this._activedIndex;
+  }
+  @Method()
+  async setActivedIndex(activedIndex: number) {
+    const ele = at(this._sliderEles, activedIndex, true);
+    console.info("watchActivedIndex", activedIndex, ele);
+    if (ele) {
+      this._inScrollInto = true;
+      this.hostEle.scrollTo({ left: ele.offsetLeft, behavior: "smooth" });
+      // ele?.scrollIntoView({ behavior: "smooth" });
+    }
   }
 
   @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement, activedIndex: number, isInControll: boolean]>;
@@ -121,11 +125,9 @@ export class CccSlider implements ComponentInterface {
    */
   @throttle(100)
   private async _updateSliderStates(layoutInfo = this._findSliderFrameLayoutInfo()) {
-    console.info("run _updateSliderStates");
+    console.info("updateSliderStates", "this._inScrollInto:", this._inScrollInto);
     const { closestSlider, viewboxCenter } = layoutInfo;
-    let changed = false;
     if (this._preSliderEles !== this.sliderEles || this._preActivedSlider !== closestSlider.ele) {
-      changed = true;
       this._preActivedSlider = closestSlider.ele;
       this._preSliderEles = this.sliderEles;
       for (const sliderEle of this.sliderEles) {
@@ -141,7 +143,6 @@ export class CccSlider implements ComponentInterface {
     /// 计算出 activedIndex
     const progress = (viewboxCenter - closestSlider.center) / closestSlider.width;
     const activedIndex = (this._activedIndex = this._sliderEles.indexOf(closestSlider.ele!) + progress);
-    console.info("this._inScrollInto", this._inScrollInto);
     this.activedSilderChange.emit([closestSlider.ele!, activedIndex, this._inScrollInto === false]);
     // }
   }
@@ -187,7 +188,7 @@ export class CccSlider implements ComponentInterface {
   private _handleScrollStop() {
     console.success("scroll stop");
     const { closestSlider, viewboxCenter, viewboxWidth } = this._findSliderFrameLayoutInfo();
-    console.info(closestSlider);
+    console.info("closestSlider:", closestSlider);
     if (closestSlider.center !== viewboxCenter) {
       /// 校准滚动坐标
       this._inScrollInto = true;
@@ -206,7 +207,7 @@ export class CccSlider implements ComponentInterface {
       if (this._inTouch === false) {
         this._scrollTick -= 1;
       }
-      console.debug("scroll tick", this._scrollTick);
+      console.verbose("scroll tick", this._scrollTick);
       if (this._scrollTick <= 0) {
         this._handleScrollStop();
         this._tickFrame = 0;

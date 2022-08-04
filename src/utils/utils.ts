@@ -344,7 +344,8 @@ export const at = <T>(arr: T[], index: number, floor?: boolean) => {
 export const enum LOGGER_LEVEL {
   /// 启用全部
   enable,
-  debug,
+  verbose,
+  log,
   info,
   warn,
   error,
@@ -355,7 +356,7 @@ export const enum LOGGER_LEVEL {
 export class Logger {
   constructor(private hostEle: HTMLElement) {}
   private _tagName = this.hostEle.tagName.toLocaleLowerCase();
-  private _tagInfo = this._tagName + ":";
+  private _tagInfo = `<${this._tagName}>:`;
   private _getLogLevel() {
     let cccDebug = this.hostEle.dataset.cccDebug;
     if (cccDebug === undefined) {
@@ -364,8 +365,8 @@ export class Logger {
         const configs = globalCccDebug.split(/[,\s]+/);
         if (
           configs.find(v => {
-            if (v.startsWith(this._tagInfo)) {
-              cccDebug = v.slice(this._tagInfo.length).trim();
+            if (v.startsWith(this._tagName + ":")) {
+              cccDebug = v.slice(this._tagName.length + 1).trim();
               return true;
             }
           })
@@ -387,8 +388,10 @@ export class Logger {
       case "*":
       case "enable":
         return LOGGER_LEVEL.enable;
-      case "debug":
-        return LOGGER_LEVEL.debug;
+      case "verbose":
+        return LOGGER_LEVEL.verbose;
+      case "log":
+        return LOGGER_LEVEL.log;
       case "info":
         return LOGGER_LEVEL.info;
       case "warn":
@@ -405,19 +408,19 @@ export class Logger {
   isEnable(level: LOGGER_LEVEL) {
     return this._getLogLevel() <= level;
   }
-  debug(...args: unknown[]) {
-    if (this.isEnable(LOGGER_LEVEL.debug)) {
-      console.debug("%c" + this._tagInfo, "color:grey", ...args);
+  verbose(...args: (string | number)[]) {
+    if (this.isEnable(LOGGER_LEVEL.verbose)) {
+      console.debug(`%c ${this._tagInfo} ${args.join(" ")}`, "color:#9e9e9e;font-size:0.8em;");
     }
   }
   log(...args: unknown[]) {
-    if (this.isEnable(LOGGER_LEVEL.debug)) {
-      console.debug("%c" + this._tagInfo, "color:grey", ...args);
+    if (this.isEnable(LOGGER_LEVEL.log)) {
+      console.debug("%c" + this._tagInfo, "color:#9e9e9e", ...args);
     }
   }
   info(...args: unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.info)) {
-      console.info(this._tagInfo, ...args);
+      console.info("%c" + this._tagInfo, "color:#00bcd4", ...args);
     }
   }
   warn(...args: unknown[]) {
@@ -432,7 +435,7 @@ export class Logger {
   }
   success(...args: unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.success)) {
-      console.log("%c" + this._tagInfo, "color:green", ...args);
+      console.log("%c" + this._tagInfo + "✔", "color:#4caf50", ...args);
     }
   }
 }
