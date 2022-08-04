@@ -278,7 +278,7 @@ export class PromiseOut<T = unknown> {
   }
 }
 
-const asyncFunctionProto = Function(`return Object.getPrototypeOf(async()=>{})`)();
+// const asyncFunctionProto = Function(`return Object.getPrototypeOf(async()=>{})`)();
 /**一个简单的节流修饰器 */
 export const throttle =
   (wait: number = 0) =>
@@ -289,8 +289,8 @@ export const throttle =
   ): TypedPropertyDescriptor<T> | void => {
     if (
       !descriptor ||
-      typeof descriptor.value !== "function" ||
-      Object.getPrototypeOf(descriptor.value) !== asyncFunctionProto
+      typeof descriptor.value !== "function" /*  ||
+      Object.getPrototypeOf(descriptor.value) !== asyncFunctionProto */
     ) {
       throw new TypeError(`Only async methods can be decorated with @throttle. <${propertyKey}> is not a method!`);
     }
