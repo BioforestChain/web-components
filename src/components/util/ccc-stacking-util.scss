@@ -1,0 +1,11 @@
+:host {
+  width: fit-content;
+  height: fit-content;
+  display: grid;
+  grid: 1fr/1fr;
+  grid-template-areas: "item";
+}
+::slotted(*),
+:host > slot > span {
+  grid-area: item;
+}

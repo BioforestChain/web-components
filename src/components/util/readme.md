@@ -7,42 +7,18 @@
 
 ## Properties
 
-| Property        | Attribute     | Description | Type                  | Default     |
-| --------------- | ------------- | ----------- | --------------------- | ----------- |
-| `animationData` | --            |             | `object \| undefined` | `undefined` |
-| `checked`       | `checked`     |             | `boolean`             | `false`     |
-| `direction`     | `direction`   |             | `"lr" \| "tb"`        | `"lr"`      |
-| `disabled`      | `disabled`    |             | `boolean`             | `false`     |
-| `icononly`      | `icononly`    |             | `boolean`             | `false`     |
-| `label`         | `label`       |             | `string`              | `""`        |
-| `labelColor`    | `label-color` |             | `string`              | `""`        |
-| `name`          | `name`        |             | `string`              | `""`        |
+| Property | Attribute | Description | Type                  | Default     |
+| -------- | --------- | ----------- | --------------------- | ----------- |
+| `text`   | `text`    |             | `string \| undefined` | `undefined` |
 
 
-## Events
+## Shadow Parts
 
-| Event           | Description | Type                   |
-| --------------- | ----------- | ---------------------- |
-| `checkedChange` |             | `CustomEvent<boolean>` |
+| Part      | Description |
+| --------- | ----------- |
+| `"back"`  |             |
+| `"front"` |             |
 
-
-## Dependencies
-
-### Used by
-
- - [ccc-lottie-web](.)
-
-### Depends on
-
-- [ccc-lottie-web](.)
-
-### Graph
-```mermaid
-graph TD;
-  ccc-lottie-web-toggle-button --> ccc-lottie-web
-  ccc-lottie-web --> ccc-lottie-web-toggle-button
-  style ccc-lottie-web-toggle-button fill:#f9f,stroke:#333,stroke-width:4px
-```
 
 ----------------------------------------------
 
