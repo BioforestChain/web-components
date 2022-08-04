@@ -42,7 +42,7 @@ export const cccUserCommentCardKit = (() => {
     slot: (args: Partial<Partial<JSX.CccUserCommentCard>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccUserCommentCard>,
   ) => {
-    return defineStory<JSX.CccUserCommentCard>(args => {
+    return defineStory<JSX.CccUserCommentCard, HTMLCccUserCommentCardElement>(args => {
       return html`<ccc-user-comment-card
         .lineClamp=${args.lineClamp}
         .text=${args.text}

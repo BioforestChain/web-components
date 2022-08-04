@@ -3,14 +3,22 @@ import type { JSX } from "../../../components";
 import { ArgFactory, defineStory } from "../../../stories/util";
 
 export const cccSliderKit = (() => {
-  const argsFactory = new ArgFactory<JSX.CccSlider>();
+  const argsFactory = new ArgFactory<JSX.CccSlider>()
+    .defineNumber("activedIndex", {
+      defaultValue: 0,
+      description: "",
+      required: false,
+    })
+    .defineAction("onActivedSilderChange", {
+      description: "",
+    });
 
   const storyFactory = (
     slot: (args: Partial<Partial<JSX.CccSlider>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccSlider>,
   ) => {
-    return defineStory<JSX.CccSlider>(args => {
-      return html`<ccc-slider>
+    return defineStory<JSX.CccSlider, HTMLCccSliderElement>(args => {
+      return html`<ccc-slider .activedIndex=${args.activedIndex} @activedSilderChange=${args.onActivedSilderChange}>
         <!-- custom child elements -->
         ${slot(args)}
       </ccc-slider>`;
@@ -39,7 +47,7 @@ export const cccSliderTabsKit = (() => {
     slot: (args: Partial<Partial<JSX.CccSliderTabs>>) => HTMLTemplateResult,
     args?: Partial<JSX.CccSliderTabs>,
   ) => {
-    return defineStory<JSX.CccSliderTabs>(args => {
+    return defineStory<JSX.CccSliderTabs, HTMLCccSliderTabsElement>(args => {
       return html`<ccc-slider-tabs
         .activedIndex=${args.activedIndex}
         .for=${args.for}

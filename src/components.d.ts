@@ -147,6 +147,8 @@ export namespace Components {
         "replyNum": number;
     }
     interface CccSlider {
+        "activedIndex": number;
+        "getActivedIndex": () => Promise<number>;
     }
     interface CccSliderTabs {
         "activedIndex"?: number;
@@ -160,6 +162,7 @@ export namespace Components {
           * the <ccc-silder> element id
          */
         "for"?: string;
+        "getActivedIndex": () => Promise<number>;
     }
     interface CccTemplate {
         /**
@@ -199,6 +202,10 @@ export interface CccLottieWebToggleButtonCustomEvent<T> extends CustomEvent<T> {
 export interface CccReplyCommentButtonCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLCccReplyCommentButtonElement;
+}
+export interface CccSliderCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLCccSliderElement;
 }
 export interface CccSliderTabsCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -444,6 +451,8 @@ declare namespace LocalJSX {
         "replyNum"?: number;
     }
     interface CccSlider {
+        "activedIndex"?: number;
+        "onActivedSilderChange"?: (event: CccSliderCustomEvent<[sliderEle: HTMLElement, activedIndex: number, isInControll: boolean]>) => void;
     }
     interface CccSliderTabs {
         "activedIndex"?: number;

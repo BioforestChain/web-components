@@ -278,34 +278,47 @@ export class PromiseOut<T = unknown> {
   }
 }
 
-export function microtaskQueue<T extends Function>(
-  _target: object,
-  propertyKey: string,
-  descriptor: TypedPropertyDescriptor<T>,
-): TypedPropertyDescriptor<T> | void {
-  if (!descriptor || typeof descriptor.value !== "function") {
-    throw new TypeError(`Only methods can be decorated with @microtaskQueue. <${propertyKey}> is not a method!`);
-  }
-  const sourceFun = descriptor.value;
-  let runned: PromiseOut<unknown> | undefined;
-  const newFun = function (this: any, ...args: unknown[]) {
-    if (runned === undefined) {
-      runned = new PromiseOut();
-      queueMicrotask(() => {
-        try {
-          runned!.resolve(sourceFun.apply(this, args));
-        } catch (err) {
-          runned!.reject(err);
-        }
-        runned = undefined;
-      });
+const asyncFunctionProto = Function(`return Object.getPrototypeOf(async()=>{})`)();
+/**一个简单的节流修饰器 */
+export const throttle =
+  (wait: number = 0) =>
+  <T extends Function>(
+    _target: object,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<T>,
+  ): TypedPropertyDescriptor<T> | void => {
+    if (
+      !descriptor ||
+      typeof descriptor.value !== "function" ||
+      Object.getPrototypeOf(descriptor.value) !== asyncFunctionProto
+    ) {
+      throw new TypeError(`Only async methods can be decorated with @throttle. <${propertyKey}> is not a method!`);
     }
-    return runned.promise;
-  };
-  descriptor.value = newFun as unknown as T;
+    const sourceFun = descriptor.value;
+    let runned: { po: PromiseOut<unknown>; startTime: number } | undefined;
+    const newFun = function (this: any, ...args: unknown[]) {
+      if (runned === undefined) {
+        const po = new PromiseOut();
+        const startTime = Date.now();
+        runned = { po, startTime };
+        const run = () => {
+          try {
+            po.resolve(sourceFun.apply(this, args));
+          } catch (err) {
+            po.reject(err);
+          }
+          if (runned?.po === po) {
+            runned = undefined;
+          }
+        };
+        wait <= 0 || Number.isSafeInteger(wait) === false ? queueMicrotask(run) : setTimeout(run, wait);
+      }
+      return runned.po.promise;
+    };
+    descriptor.value = newFun as unknown as T;
 
-  return descriptor;
-}
+    return descriptor;
+  };
 
 type DomQueryer = Document | Element | DocumentFragment;
 
@@ -325,7 +338,7 @@ export const at = <T>(arr: T[], index: number, floor?: boolean) => {
     index = Math.floor(index);
   }
 
-  return arr[index];
+  return arr[index] as T | undefined;
 };
 
 export const enum LOGGER_LEVEL {
@@ -344,13 +357,34 @@ export class Logger {
   private _tagName = this.hostEle.tagName.toLocaleLowerCase();
   private _tagInfo = this._tagName + ":";
   private _getLogLevel() {
-    switch (this.hostEle.dataset.cccDebug) {
-      case undefined:
-        const globalCccDebug = localStorage.getItem("ccc-debug");
-        if (globalCccDebug === "*" || globalCccDebug?.split(/[,\s]+/).includes(this._tagName)) {
-          return LOGGER_LEVEL.enable;
+    let cccDebug = this.hostEle.dataset.cccDebug;
+    if (cccDebug === undefined) {
+      const globalCccDebug = localStorage.getItem("ccc-debug");
+      if (globalCccDebug) {
+        const configs = globalCccDebug.split(/[,\s]+/);
+        if (
+          configs.find(v => {
+            if (v.startsWith(this._tagInfo)) {
+              cccDebug = v.slice(this._tagInfo.length).trim();
+              return true;
+            }
+          })
+        ) {
+        } else if (
+          configs.find(v => {
+            if (v.startsWith("*:")) {
+              cccDebug = v.slice(2).trim();
+              return true;
+            }
+          })
+        ) {
+        } else if (configs.includes("*")) {
+          cccDebug = "*";
         }
-        return LOGGER_LEVEL.disable;
+      }
+    }
+    switch (cccDebug) {
+      case "*":
       case "enable":
         return LOGGER_LEVEL.enable;
       case "debug":
@@ -363,8 +397,8 @@ export class Logger {
         return LOGGER_LEVEL.error;
       case "success":
         return LOGGER_LEVEL.success;
-      case "disable":
-        return LOGGER_LEVEL.disable;
+      // case "disable":
+      //   return LOGGER_LEVEL.disable;
     }
     return LOGGER_LEVEL.disable;
   }

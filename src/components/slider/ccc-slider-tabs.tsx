@@ -10,20 +10,14 @@ import {
   Prop,
   Watch,
 } from "@stencil/core";
-import {
-  at,
-  cssAnimationDurationToMs,
-  Logger,
-  microtaskQueue,
-  querySelector,
-  querySelectorAll,
-} from "../../utils/utils";
+import { at, cssAnimationDurationToMs, Logger, throttle, querySelector, querySelectorAll } from "../../utils/utils";
 
 type CursorLayout = {
   width: number;
   left: number;
 };
 const DEFAULT_CURSOR_LAYOUT: CursorLayout = { width: 0, left: 0 };
+let console!: Logger;
 
 @Component({
   tag: "ccc-slider-tabs",
@@ -32,7 +26,7 @@ const DEFAULT_CURSOR_LAYOUT: CursorLayout = { width: 0, left: 0 };
 })
 export class CccSliderTabs implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
-  readonly logger = new Logger(this.hostEle);
+  readonly logger = (console = new Logger(this.hostEle));
   /**
    * the <ccc-silder> element id
    */
@@ -44,28 +38,56 @@ export class CccSliderTabs implements ComponentInterface {
     this.bindForElement(this.for ? querySelector<HTMLCccSliderElement>(document, `#${this.for}`) : null);
     this._canWriteAttr_for = true;
   }
+  private selectFor() {
+    if (this._forEle) {
+      this._forEle.activedIndex = Math.floor(this._activedIndex);
+    }
+  }
 
-  @Prop({ reflect: true, mutable: true }) activedIndex?: number = 0;
-  private _canWriteAttr_activedIndex = true;
+  // /**
+  //  * 是否跟随着for元素
+  //  * 如果true，那么它的activedIndex不会反应给for元素
+  //  * 在for元素要对其进行控制的时候，它会被控制成true
+  //  */
+  // @Prop({ reflect: true, mutable: true }) followFor?: boolean;
+
+  @Prop({ reflect: true }) activedIndex?: number = 0;
   @Watch("activedIndex")
   watchActivedIndex() {
-    this._canWriteAttr_activedIndex = false;
     const activedIndex =
       (this.activedIndex === undefined ? -1 : Number.isSafeInteger(this.activedIndex) ? this.activedIndex : -1) %
       this._tabElements.length;
-    const selectedEle = at(this._tabElements, activedIndex, true);
+    this._activedIndex = activedIndex;
     // 尝试选中新的tab对象
-    this.selectTab(selectedEle);
+    this.selectTab();
+    // 将变动同步到slider上
+    this.selectFor();
     // 更新插槽的css属性来做出动画，这里不和 selectTab 一起。因为 activedIndex 可能是小数
     this._effectCursorLayout();
-    this._canWriteAttr_activedIndex = true;
+  }
+
+  private _activedIndex = 0;
+  @Method()
+  async getActivedIndex() {
+    return this._activedIndex;
   }
 
   @Event() activedTabChange!: EventEmitter<[HTMLElement | null, number]>;
 
-  private _forEle: HTMLElement | null = null;
-  private _onForEleScroll = (event: Event) => {
-    event.target;
+  private _forEle: HTMLCccSliderElement | null = null;
+  private _onForEleActivedSliderChange = (
+    event: CustomEvent<[sliderEle: HTMLElement, activedIndex: number, isInControll: boolean]>,
+  ) => {
+    const [_, activedIndex, isInControll] = event.detail;
+    if (isInControll) {
+      console.success("ActivedSliderChange", activedIndex);
+      this._activedIndex = activedIndex;
+      this.selectTab(at(this._tabElements, activedIndex, true));
+      // 更新插槽的css属性来做出动画
+      this._effectCursorLayout();
+    } else {
+      console.info("ActivedSliderChange", activedIndex);
+    }
   };
 
   private _tabElements: Array<HTMLElement> = [];
@@ -80,12 +102,12 @@ export class CccSliderTabs implements ComponentInterface {
   /**
    * 计算底部浮标的布局位置
    */
-  @microtaskQueue
-  private _calcCursorSlotLayouts() {
+  @throttle()
+  private async _calcCursorSlotLayouts() {
     if (!this._tabListEle) {
       return;
     }
-    this.logger.log("_calcCursorSlotLayouts");
+    console.log("_calcCursorSlotLayouts");
     const offsetLeftStart = this._tabListEle.offsetLeft;
     const cursorLayouts = this._cursorLayouts;
     for (const tabEle of (this.tabElements = querySelectorAll<HTMLElement>(this.hostEle, '[slot="tab"]'))) {
@@ -99,21 +121,21 @@ export class CccSliderTabs implements ComponentInterface {
   }
 
   private _resizeOb = new ResizeObserver(() => {
-    this.logger.log("resize");
+    console.log("resize");
     this._calcCursorSlotLayouts();
   });
   private _mutationOb = new MutationObserver(() => {
-    this.logger.log("mutation");
+    console.log("mutation");
     this._calcCursorSlotLayouts();
   });
   connectedCallback() {
     this.watchFor();
-    this.logger.log("connectedCallback");
+    console.log("connectedCallback");
   }
   private _tabListEle?: HTMLElement;
   private _cursorEle?: HTMLElement;
   componentDidLoad() {
-    this.logger.log("componentDidLoad");
+    console.log("componentDidLoad");
     this._mutationOb.observe(this.hostEle, { childList: true });
     this._cursorEle = querySelector(this.hostEle.shadowRoot, ".cursor");
     this._resizeOb.observe((this._tabListEle = querySelector(this.hostEle.shadowRoot, ".tab-list")!));
@@ -135,24 +157,24 @@ export class CccSliderTabs implements ComponentInterface {
   async bindForElement(_forEle?: HTMLElement | null) {
     const forEle = _forEle
       ? _forEle instanceof HTMLElement && _forEle.tagName === "CCC-SLIDER"
-        ? _forEle
+        ? (_forEle as HTMLCccSliderElement)
         : null
       : null;
     if (forEle !== _forEle) {
-      this.logger.error("for attribute can only binding <ccc-slider> element");
+      console.error("for attribute can only binding <ccc-slider> element");
     }
     if (forEle === this._forEle) {
       return;
     }
     /// 解绑
     if (this._forEle) {
-      this._forEle.removeEventListener("scroll", this._onForEleScroll);
+      (this._forEle as any).removeEventListener("activedSilderChange", this._onForEleActivedSliderChange);
     }
 
     /// 绑定
     if (forEle) {
       this._forEle = forEle;
-      forEle.addEventListener("scroll", this._onForEleScroll);
+      (forEle as any).addEventListener("activedSilderChange", this._onForEleActivedSliderChange);
     }
 
     if (this._canWriteAttr_for) {
@@ -167,46 +189,47 @@ export class CccSliderTabs implements ComponentInterface {
   });
 
   private _activiedTabEle: HTMLElement | null = null;
-  private _onClick = (event: MouseEvent) => {
+  onClick = (event: MouseEvent) => {
     const ele = event.target ? (event.target instanceof HTMLElement ? event.target : null) : null;
     if (!ele) {
       return;
     }
+    // 选中点击的tab对象
     this.selectTab(ele.closest<HTMLElement>(`[slot="tab"]`));
+    // 将变动同步到slider上
+    this.selectFor();
     // 更新插槽的css属性来做出动画
     this._effectCursorLayout();
   };
-  private selectTab(_newTabEle?: HTMLElement | null) {
+  private selectTab(_newTabEle: HTMLElement | null | undefined = at(this._tabElements, this._activedIndex, true)) {
     const newTabEle = _newTabEle instanceof HTMLElement ? _newTabEle : null;
     const oldTabEle = this._activiedTabEle;
     if (newTabEle === oldTabEle) {
       return;
     }
-    oldTabEle?.removeAttribute("data-slider-tabs");
-    newTabEle?.setAttribute("data-slider-tabs", "actived");
+    oldTabEle?.removeAttribute("data-ccc-slider-tabs");
+    newTabEle?.setAttribute("data-ccc-slider-tabs", "actived");
     const activedIndex = newTabEle ? this._tabElements.indexOf(newTabEle) : -1;
 
     /// 更新属性
     this._activiedTabEle = newTabEle; // 务必要先写入这个值，因为后面activedIndex的写入会引发selectTab被在此调用
-    if (this._canWriteAttr_activedIndex) {
-      this.activedIndex = activedIndex;
-    }
+    this._activedIndex = activedIndex;
 
     /// 触发事件更新
     this.activedTabChange.emit([newTabEle, activedIndex]);
   }
 
   /**引用游标的插槽布局 */
-  @microtaskQueue
-  private _effectCursorLayout() {
-    this.logger.log("_effectCursorLayout");
+  @throttle()
+  private async _effectCursorLayout() {
+    console.log("_effectCursorLayout");
 
     const cursorEle = this._cursorEle;
     if (cursorEle) {
       const cursorEleStyle = cursorEle.style;
       /// 获取新的布局目标
       let nextCursorLayout = DEFAULT_CURSOR_LAYOUT;
-      const { activedIndex } = this;
+      const { _activedIndex: activedIndex } = this;
       let useAnimation = true;
 
       if (activedIndex !== undefined) {
@@ -219,10 +242,12 @@ export class CccSliderTabs implements ComponentInterface {
         if (progress !== 0) {
           useAnimation = false;
           const cursorLayout = at(this._cursorLayouts, activedIndex + 1, true);
-          nextCursorLayout = {
-            left: (cursorLayout.left - nextCursorLayout.left) * progress + nextCursorLayout.left,
-            width: (cursorLayout.width - nextCursorLayout.width) * progress + nextCursorLayout.width,
-          };
+          if (cursorLayout) {
+            nextCursorLayout = {
+              left: (cursorLayout.left - nextCursorLayout.left) * progress + nextCursorLayout.left,
+              width: (cursorLayout.width - nextCursorLayout.width) * progress + nextCursorLayout.width,
+            };
+          }
         }
       }
 
@@ -256,7 +281,7 @@ export class CccSliderTabs implements ComponentInterface {
         "--cursor-to-right",
         `${widthPx - (nextCursorLayout.left + nextCursorLayout.width)}px`,
       );
-      if (useAnimation) {
+      if (useAnimation || true) {
         cursorEle.animate(
           [
             {
@@ -269,7 +294,7 @@ export class CccSliderTabs implements ComponentInterface {
           ],
           {
             duration: durationMs,
-            easing: diretion === "right" ? leftOut : leftIn,
+            easing: useAnimation ? (diretion === "right" ? leftOut : leftIn) : "ease-out",
             fill: "forwards",
           },
         );
@@ -285,7 +310,7 @@ export class CccSliderTabs implements ComponentInterface {
           ],
           {
             duration: durationMs,
-            easing: diretion === "left" ? rightIn : rightOut,
+            easing: useAnimation ? (diretion === "left" ? rightIn : rightOut) : "ease-out",
             fill: "forwards",
           },
         );
@@ -295,7 +320,7 @@ export class CccSliderTabs implements ComponentInterface {
 
   render() {
     return (
-      <Host onClick={this._onClick}>
+      <Host onClick={this.onClick}>
         <div class="tab-list" part="tabs">
           <slot name="tab"></slot>
         </div>

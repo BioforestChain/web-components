@@ -33,6 +33,16 @@ Type: `Promise<void>`
 
 
 
+### `getActivedIndex() => Promise<number>`
+
+
+
+#### Returns
+
+Type: `Promise<number>`
+
+
+
 
 ## Shadow Parts
 

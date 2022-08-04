@@ -19,6 +19,8 @@ log.txt
 .versions/
 node_modules/
 $RECYCLE.BIN/
+/src/components.d.ts
+/src/components/*/stories/autogen.ts
 
 .DS_Store
 Thumbs.db
