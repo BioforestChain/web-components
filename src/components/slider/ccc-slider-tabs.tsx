@@ -40,10 +40,10 @@ export class CccSliderTabs implements ComponentInterface {
     this.bindForElement(this.for ? querySelector<HTMLCccSliderElement>(document, `#${this.for}`) : null);
     this._canWriteAttr_for = true;
   }
-  private selectFor() {
+  private selectFor(activedIndex: number) {
     if (this._forEle) {
-      console.log("set forEle activedIndex as", this._activedIndex);
-      this._forEle.setActivedIndex(this._activedIndex);
+      console.log("set forEle activedIndex as", activedIndex);
+      this._forEle.slideTo(activedIndex);
     }
   }
 
@@ -54,22 +54,21 @@ export class CccSliderTabs implements ComponentInterface {
   //  */
   // @Prop({ reflect: true, mutable: true }) followFor?: boolean;
 
-  @Prop({ reflect: true }) activedIndex?: number = 0;
+  @Prop({ reflect: true }) defaultActivedIndex?: number;
+  @Prop({ reflect: true }) activedIndex?: number;
   @Watch("activedIndex")
-  watchActivedIndex() {
+  watchActivedIndex(newVal: number) {
     const activedIndex =
-      (this.activedIndex === undefined ? -1 : Number.isSafeInteger(this.activedIndex) ? this.activedIndex : -1) %
-      this._tabElements.length;
-    this._activedIndex = activedIndex;
+      (newVal === undefined ? -1 : Number.isSafeInteger(newVal) ? newVal : -1) % this._tabElements.length;
     // 尝试选中新的tab对象
-    this.selectTab();
+    this.selectTab(at(this._tabElements, activedIndex, true));
     // 将变动同步到slider上
-    this.selectFor();
+    this.selectFor(activedIndex);
     // 更新插槽的css属性来做出动画，这里不和 selectTab 一起。因为 activedIndex 可能是小数
     this._effectCursorLayout();
   }
 
-  private _activedIndex = 0;
+  private _activedIndex = NaN;
   @Method()
   async getActivedIndex() {
     return this._activedIndex;
@@ -81,13 +80,15 @@ export class CccSliderTabs implements ComponentInterface {
   private _onForEleActivedSliderChange = (
     event: CustomEvent<[sliderEle: HTMLElement, activedIndex: number, isInControll: boolean]>,
   ) => {
+    if (event.target !== this._forEle) {
+      return;
+    }
     const [_, activedIndex, isInControll] = event.detail;
     if (isInControll) {
       console.success("ActivedSliderChange", activedIndex);
-      this._activedIndex = activedIndex;
-      this.selectTab(at(this._tabElements, activedIndex, true));
+      this.selectTab(at(this._tabElements, Math.round(activedIndex), true));
       // 更新插槽的css属性来做出动画
-      this._effectCursorLayout();
+      this._effectCursorLayout(activedIndex);
     } else {
       console.info("ActivedSliderChange", activedIndex);
     }
@@ -99,7 +100,6 @@ export class CccSliderTabs implements ComponentInterface {
   }
   public set tabElements(value) {
     this._tabElements = value;
-    this.watchActivedIndex();
   }
   private _cursorLayouts: Array<CursorLayout> = [];
   /**
@@ -113,16 +113,15 @@ export class CccSliderTabs implements ComponentInterface {
     console.log("_calcCursorSlotLayouts");
     const offsetLeftStart = this._tabListEle.offsetLeft;
     const cursorLayouts = this._cursorLayouts;
-    for (const tabEle of (this.tabElements = querySelectorAll<HTMLElement>(this.hostEle, '[slot="tab"]'))) {
+    for (const tabEle of (this.tabElements = querySelectorAll<HTMLElement>(this.hostEle, ':scope > [slot="tab"]'))) {
       const left = tabEle.offsetLeft - offsetLeftStart;
       const width = tabEle.offsetWidth;
       cursorLayouts.push({ left, width });
     }
     this._cursorLayouts = cursorLayouts;
     // 布局变更，重新绘制
-    this._effectCursorLayout();
+    this.watchActivedIndex(Number.isNaN(this._activedIndex) ? this.defaultActivedIndex ?? 0 : this._activedIndex);
   }
-
   private _resizeOb = new ResizeObserver(() => {
     console.log("resize");
     this._calcCursorSlotLayouts();
@@ -214,9 +213,11 @@ export class CccSliderTabs implements ComponentInterface {
     }
 
     // 选中点击的tab对象
-    this.selectTab(tabEle);
+    const activedIndex = this.selectTab(tabEle);
     // 将变动同步到slider上
-    this.selectFor();
+    if (activedIndex !== undefined) {
+      this.selectFor(activedIndex);
+    }
     // 更新插槽的css属性来做出动画
     this._effectCursorLayout();
   };
@@ -237,104 +238,101 @@ export class CccSliderTabs implements ComponentInterface {
     /// 触发事件更新
     this.activedTabChange.emit([newTabEle, activedIndex]);
     console.log("activedTabChange", newTabEle, activedIndex);
+    return activedIndex;
   }
 
   /**引用游标的插槽布局 */
   @throttle()
-  private async _effectCursorLayout() {
+  private async _effectCursorLayout(activedIndex = this._activedIndex) {
     console.log("_effectCursorLayout");
 
     const cursorEle = this._cursorEle;
-    if (cursorEle) {
-      const cursorEleStyle = cursorEle.style;
-      /// 获取新的布局目标
-      let nextCursorLayout = DEFAULT_CURSOR_LAYOUT;
-      const { _activedIndex: activedIndex } = this;
-      let useAnimation = true;
+    if (!cursorEle) {
+      return;
+    }
 
-      if (activedIndex !== undefined) {
-        const progress = activedIndex % 1;
-        const cursorLayout = at(this._cursorLayouts, activedIndex, true);
-        if (cursorLayout) {
-          nextCursorLayout = cursorLayout;
-        }
-        /// 如果有特殊的进度，那么不使用动画，直接依赖于属性过去
-        if (progress !== 0) {
-          useAnimation = false;
-          const cursorLayout = at(this._cursorLayouts, activedIndex + 1, true);
-          if (cursorLayout) {
-            nextCursorLayout = {
-              left: (cursorLayout.left - nextCursorLayout.left) * progress + nextCursorLayout.left,
-              width: (cursorLayout.width - nextCursorLayout.width) * progress + nextCursorLayout.width,
-            };
-          }
-        }
+    const cursorEleStyle = cursorEle.style;
+    /// 获取新的布局目标
+    let nextCursorLayout = DEFAULT_CURSOR_LAYOUT;
+    let useAnimation = true;
+
+    const progress = activedIndex % 1;
+    const cursorLayout = at(this._cursorLayouts, activedIndex, true);
+    if (cursorLayout) {
+      nextCursorLayout = cursorLayout;
+    }
+    /// 如果有特殊的进度，那么不使用动画，直接依赖于属性过去
+    if (progress > 0 /* NaN>0 === false */) {
+      useAnimation = false;
+      const cursorLayout = at(this._cursorLayouts, activedIndex + 1, true);
+      if (cursorLayout) {
+        nextCursorLayout = {
+          left: (cursorLayout.left - nextCursorLayout.left) * progress + nextCursorLayout.left,
+          width: (cursorLayout.width - nextCursorLayout.width) * progress + nextCursorLayout.width,
+        };
       }
+    }
 
-      /// 获取动画配置以及旧的布局目标
+    /// 获取动画配置以及旧的布局目标
 
-      const cursorStyleMap = getComputedStyle(cursorEle);
-      const { animationDuration, width, paddingLeft, paddingRight } = cursorStyleMap;
-      const leftIn = cursorStyleMap.getPropertyValue("--cursor-left-in-easing") || "ease-out";
-      const leftOut = cursorStyleMap.getPropertyValue("--cursor-left-out-easing") || "ease-in";
-      const rightIn = cursorStyleMap.getPropertyValue("--cursor-right-in-easing") || "ease-in";
-      const rightOut = cursorStyleMap.getPropertyValue("--cursor-right-out-easing") || "ease-out";
-      const durationMs = cssAnimationDurationToMs(animationDuration);
-      const widthPx = parseFloat(width);
-      const paddingLeftPx = parseFloat(paddingLeft);
-      // const paddingRightPx = parseFloat(paddingRight);
+    const cursorStyleMap = getComputedStyle(cursorEle);
+    const { animationDuration, width, paddingLeft, paddingRight } = cursorStyleMap;
+    const leftIn = cursorStyleMap.getPropertyValue("--cursor-left-in-easing") || "ease-out";
+    const leftOut = cursorStyleMap.getPropertyValue("--cursor-left-out-easing") || "ease-in";
+    const rightIn = cursorStyleMap.getPropertyValue("--cursor-right-in-easing") || "ease-in";
+    const rightOut = cursorStyleMap.getPropertyValue("--cursor-right-out-easing") || "ease-out";
+    const durationMs = cssAnimationDurationToMs(animationDuration);
+    const widthPx = parseFloat(width);
+    const paddingLeftPx = parseFloat(paddingLeft);
+    // const paddingRightPx = parseFloat(paddingRight);
 
-      let diretion: string;
-      if (widthPx === 0 || nextCursorLayout.width === 0) {
-        diretion = "center";
-      } else if (nextCursorLayout.left > paddingLeftPx) {
-        diretion = "right";
-      } else {
-        diretion = "left";
-      }
+    let diretion: string;
+    if (widthPx === 0 || nextCursorLayout.width === 0) {
+      diretion = "center";
+    } else if (nextCursorLayout.left > paddingLeftPx) {
+      diretion = "right";
+    } else {
+      diretion = "left";
+    }
 
-      cursorEleStyle.setProperty("--cursor-from-left", paddingLeft);
-      cursorEleStyle.setProperty("--cursor-from-right", paddingRight);
+    cursorEleStyle.setProperty("--cursor-from-left", paddingLeft);
+    cursorEleStyle.setProperty("--cursor-from-right", paddingRight);
 
-      cursorEleStyle.setProperty("--cursor-to-left", nextCursorLayout.left + "px");
-      cursorEleStyle.setProperty(
-        "--cursor-to-right",
-        `${widthPx - (nextCursorLayout.left + nextCursorLayout.width)}px`,
+    cursorEleStyle.setProperty("--cursor-to-left", nextCursorLayout.left + "px");
+    cursorEleStyle.setProperty("--cursor-to-right", `${widthPx - (nextCursorLayout.left + nextCursorLayout.width)}px`);
+    if (useAnimation || true) {
+      cursorEle.animate(
+        [
+          {
+            composite: "replace",
+            paddingLeft: paddingLeft,
+          },
+          {
+            paddingLeft: `var(--cursor-to-left)`,
+          },
+        ],
+        {
+          duration: durationMs,
+          easing: useAnimation ? (diretion === "right" ? leftOut : leftIn) : "ease-out",
+          fill: "forwards",
+        },
       );
-      if (useAnimation || true) {
-        cursorEle.animate(
-          [
-            {
-              composite: "replace",
-              paddingLeft: paddingLeft,
-            },
-            {
-              paddingLeft: `var(--cursor-to-left)`,
-            },
-          ],
+      cursorEle.animate(
+        [
           {
-            duration: durationMs,
-            easing: useAnimation ? (diretion === "right" ? leftOut : leftIn) : "ease-out",
-            fill: "forwards",
+            composite: "replace",
+            paddingRight: paddingRight,
           },
-        );
-        cursorEle.animate(
-          [
-            {
-              composite: "replace",
-              paddingRight: paddingRight,
-            },
-            {
-              paddingRight: `var(--cursor-to-right)`,
-            },
-          ],
           {
-            duration: durationMs,
-            easing: useAnimation ? (diretion === "left" ? rightIn : rightOut) : "ease-out",
-            fill: "forwards",
+            paddingRight: `var(--cursor-to-right)`,
           },
-        );
-      }
+        ],
+        {
+          duration: durationMs,
+          easing: useAnimation ? (diretion === "left" ? rightIn : rightOut) : "ease-out",
+          fill: "forwards",
+        },
+      );
     }
   }
 

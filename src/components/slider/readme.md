@@ -7,10 +7,11 @@
 
 ## Properties
 
-| Property       | Attribute       | Description                 | Type                  | Default     |
-| -------------- | --------------- | --------------------------- | --------------------- | ----------- |
-| `activedIndex` | `actived-index` |                             | `number \| undefined` | `0`         |
-| `for`          | `for`           | the <ccc-silder> element id | `string \| undefined` | `undefined` |
+| Property              | Attribute               | Description                 | Type                  | Default     |
+| --------------------- | ----------------------- | --------------------------- | --------------------- | ----------- |
+| `activedIndex`        | `actived-index`         |                             | `number \| undefined` | `undefined` |
+| `defaultActivedIndex` | `default-actived-index` |                             | `number \| undefined` | `undefined` |
+| `for`                 | `for`                   | the <ccc-silder> element id | `string \| undefined` | `undefined` |
 
 
 ## Events

@@ -71,7 +71,7 @@ export class CccSlider implements ComponentInterface {
   }
   componentDidLoad() {
     this._querySliderEles();
-    this.watchActivedIndex();
+    this._setActivedIndex(Number.isNaN(this._activedIndex) ? this.defaultActivedIndex : this._activedIndex);
   }
 
   disconnectedCallback() {
@@ -91,27 +91,42 @@ export class CccSlider implements ComponentInterface {
     this._updateSliderStates();
   }
   private _querySliderEles() {
-    this.sliderEles = querySelectorAll<HTMLElement>(this.hostEle, `[slot="slider"]`);
+    this.sliderEles = querySelectorAll<HTMLElement>(this.hostEle, `:scope > [slot="slider"]`);
   }
-  @Prop({ reflect: true }) activedIndex = 0;
+  @Prop({ reflect: true }) defaultActivedIndex?: number;
+  @Prop({ reflect: true }) activedIndex?: number;
   @Watch("activedIndex")
-  watchActivedIndex() {
-    this.setActivedIndex(this.activedIndex);
+  watchActivedIndex(newVal: number) {
+    this._setActivedIndex(newVal);
   }
-  private _activedIndex = 0;
+  private _activedIndex = NaN;
   @Method()
   async getActivedIndex() {
     return this._activedIndex;
   }
-  @Method()
-  async setActivedIndex(activedIndex: number) {
+  private _setActivedIndex(activedIndex?: number, behavior: ScrollBehavior = "smooth") {
+    if (activedIndex === undefined) {
+      return;
+    }
     const ele = at(this._sliderEles, activedIndex, true);
-    console.info("watchActivedIndex", activedIndex, ele);
+    console.info("setActivedIndex", activedIndex, ele);
     if (ele) {
       this._inScrollInto = true;
-      this.hostEle.scrollTo({ left: ele.offsetLeft, behavior: "smooth" });
-      // ele?.scrollIntoView({ behavior: "smooth" });
+      this.hostEle.scrollTo({ left: ele.offsetLeft, behavior });
     }
+  }
+  @Method()
+  async setActivedIndex(activedIndex: number) {
+    this._setActivedIndex(activedIndex);
+  }
+  /**兼容ionic-sliders的语法 */
+  @Method()
+  async slideTo(activedIndex: number, behavior?: ScrollBehavior) {
+    this._setActivedIndex(activedIndex, behavior);
+  }
+  @Method()
+  async update() {
+    this._querySliderEles();
   }
 
   @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement, activedIndex: number, isInControll: boolean]>;
@@ -221,6 +236,7 @@ export class CccSlider implements ComponentInterface {
   private _scrolling = { startTime: 0 };
   private _scrollTick = 0;
   onScroll = (event: Event) => {
+    event.cancelBubble = true;
     this._scrolling = { startTime: event.timeStamp };
     this._updateSliderStates();
 
@@ -230,7 +246,10 @@ export class CccSlider implements ComponentInterface {
       this._handleScrollTick();
     }
   };
-  onScrollEnd = () => {
+  onScrollEnd = (event?: Event) => {
+    if (event) {
+      event.cancelBubble = true;
+    }
     if (this._scrolling.startTime > 0) {
       console.info("scroll end");
       this._inScrollInto = false;

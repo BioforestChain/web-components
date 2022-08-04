@@ -331,8 +331,10 @@ export const querySelector = <T>(root: DomQueryer | null | undefined, selector: 
 };
 
 export const at = <T>(arr: T[], index: number, floor?: boolean) => {
+  if (Number.isNaN(index)) {
+    index = 0;
+  }
   index = index % arr.length;
-  index;
   index = index < 0 ? index + arr.length : index;
   if (floor) {
     index = Math.floor(index);
