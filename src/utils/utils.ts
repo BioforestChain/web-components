@@ -408,7 +408,7 @@ export class Logger {
     return LOGGER_LEVEL.disable;
   }
   isEnable(level: LOGGER_LEVEL) {
-    return this._getLogLevel() <= level;
+    return !!(self as any).__ccc_dev__ && this._getLogLevel() <= level;
   }
   verbose(...args: (string | number)[]) {
     if (this.isEnable(LOGGER_LEVEL.verbose)) {
