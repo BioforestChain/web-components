@@ -97,6 +97,7 @@ export class CccSliderTabs implements ComponentInterface {
 
   private _forEle: HTMLCccSliderElement | null = null;
   private _onForEleActivedSliderChange = (event: CustomEvent<[sliderEle: HTMLElement, activedIndex: number]>) => {
+    this.console.log("ActivedSliderChange", event.detail);
     this._onForEleScroll(event);
     // if (event.target !== this._forEle) {
     //   return;
@@ -112,21 +113,23 @@ export class CccSliderTabs implements ComponentInterface {
     // }
   };
 
-  private _onForEleScroll = async (event: Event) => {
+  private _onForEleScroll = (event: Event) => {
     const ele = event.target as HTMLCccSliderElement;
     if (ele !== this._forEle) {
       return;
     }
-    const layoutInfo = await ele.getLayoutInfo();
-    if (layoutInfo.reason === "user") {
-      this.console.verbose("USER scroll", layoutInfo.activedIndex);
-    } else {
-      this.console.verbose("AUTO scroll", layoutInfo.activedIndex);
-    }
+    requestAnimationFrame(async () => {
+      const layoutInfo = await ele.getLayoutInfo();
+      if (layoutInfo.reason === "user") {
+        this.console.verbose("USER scroll", layoutInfo.activedIndex);
+      } else {
+        this.console.verbose("AUTO scroll", layoutInfo.activedIndex);
+      }
 
-    this._selectTab(at(this._tabElements, Math.round(layoutInfo.activedIndex), true));
-    // 更新插槽的css属性来做出动画
-    this._effectCursorLayout(layoutInfo.activedIndex);
+      this._selectTab(at(this._tabElements, Math.round(layoutInfo.activedIndex), true));
+      // 更新插槽的css属性来做出动画
+      this._effectCursorLayout(layoutInfo.activedIndex);
+    });
   };
 
   private _tabElements: Array<HTMLElement> = [];

@@ -10,7 +10,7 @@ import {
   Prop,
   Watch,
 } from "@stencil/core";
-import { at, Logger, querySelectorAll, throttle } from "../../utils/utils";
+import { at, Logger, querySelectorAll } from "../../utils/utils";
 
 const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
 
@@ -230,6 +230,12 @@ export class CccSlider implements ComponentInterface {
     // 这里不时用 closestSlider.ele.scrollIntoView，因为如果ele在滚动，那么可能久失效
     this.hostEle.scrollTo({ left, behavior });
     this.console.info("scroll Into", left, behavior);
+
+    // 如果滚动时瞬发的，基于浏览器行为或者behavior配置，那么可能不会触发scrolleEnd函数，所以这里手动触发状态基的变更
+    if (this.hostEle.scrollLeft === left) {
+      this._cachedLayoutInfo = undefined; //强制清理这一帧的布局缓存
+      this._updateSliderStates();
+    }
   }
 
   @Method()
@@ -258,13 +264,13 @@ export class CccSlider implements ComponentInterface {
 
   @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement, activedIndex: number]>;
 
-  private _preSliderStates?: { list: $Slider[]; activedIndex: number };
+  private _preSliderStates: { list: $Slider[]; activedIndex: number } = { list: [], activedIndex: -1 };
   /**
    * 通知slider-ele的状态变更
    * 更新activedIndex的值变更
    * 触发activedSilderChange事件
    */
-  @throttle()
+  // @throttle()
   private _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
     this.console.info("updateSliderStates", "reasons:", this._reasons, this._reason);
     const {
@@ -273,16 +279,16 @@ export class CccSlider implements ComponentInterface {
     } = layoutInfo;
     const { _sliderList: sliderList } = this;
     let changed = false;
-    if (
-      this._preSliderStates === undefined ||
-      this._preSliderStates.list !== sliderList ||
-      this._preSliderStates.activedIndex !== closestSlider.index
-    ) {
-      changed = true;
-      this._preSliderStates = {
+    if (this._preSliderStates.list !== sliderList || this._preSliderStates.activedIndex !== closestSlider.index) {
+      const preSliderStates = this._preSliderStates;
+      const newSliderStates = {
         list: sliderList,
         activedIndex: closestSlider.index,
       };
+      changed =
+        at(preSliderStates.list, preSliderStates.activedIndex) !==
+        at(newSliderStates.list, newSliderStates.activedIndex);
+      this._preSliderStates = newSliderStates;
 
       for (const slider of sliderList) {
         if (slider.index === closestSlider.index - 1) {
