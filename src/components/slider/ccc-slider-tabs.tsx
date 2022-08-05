@@ -213,6 +213,7 @@ export class CccSliderTabs implements ComponentInterface {
     if (this._forEle) {
       (this._forEle as any).removeEventListener("activedSilderChange", this._onForEleActivedSliderChange);
       (this._forEle as any).removeEventListener("scroll", this._onForEleScroll);
+      (this._forEle as any).removeEventListener("scrollend", this._onForEleScroll);
     }
 
     /// 绑定
@@ -220,6 +221,7 @@ export class CccSliderTabs implements ComponentInterface {
       this._forEle = forEle;
       (forEle as any).addEventListener("activedSilderChange", this._onForEleActivedSliderChange);
       (this._forEle as any).addEventListener("scroll", this._onForEleScroll);
+      (this._forEle as any).addEventListener("scrollend", this._onForEleScroll);
     }
 
     if (this._canWriteAttr_for) {
