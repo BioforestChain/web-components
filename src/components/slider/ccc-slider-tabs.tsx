@@ -70,21 +70,28 @@ export class CccSliderTabs implements ComponentInterface {
     if (activedIndex === undefined || Number.isSafeInteger(activedIndex) === false) {
       return;
     }
-    // 尝试选中新的tab对象
-    const selectedIndex = this.selectTab(at(this._tabElements, activedIndex, true));
-    // 将变动同步到slider上
-    if (selectedIndex !== undefined) {
-      /// 如果用户正在手势操作中，那么下一帧再生效，避免冲突
-      if (userGesture) {
-        requestAnimationFrame(() => {
+    /// 如果有 for 绑定，那么跟随for绑定
+    if (this._forEle) {
+      const selectedIndex = this._tabElements.indexOf(at(this._tabElements, activedIndex, true)!);
+      if (selectedIndex !== -1) {
+        /// 如果用户正在手势操作中，那么下一帧再生效，避免冲突
+        if (userGesture) {
+          requestAnimationFrame(() => {
+            this._syncToForActivedIndex(selectedIndex);
+          });
+        } else {
           this._syncToForActivedIndex(selectedIndex);
-        });
-      } else {
-        this._syncToForActivedIndex(selectedIndex);
+        }
       }
     }
-    // 更新插槽的css属性来做出动画，这里不和 selectTab 一起。因为 activedIndex 可能是小数
-    this._effectCursorLayout(activedIndex);
+    /// 没有for绑定，自己进行渲染
+    else {
+      // 尝试选中新的tab对象
+      this._selectTab(at(this._tabElements, activedIndex, true));
+
+      // 更新插槽的css属性来做出动画，这里不和 selectTab 一起。因为 activedIndex 可能是小数
+      this._effectCursorLayout(activedIndex);
+    }
   }
 
   @Event() activedTabChange!: EventEmitter<[HTMLElement | null, number]>;
@@ -114,12 +121,13 @@ export class CccSliderTabs implements ComponentInterface {
     const layoutInfo = await ele.getLayoutInfo();
     if (layoutInfo.reason === "user") {
       console.verbose("USER scroll", layoutInfo.activedIndex);
-      this.selectTab(at(this._tabElements, Math.round(layoutInfo.activedIndex), true));
-      // 更新插槽的css属性来做出动画
-      this._effectCursorLayout(layoutInfo.activedIndex);
     } else {
       console.verbose("AUTO scroll", layoutInfo.activedIndex);
     }
+
+    this._selectTab(at(this._tabElements, Math.round(layoutInfo.activedIndex), true));
+    // 更新插槽的css属性来做出动画
+    this._effectCursorLayout(layoutInfo.activedIndex);
   };
 
   private _tabElements: Array<HTMLElement> = [];
@@ -250,7 +258,7 @@ export class CccSliderTabs implements ComponentInterface {
 
     this._setActivedIndex(this._tabElements.indexOf(tabEle), undefined, true);
   };
-  private selectTab(_newTabEle: HTMLElement | null | undefined = at(this._tabElements, this._activedIndex, true)) {
+  private _selectTab(_newTabEle: HTMLElement | null | undefined = at(this._tabElements, this._activedIndex, true)) {
     const newTabEle = _newTabEle instanceof HTMLElement ? _newTabEle : null;
     const oldTabEle = this._activiedTabEle;
     if (newTabEle === oldTabEle) {
