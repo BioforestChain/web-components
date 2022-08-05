@@ -151,7 +151,7 @@ export class CccSliderTabs implements ComponentInterface {
     this._cursorLayouts = cursorLayouts;
     // 布局变更，重新绘制
     if (Number.isNaN(this._activedIndex)) {
-      this.watchActivedIndex(this.defaultActivedIndex ?? this.activedIndex);
+      this.watchActivedIndex(this.defaultActivedIndex ?? this.activedIndex ?? 0);
     } else {
       this._effectCursorLayout(this._activedIndex);
     }
