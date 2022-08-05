@@ -14,6 +14,20 @@ import { at, Logger, querySelectorAll, throttle } from "../../utils/utils";
 
 const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
 
+export type $Slider = {
+  index: number;
+  ele: HTMLElement;
+  offsetLeft: number;
+  offsetWidth: number;
+  offsetCenter: number;
+};
+/**当前的“原因”
+ * 如果是 user ，说明是用户在控制，此时应该避免去对它进行任何覆盖操作，避免行为不跟手
+ * 如果是 auto ，说明是机器在控制
+ */
+export type $Reason = "user" | "auto";
+type $InternalReason = "touch" | "mousewheel" | "into";
+
 let console!: Logger;
 @Component({
   tag: "ccc-slider",
@@ -55,7 +69,7 @@ export class CccSlider implements ComponentInterface {
           this._unbindTabs();
           this._bindingTabs();
         } else if (entry.type === "childList") {
-          this._querySliderEles();
+          this._querySliders();
         }
       }
     }
@@ -72,8 +86,7 @@ export class CccSlider implements ComponentInterface {
     });
   }
   componentDidLoad() {
-    this._querySliderEles();
-    this._setActivedIndex(Number.isNaN(this._activedIndex) ? this.defaultActivedIndex : this._activedIndex);
+    this.update();
   }
 
   disconnectedCallback() {
@@ -88,18 +101,85 @@ export class CccSlider implements ComponentInterface {
    */
   @Prop({ reflect: true }) cross?: boolean;
 
-  private _sliderEles: HTMLElement[] = [];
-  public get sliderEles(): HTMLElement[] {
-    return this._sliderEles;
-  }
-  public set sliderEles(value: HTMLElement[]) {
-    this._sliderEles = value;
-    console.info("set sliderEles", value);
+  private _sliderList: $Slider[] = [];
+
+  private _querySliders() {
+    const sliderEles = querySelectorAll<HTMLElement>(this.hostEle, `:scope > [slot="slider"]`);
+    this._sliderList = sliderEles.map((ele, i) => {
+      const slider: $Slider = {
+        index: i,
+        ele,
+        offsetLeft: 0,
+        offsetWidth: 0,
+        offsetCenter: 0,
+      };
+      return slider;
+    });
+    console.info("set sliderEles", this._sliderList);
+    /// 进行布局计算，并更新状态
     this._updateSliderStates();
   }
-  private _querySliderEles() {
-    this.sliderEles = querySelectorAll<HTMLElement>(this.hostEle, `:scope > [slot="slider"]`);
+
+  private _cachedLayoutInfo?: ReturnType<CccSlider["_calcLayoutInfo"]>;
+  /**
+   * 获取这一帧的布局信息
+   * @returns
+   */
+  private _calcLayoutInfo() {
+    const {
+      offsetLeft: viewboxOffsetLeft,
+      offsetWidth: viewboxOffsetWidth,
+      scrollLeft: viewboxScrollLeft,
+    } = this.hostEle;
+    const viewboxOffsetCenter = viewboxOffsetLeft + viewboxScrollLeft + viewboxOffsetWidth / 2;
+
+    let closestSlider = {
+      index: -1,
+      ele: undefined as HTMLElement | undefined,
+      offsetLeft: 0,
+      offsetWidth: 0,
+      offsetCenter: 0,
+    };
+    /// 更新slider的布局信息；并寻找"中线"现在进入到哪一个视图中
+    for (const sliderLayoutInfo of this._sliderList) {
+      const { offsetLeft, offsetWidth } = sliderLayoutInfo.ele;
+      const offsetRight = offsetLeft + offsetWidth;
+
+      sliderLayoutInfo.offsetLeft = offsetLeft;
+      sliderLayoutInfo.offsetWidth = offsetWidth;
+      sliderLayoutInfo.offsetCenter = offsetLeft + offsetWidth / 2;
+
+      if (offsetLeft <= viewboxOffsetCenter && viewboxOffsetCenter <= offsetRight) {
+        closestSlider = sliderLayoutInfo;
+      }
+    }
+    return {
+      closestSlider,
+      viewbox: {
+        scrollLeft: viewboxScrollLeft,
+        offsetLeft: viewboxOffsetLeft,
+        offsetWidth: viewboxOffsetWidth,
+        offsetCenter: viewboxOffsetCenter,
+      },
+      reason: this._reason,
+      activedIndex: this._activedIndex,
+    };
   }
+  calcLayoutInfo() {
+    if (this._cachedLayoutInfo === undefined) {
+      this._cachedLayoutInfo = this._calcLayoutInfo();
+      requestAnimationFrame(() => {
+        this._cachedLayoutInfo = undefined;
+      });
+    }
+    return this._cachedLayoutInfo;
+  }
+
+  @Method()
+  async getLayoutInfo() {
+    return this.calcLayoutInfo();
+  }
+
   @Prop({ reflect: true }) defaultActivedIndex?: number;
   @Prop({ reflect: true }) activedIndex?: number;
   @Watch("activedIndex")
@@ -115,14 +195,25 @@ export class CccSlider implements ComponentInterface {
     if (activedIndex === undefined) {
       return;
     }
-    const ele = at(this._sliderEles, activedIndex, true);
-    console.info("setActivedIndex", activedIndex, ele);
-    if (ele) {
-      this._inScrollInto = true;
-      const scrollLeft = ele.offsetLeft - this.hostEle.offsetLeft;
-      this.hostEle.scrollTo({ left: scrollLeft, behavior });
+    const slider = at(this._sliderList, activedIndex, true);
+    console.info("setActivedIndex", activedIndex, slider);
+    if (slider) {
+      const { scrollLeft, offsetLeft } = this.hostEle;
+      const left = slider.offsetLeft - offsetLeft;
+      if (scrollLeft !== left) {
+        this._scrollInto(slider.offsetLeft - offsetLeft, behavior);
+      }
     }
   }
+  private _scrollInto(left: number, behavior: ScrollBehavior) {
+    this._reasons.add("into");
+    /// 校准滚动坐标
+    this._inScrollInto = true;
+    // 这里不时用 closestSlider.ele.scrollIntoView，因为如果ele在滚动，那么可能久失效
+    this.hostEle.scrollTo({ left, behavior });
+    console.info("scroll Into", left, behavior);
+  }
+
   @Method()
   async setActivedIndex(activedIndex: number) {
     this._setActivedIndex(activedIndex);
@@ -134,84 +225,61 @@ export class CccSlider implements ComponentInterface {
   }
   @Method()
   async update() {
-    this._querySliderEles();
+    this._querySliders();
+    this._setActivedIndex(Number.isNaN(this._activedIndex) ? this.defaultActivedIndex : this._activedIndex);
   }
 
-  @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement, activedIndex: number, isInControll: boolean]>;
+  @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement, activedIndex: number]>;
 
-  private _preSliderEles?: HTMLElement[];
-  private _preActivedSlider?: HTMLElement;
+  private _preSliderStates?: { list: $Slider[]; activedIndex: number };
   /**
    * 通知slider-ele的状态变更
    * 更新activedIndex的值变更
    * 触发activedSilderChange事件
    */
-  @throttle(100)
-  private async _updateSliderStates(layoutInfo = this._findSliderFrameLayoutInfo()) {
-    console.info("updateSliderStates", "this._inScrollInto:", this._inScrollInto);
-    const { closestSlider, viewboxCenter } = layoutInfo;
-    const { sliderEles } = this;
-    if (this._preSliderEles !== sliderEles || this._preActivedSlider !== closestSlider.ele) {
-      this._preActivedSlider = closestSlider.ele;
-      this._preSliderEles = sliderEles;
+  // @throttle(100)
+  private async _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
+    console.info("updateSliderStates", "reasons:", this._reasons);
+    const {
+      closestSlider,
+      viewbox: { offsetCenter: viewboxOffsetCenter },
+    } = layoutInfo;
+    const { _sliderList: sliderList } = this;
+    let changed = false;
+    if (
+      this._preSliderStates === undefined ||
+      this._preSliderStates.list !== sliderList ||
+      this._preSliderStates.activedIndex !== closestSlider.index
+    ) {
+      changed = true;
+      this._preSliderStates = {
+        list: sliderList,
+        activedIndex: closestSlider.index,
+      };
 
       let index = 0;
-      for (const sliderEle of sliderEles) {
+      for (const slider of sliderList) {
         if (index === closestSlider.index - 1) {
-          sliderEle.setAttribute(SLIDER_STATE_DATASET_KEY, "prev");
+          slider.ele.setAttribute(SLIDER_STATE_DATASET_KEY, "prev");
         } else if (index === closestSlider.index) {
-          sliderEle.setAttribute(SLIDER_STATE_DATASET_KEY, "actived");
+          slider.ele.setAttribute(SLIDER_STATE_DATASET_KEY, "actived");
         } else if (index === closestSlider.index + 1) {
-          sliderEle.setAttribute(SLIDER_STATE_DATASET_KEY, "next");
+          slider.ele.setAttribute(SLIDER_STATE_DATASET_KEY, "next");
         } else {
-          sliderEle.removeAttribute(SLIDER_STATE_DATASET_KEY);
+          slider.ele.removeAttribute(SLIDER_STATE_DATASET_KEY);
         }
       }
-      if (closestSlider.index !== -1) {
-      }
     }
 
-    // if (this._inScrollInto === false || changed) {
     /// 计算出 activedIndex
-    const progress = (viewboxCenter - closestSlider.center) / closestSlider.width;
-    const activedIndex = (this._activedIndex = this._sliderEles.indexOf(closestSlider.ele!) + progress);
-    this.activedSilderChange.emit([closestSlider.ele!, activedIndex, this._inScrollInto === false]);
-    // }
-  }
-  /**
-   * 获取这一帧的布局信息
-   * @returns
-   */
-  private _findSliderFrameLayoutInfo() {
-    const { offsetLeft: viewboxScrollLeft, offsetWidth: viewboxWidth, scrollLeft } = this.hostEle;
-    const viewboxCenter = viewboxScrollLeft + viewboxWidth / 2 + scrollLeft;
+    const progress = (viewboxOffsetCenter - closestSlider.offsetCenter) / closestSlider.offsetWidth;
+    this._activedIndex = closestSlider.index + progress;
 
-    let closestSlider = {
-      index: -1,
-      ele: undefined as HTMLElement | undefined,
-      left: 0,
-      width: 0,
-      center: 0,
-    };
-    let index = 0;
-    /// 从左往右，寻找中线现在进入到哪一个视图中
-    for (const sliderEle of this.sliderEles) {
-      const { offsetLeft, offsetWidth } = sliderEle;
-      const offsetRight = offsetLeft + offsetWidth;
-      if (offsetLeft <= viewboxCenter && viewboxCenter <= offsetRight) {
-        const { offsetWidth } = sliderEle;
-        closestSlider = {
-          index,
-          ele: sliderEle,
-          left: offsetLeft,
-          width: offsetWidth,
-          center: offsetLeft + offsetWidth / 2,
-        };
-        break;
-      }
-      index++;
+    /// 触发事件
+    if (changed) {
+      console.info("emit activedSilderChange", this._activedIndex, closestSlider);
+      this.activedSilderChange.emit([closestSlider.ele!, this._activedIndex]);
     }
-    return { closestSlider, viewboxCenter, viewboxScrollLeft, viewboxWidth };
   }
 
   //#region 滚动控制
@@ -222,13 +290,10 @@ export class CccSlider implements ComponentInterface {
    */
   private _handleScrollStop() {
     console.success("scroll stop");
-    const { closestSlider, viewboxCenter, viewboxWidth } = this._findSliderFrameLayoutInfo();
+    const { closestSlider, viewbox } = this.calcLayoutInfo();
     console.info("closestSlider:", closestSlider);
-    if (closestSlider.center !== viewboxCenter) {
-      /// 校准滚动坐标
-      this._inScrollInto = true;
-      // 这里不时用 closestSlider.ele.scrollIntoView，因为如果ele在滚动，那么可能久失效
-      this.hostEle.scrollTo({ left: closestSlider.center - viewboxWidth / 2, behavior: "smooth" });
+    if (closestSlider.offsetCenter !== viewbox.offsetCenter) {
+      this._scrollInto(closestSlider.offsetCenter - viewbox.offsetWidth / 2, "smooth");
     } else {
       this.onScrollEnd();
     }
@@ -256,7 +321,10 @@ export class CccSlider implements ComponentInterface {
   private _scrolling = { startTime: 0 };
   private _scrollTick = 0;
   onScroll = (event: Event) => {
-    event.cancelBubble = true;
+    if (event && event.target !== this.hostEle) {
+      return;
+    }
+    // event.cancelBubble = true;
     this._scrolling = { startTime: event.timeStamp };
     this._updateSliderStates();
 
@@ -267,26 +335,42 @@ export class CccSlider implements ComponentInterface {
     }
   };
   onScrollEnd = (event?: Event) => {
-    if (event) {
-      event.cancelBubble = true;
+    if (event && event.target !== this.hostEle) {
+      return;
     }
+    // if (event) {
+    //   event.cancelBubble = true;
+    // }
     if (this._scrolling.startTime > 0) {
       console.info("scroll end");
       this._inScrollInto = false;
       this._scrolling.startTime = 0;
     }
+
+    this._reasons.delete("mousewheel");
+    this._reasons.delete("into");
+    /// 尝试触发事件
     this._updateSliderStates();
+  };
+  private get _reason(): $Reason {
+    return this._reasons.size === 1 && this._reasons.has("into") ? "auto" : "user"; //: "auto";
+  }
+  private _reasons = new Set<$InternalReason>();
+  onMouseWheel = () => {
+    this._reasons.add("mousewheel");
   };
   /**
    * 是否在“主动控制”中，包括：用户的触摸控制滚动
    */
   private _inTouch = false;
   onTouchStart = () => {
+    this._reasons.add("touch");
     this._inTouch = true;
     this._inScrollInto = false;
     console.info("touch start");
   };
   onTouchStop = () => {
+    this._reasons.delete("touch");
     this._inTouch = false;
     console.info("touch stop");
   };
@@ -297,6 +381,7 @@ export class CccSlider implements ComponentInterface {
       <Host
         onScroll={this.onScroll}
         onScrollEnd={this.onScrollEnd}
+        onMouseWheel={this.onMouseWheel}
         onTouchStart={this.onTouchStart}
         onTouchCancel={this.onTouchStop}
         onTouchEnd={this.onTouchStop}

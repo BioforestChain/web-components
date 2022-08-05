@@ -40,10 +40,10 @@ export class CccSliderTabs implements ComponentInterface {
     this.bindForElement(this.for ? querySelector<HTMLCccSliderElement>(document, `#${this.for}`) : null);
     this._canWriteAttr_for = true;
   }
-  private selectFor(activedIndex: number) {
+  private _syncToForActivedIndex(activedIndex: number) {
     if (this._forEle) {
       console.log("set forEle activedIndex as", activedIndex);
-      this._forEle.slideTo(activedIndex);
+      this._forEle?.slideTo(activedIndex);
     }
   }
 
@@ -66,7 +66,7 @@ export class CccSliderTabs implements ComponentInterface {
   async getActivedIndex() {
     return this._activedIndex;
   }
-  private _setActivedIndex(activedIndex?: number, _behavior: ScrollBehavior = "smooth") {
+  private _setActivedIndex(activedIndex?: number, _behavior: ScrollBehavior = "smooth", userGesture = false) {
     if (activedIndex === undefined || Number.isSafeInteger(activedIndex) === false) {
       return;
     }
@@ -74,7 +74,14 @@ export class CccSliderTabs implements ComponentInterface {
     const selectedIndex = this.selectTab(at(this._tabElements, activedIndex, true));
     // 将变动同步到slider上
     if (selectedIndex !== undefined) {
-      this.selectFor(selectedIndex);
+      /// 如果用户正在手势操作中，那么下一帧再生效，避免冲突
+      if (userGesture) {
+        requestAnimationFrame(() => {
+          this._syncToForActivedIndex(selectedIndex);
+        });
+      } else {
+        this._syncToForActivedIndex(selectedIndex);
+      }
     }
     // 更新插槽的css属性来做出动画，这里不和 selectTab 一起。因为 activedIndex 可能是小数
     this._effectCursorLayout(activedIndex);
@@ -83,20 +90,35 @@ export class CccSliderTabs implements ComponentInterface {
   @Event() activedTabChange!: EventEmitter<[HTMLElement | null, number]>;
 
   private _forEle: HTMLCccSliderElement | null = null;
-  private _onForEleActivedSliderChange = (
-    event: CustomEvent<[sliderEle: HTMLElement, activedIndex: number, isInControll: boolean]>,
-  ) => {
-    if (event.target !== this._forEle) {
+  private _onForEleActivedSliderChange = (event: CustomEvent<[sliderEle: HTMLElement, activedIndex: number]>) => {
+    this._onForEleScroll(event);
+    // if (event.target !== this._forEle) {
+    //   return;
+    // }
+    // const [_, activedIndex, isInControll] = event.detail;
+    // if (isInControll) {
+    //   console.success("ActivedSliderChange", activedIndex);
+    //   this.selectTab(at(this._tabElements, Math.round(activedIndex), true));
+    //   // 更新插槽的css属性来做出动画
+    //   this._effectCursorLayout(activedIndex);
+    // } else {
+    //   console.info("ActivedSliderChange", activedIndex);
+    // }
+  };
+
+  private _onForEleScroll = async (event: Event) => {
+    const ele = event.target as HTMLCccSliderElement;
+    if (ele !== this._forEle) {
       return;
     }
-    const [_, activedIndex, isInControll] = event.detail;
-    if (isInControll) {
-      console.success("ActivedSliderChange", activedIndex);
-      this.selectTab(at(this._tabElements, Math.round(activedIndex), true));
+    const layoutInfo = await ele.getLayoutInfo();
+    if (layoutInfo.reason === "user") {
+      console.verbose("USER scroll", layoutInfo.activedIndex);
+      this.selectTab(at(this._tabElements, Math.round(layoutInfo.activedIndex), true));
       // 更新插槽的css属性来做出动画
-      this._effectCursorLayout(activedIndex);
+      this._effectCursorLayout(layoutInfo.activedIndex);
     } else {
-      console.info("ActivedSliderChange", activedIndex);
+      console.verbose("AUTO scroll", layoutInfo.activedIndex);
     }
   };
 
@@ -128,7 +150,11 @@ export class CccSliderTabs implements ComponentInterface {
     }
     this._cursorLayouts = cursorLayouts;
     // 布局变更，重新绘制
-    this.watchActivedIndex(Number.isNaN(this._activedIndex) ? this.defaultActivedIndex ?? 0 : this._activedIndex);
+    if (Number.isNaN(this._activedIndex)) {
+      this.watchActivedIndex(this.defaultActivedIndex ?? 0);
+    } else {
+      this._effectCursorLayout(this._activedIndex);
+    }
   }
   private _resizeOb = new ResizeObserver(() => {
     console.log("resize");
@@ -179,12 +205,14 @@ export class CccSliderTabs implements ComponentInterface {
     /// 解绑
     if (this._forEle) {
       (this._forEle as any).removeEventListener("activedSilderChange", this._onForEleActivedSliderChange);
+      (this._forEle as any).removeEventListener("scroll", this._onForEleScroll);
     }
 
     /// 绑定
     if (forEle) {
       this._forEle = forEle;
       (forEle as any).addEventListener("activedSilderChange", this._onForEleActivedSliderChange);
+      (this._forEle as any).addEventListener("scroll", this._onForEleScroll);
     }
 
     if (this._canWriteAttr_for) {
@@ -220,7 +248,7 @@ export class CccSliderTabs implements ComponentInterface {
       return;
     }
 
-    this._setActivedIndex(this._tabElements.indexOf(tabEle));
+    this._setActivedIndex(this._tabElements.indexOf(tabEle), undefined, true);
   };
   private selectTab(_newTabEle: HTMLElement | null | undefined = at(this._tabElements, this._activedIndex, true)) {
     const newTabEle = _newTabEle instanceof HTMLElement ? _newTabEle : null;
@@ -302,6 +330,8 @@ export class CccSliderTabs implements ComponentInterface {
     cursorEleStyle.setProperty("--cursor-to-left", nextCursorLayout.left + "px");
     cursorEleStyle.setProperty("--cursor-to-right", `${widthPx - (nextCursorLayout.left + nextCursorLayout.width)}px`);
     if (useAnimation || true) {
+      const optionsDuration = useAnimation ? durationMs : 20;
+      const optionsEasing = "ease-in"; // "ease-out" | "linear"
       cursorEle.animate(
         [
           {
@@ -313,8 +343,8 @@ export class CccSliderTabs implements ComponentInterface {
           },
         ],
         {
-          duration: durationMs,
-          easing: useAnimation ? (diretion === "right" ? leftOut : leftIn) : "ease-out",
+          duration: optionsDuration,
+          easing: useAnimation ? (diretion === "right" ? leftOut : leftIn) : optionsEasing,
           fill: "forwards",
         },
       );
@@ -329,8 +359,8 @@ export class CccSliderTabs implements ComponentInterface {
           },
         ],
         {
-          duration: durationMs,
-          easing: useAnimation ? (diretion === "left" ? rightIn : rightOut) : "ease-out",
+          duration: optionsDuration,
+          easing: useAnimation ? (diretion === "left" ? rightIn : rightOut) : optionsEasing,
           fill: "forwards",
         },
       );
