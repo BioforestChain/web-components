@@ -80,6 +80,40 @@ export const With_Tabs = cccSliderKit
     border-radius: 2em;
   }
   `);
+export const With_Tabs_And_Default_Index = cccSliderKit
+  .storyFactory(() => DEMO_HTML, {})
+  .addStyle(DEMO_STYLE)
+  .onMount((_, ele) => {
+    ele.id = "qaq";
+  })
+  .addHtmlTpl(
+    html`
+      <ccc-slider-tabs for="qaq" default-actived-index="1">
+        <span class="tab" slot="tab">s1</span>
+        <span class="tab" slot="tab">s2</span>
+        <span class="tab" slot="tab">s3</span>
+      </ccc-slider-tabs>
+    `,
+    "before",
+  ).addStyle(`
+    #root {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    ccc-slider-tabs > .tab{
+     width: 3em;
+     text-align:center;
+    }
+    ccc-slider-tabs > .tab[data-ccc-slider-tabs="actived"]{
+      font-weight: bold;
+      transform: scale(1.1);
+      transition-duration: 250ms;
+    }
+    ccc-slider {
+      border-radius: 2em;
+    }
+    `);
 
 export const Nested_Slider = cccSliderKit
   .storyFactory(

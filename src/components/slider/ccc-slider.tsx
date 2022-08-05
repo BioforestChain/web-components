@@ -252,7 +252,7 @@ export class CccSlider implements ComponentInterface {
    */
   @throttle()
   private _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
-    console.info("updateSliderStates", "reasons:", this._reasons);
+    console.info("updateSliderStates", "reasons:", this._reasons, this._reason);
     const {
       closestSlider,
       viewbox: { offsetCenter: viewboxOffsetCenter },
@@ -365,7 +365,10 @@ export class CccSlider implements ComponentInterface {
     this._updateSliderStates();
   };
   private get _reason(): $Reason {
-    return this._reasons.size === 1 && this._reasons.has("into") ? "auto" : "user"; //: "auto";
+    if (this._reasons.has("mousewheel") || this._reasons.has("touch")) {
+      return "user";
+    }
+    return "auto";
   }
   private _reasons = new Set<$InternalReason>();
   onMouseWheel = () => {
