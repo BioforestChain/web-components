@@ -26,7 +26,7 @@ export type $Slider = {
  * 如果是 auto ，说明是机器在控制
  */
 export type $Reason = "user" | "auto";
-type $InternalReason = "touch" | "mousewheel" | "into";
+type $InternalReason = "touch" | "mousewheel" | "into" | "init";
 
 let console!: Logger;
 @Component({
@@ -70,6 +70,8 @@ export class CccSlider implements ComponentInterface {
           this._bindingTabs();
         } else if (entry.type === "childList") {
           this._querySliders();
+          // 进行布局计算，并更新状态
+          this._updateSliderStates();
         }
       }
     }
@@ -116,8 +118,6 @@ export class CccSlider implements ComponentInterface {
       return slider;
     });
     console.info("set sliderEles", this._sliderList);
-    /// 进行布局计算，并更新状态
-    this._updateSliderStates();
   }
 
   private _cachedLayoutInfo?: ReturnType<CccSlider["_calcLayoutInfo"]>;
@@ -162,7 +162,9 @@ export class CccSlider implements ComponentInterface {
         offsetCenter: viewboxOffsetCenter,
       },
       reason: this._reason,
-      activedIndex: this._activedIndex,
+      activedIndex: Number.isNaN(this._activedIndex)
+        ? this.defaultActivedIndex ?? this.activedIndex ?? 0
+        : this._activedIndex,
     };
   }
   calcLayoutInfo() {
@@ -226,7 +228,16 @@ export class CccSlider implements ComponentInterface {
   @Method()
   async update() {
     this._querySliders();
-    this._setActivedIndex(Number.isNaN(this._activedIndex) ? this.defaultActivedIndex : this._activedIndex);
+    // 进行布局计算
+    this.calcLayoutInfo();
+    /// 需要进行初始化
+    if (Number.isNaN(this._activedIndex)) {
+      this._reasons.add("init");
+      this._setActivedIndex(this.defaultActivedIndex ?? this.activedIndex, "auto" /* 初始化的时候减少动画 */);
+      requestAnimationFrame(() => {
+        this._reasons.delete("init");
+      });
+    }
   }
 
   @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement, activedIndex: number]>;
@@ -257,13 +268,12 @@ export class CccSlider implements ComponentInterface {
         activedIndex: closestSlider.index,
       };
 
-      let index = 0;
       for (const slider of sliderList) {
-        if (index === closestSlider.index - 1) {
+        if (slider.index === closestSlider.index - 1) {
           slider.ele.setAttribute(SLIDER_STATE_DATASET_KEY, "prev");
-        } else if (index === closestSlider.index) {
+        } else if (slider.index === closestSlider.index) {
           slider.ele.setAttribute(SLIDER_STATE_DATASET_KEY, "actived");
-        } else if (index === closestSlider.index + 1) {
+        } else if (slider.index === closestSlider.index + 1) {
           slider.ele.setAttribute(SLIDER_STATE_DATASET_KEY, "next");
         } else {
           slider.ele.removeAttribute(SLIDER_STATE_DATASET_KEY);

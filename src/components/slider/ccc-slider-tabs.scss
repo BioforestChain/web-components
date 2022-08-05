@@ -29,10 +29,11 @@
   pointer-events: none;
 
   // 样式
+  contain: strict;
   --cursor-from-left: 0;
   --cursor-from-right: 0;
-  --cursor-to-left: 0;
-  --cursor-to-right: 0;
+  --cursor-to-left: 50%;
+  --cursor-to-right: 50%;
   padding-left: var(--cursor-to-left, 0);
   padding-right: var(--cursor-to-right, 0);
   width: 100%;
@@ -48,12 +49,14 @@
   animation-fill-mode: forwards;
   animation-duration: var(--cursor-duration);
   > .spirit {
+    flex: 1;
+    height: 100%;
+    contain: strict;
+
     --cursor-start-color: #1e80f7;
     --cursor-end-color: #3fbdfc;
     background-image: linear-gradient(to right, var(--cursor-start-color), var(--cursor-end-color));
     border-radius: 0.25em;
-    flex: 1;
-    height: 100%;
     margin: 0 12%;
   }
 }
