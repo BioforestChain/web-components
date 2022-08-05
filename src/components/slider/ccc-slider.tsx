@@ -2,15 +2,15 @@ import {
   Component,
   ComponentInterface,
   Element,
-  h,
-  Host,
-  Prop,
   Event,
   EventEmitter,
-  Watch,
+  h,
+  Host,
   Method,
+  Prop,
+  Watch,
 } from "@stencil/core";
-import { at, Logger, querySelectorAll, throttle } from "../../utils/utils";
+import { at, Logger, querySelectorAll } from "../../utils/utils";
 
 const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
 
@@ -248,7 +248,6 @@ export class CccSlider implements ComponentInterface {
    * 更新activedIndex的值变更
    * 触发activedSilderChange事件
    */
-  // @throttle(100)
   private async _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
     console.info("updateSliderStates", "reasons:", this._reasons);
     const {

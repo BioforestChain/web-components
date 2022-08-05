@@ -21,10 +21,11 @@ const DEMO_HTML = html`<div slot="slider" class="slider item-1">
 const DEMO_STYLE = `
   ccc-slider{
     width: 300px;
+    height: 500px;
   }
   .slider {
-    width: 300px;
-    height: 500px;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -32,14 +33,14 @@ const DEMO_STYLE = `
     overflow: auto;
   }
   .item-1{
-    background: #e91e63;
+    background: #e91e6388;
   }
   .item-2{
-    background: #4caf50;
+    background: #4caf5088;
     justify-content: flex-start;
   }
   .item-3{
-    background: #2196f3;
+    background: #2196f388;
   }
   `;
 
@@ -150,5 +151,8 @@ export const Nested_Slider = cccSliderKit
   }
   ccc-slider {
     border-radius: 2em;
+  }
+  .slider ccc-slider {
+    width: 260px;
   }
   `);
