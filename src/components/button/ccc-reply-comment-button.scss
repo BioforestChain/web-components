@@ -6,7 +6,7 @@
 }
 .reply-button {
   background: #f1f2f3;
-  border-radius: 12px;
+  border-radius: 0.86em;
   border: 1px solid #f1f2f3;
   height: 1.714em;
   // width: 6.214em;
@@ -14,14 +14,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  line-height: 1.714em;
   span {
-    font-size: 0.86em;
+    font-size: 0.9em;
   }
   .reply {
     margin: 0 0.285em;
   }
   ion-icon {
     width: 0.5em;
-    height: 0.714em;
+    height: 0.7em;
   }
 }

@@ -13,6 +13,7 @@ export class CccUserCommentCard implements ComponentInterface {
   @Prop() time = "some time";
   @Prop() text = "";
   @Prop() lineClamp = 4;
+  @Prop() isAuthor: boolean = false;
 
   @State() canFlod = false;
   @State() isFlod = true;
@@ -73,6 +74,9 @@ export class CccUserCommentCard implements ComponentInterface {
                 <span class="name">
                   <slot name="username">{this.userName}</slot>
                 </span>
+                {this.isAuthor?(<span class="author">
+                  <slot name="author">作者</slot>
+                </span>):undefined}
                 <span class="flag">
                   <slot name="userflag">
                     <span class="flag-badge">{this.userFlag}</span>
@@ -84,16 +88,21 @@ export class CccUserCommentCard implements ComponentInterface {
               </span>
             </div>
           </slot>
+          {/* <div class="text-wrapper gray" style={{ "--line-clamp": `1` }}>
+            <div class="text fold ">
+              <slot name="replyComment">{this.text}</slot>
+            </div>
+          </div> */}
           <div class="text-wrapper" style={{ "--line-clamp": `${this.lineClamp}` }}>
             <div class={{ text: true, fold: this.isFlod }}>
               <slot name="text">{this.text}</slot>
             </div>
           </div>
           {this.canFlod ? (
-              <button class={{ "fold-btn": true, "fold": this.isFlod }} onClick={this.toggleFold}>
-                {this.isFlod ? <slot name="unfold">展开</slot> : <slot name="fold">收起</slot>}
-              </button>
-            ) : undefined}
+            <button class={{ "fold-btn": true, "fold": this.isFlod }} onClick={this.toggleFold}>
+              {this.isFlod ? <slot name="unfold">展开</slot> : <slot name="fold">收起</slot>}
+            </button>
+          ) : undefined}
           <div class="actions-bar">
             <div class="actions">
               <div class="left-actions">

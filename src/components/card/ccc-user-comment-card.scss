@@ -39,6 +39,15 @@
       font-weight: 600;
       margin-right: 0.5em; //替换gap不生效
     }
+    > .author {
+      border: 0.5px solid rgba(172, 181, 191, 1);
+      border-radius: 3px;
+      color: rgba(172, 181, 191, 1);
+      font-size: 0.8em;
+      padding: 0 0.5em;
+      line-height: 1.4em;
+      text-align: center;
+    }
     > .flag {
       display: flex;
       align-items: center;
@@ -65,7 +74,6 @@
 .text-wrapper {
   font-size: 1em;
   margin-top: 0.3em;
-
   .text {
     display: -webkit-box;
     overflow: hidden;
@@ -81,6 +89,14 @@
       /* 虽然已经有line-clamp了，但是为了兼容，还是要加上max-height */
       max-height: calc(var(--line-clamp) * var(--line-height));
     }
+  }
+  &.gray {
+    background: #f4f6f7;
+    border-radius: 1px;
+    font-size: 0.95em;
+    color: #737880;
+    padding: 0.3em 0.3em;
+    margin-bottom: 0.3em;
   }
 }
 .fold-btn {
