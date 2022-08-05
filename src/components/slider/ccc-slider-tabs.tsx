@@ -43,7 +43,7 @@ export class CccSliderTabs implements ComponentInterface {
   private _syncToForActivedIndex(activedIndex: number) {
     if (this._forEle) {
       console.log("set forEle activedIndex as", activedIndex);
-      this._forEle?.slideTo(activedIndex);
+      this._forEle.slideTo(activedIndex);
     }
   }
 

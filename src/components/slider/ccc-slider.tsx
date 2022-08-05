@@ -10,7 +10,7 @@ import {
   Prop,
   Watch,
 } from "@stencil/core";
-import { at, Logger, querySelectorAll } from "../../utils/utils";
+import { at, Logger, querySelectorAll, throttle } from "../../utils/utils";
 
 const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
 
@@ -204,6 +204,8 @@ export class CccSlider implements ComponentInterface {
       const left = slider.offsetLeft - offsetLeft;
       if (scrollLeft !== left) {
         this._scrollInto(slider.offsetLeft - offsetLeft, behavior);
+      } else if (Number.isNaN(this._activedIndex)) {
+        this._updateSliderStates();
       }
     }
   }
@@ -248,7 +250,8 @@ export class CccSlider implements ComponentInterface {
    * 更新activedIndex的值变更
    * 触发activedSilderChange事件
    */
-  private async _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
+  @throttle()
+  private _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
     console.info("updateSliderStates", "reasons:", this._reasons);
     const {
       closestSlider,
