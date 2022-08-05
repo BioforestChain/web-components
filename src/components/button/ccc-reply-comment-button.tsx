@@ -14,7 +14,7 @@ export class CccReplyCommentButton implements ComponentInterface {
 
   @Event() userClick!: EventEmitter;
   userClickHandle(commentInfo: any) {
-    // console.log("世界-v", commentInfo);
+    // this.logger.log("世界-v", commentInfo);
     this.userClick.emit(commentInfo);
   }
   render() {

@@ -356,9 +356,18 @@ export const enum LOGGER_LEVEL {
   disable,
 }
 export class Logger {
-  constructor(private hostEle: HTMLElement) {}
+  constructor(private hostEleGetter: () => HTMLElement) {}
+  get hostEle() {
+    return this.hostEleGetter();
+  }
   private _tagName = this.hostEle.tagName.toLocaleLowerCase();
-  private _tagInfo = `<${this._tagName}>:`;
+  private get _tagInfo() {
+    if (this.hostEle.id) {
+      return `<${this._tagName}>#${this.hostEle.id}:`;
+    } else {
+      return `<${this._tagName}>:`;
+    }
+  }
   private _getLogLevel() {
     let cccDebug = this.hostEle.dataset.cccDebug;
     if (cccDebug === undefined) {

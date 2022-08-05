@@ -17,7 +17,6 @@ type CursorLayout = {
   left: number;
 };
 const DEFAULT_CURSOR_LAYOUT: CursorLayout = { width: 0, left: 0 };
-let console!: Logger;
 
 const TAB_STATE_DATASET_KEY = "data-ccc-slider-tabs";
 
@@ -28,7 +27,7 @@ const TAB_STATE_DATASET_KEY = "data-ccc-slider-tabs";
 })
 export class CccSliderTabs implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
-  readonly logger = (console = new Logger(this.hostEle));
+  readonly console = new Logger(() => this.hostEle);
   /**
    * the <ccc-silder> element id
    */
@@ -42,7 +41,7 @@ export class CccSliderTabs implements ComponentInterface {
   }
   private _syncToForActivedIndex(activedIndex: number) {
     if (this._forEle) {
-      console.log("set forEle activedIndex as", activedIndex);
+      this.console.log("set forEle activedIndex as", activedIndex);
       this._forEle.slideTo(activedIndex);
     }
   }
@@ -85,7 +84,7 @@ export class CccSliderTabs implements ComponentInterface {
       }
     }
     /// 没有for绑定，自己进行渲染
-    else {
+    if (Number.isNaN(this._activedIndex) || this._forEle === null) {
       // 尝试选中新的tab对象
       this._selectTab(at(this._tabElements, activedIndex, true));
 
@@ -104,12 +103,12 @@ export class CccSliderTabs implements ComponentInterface {
     // }
     // const [_, activedIndex, isInControll] = event.detail;
     // if (isInControll) {
-    //   console.success("ActivedSliderChange", activedIndex);
+    //   this.logger.success("ActivedSliderChange", activedIndex);
     //   this.selectTab(at(this._tabElements, Math.round(activedIndex), true));
     //   // 更新插槽的css属性来做出动画
     //   this._effectCursorLayout(activedIndex);
     // } else {
-    //   console.info("ActivedSliderChange", activedIndex);
+    //   this.logger.info("ActivedSliderChange", activedIndex);
     // }
   };
 
@@ -120,9 +119,9 @@ export class CccSliderTabs implements ComponentInterface {
     }
     const layoutInfo = await ele.getLayoutInfo();
     if (layoutInfo.reason === "user") {
-      console.verbose("USER scroll", layoutInfo.activedIndex);
+      this.console.verbose("USER scroll", layoutInfo.activedIndex);
     } else {
-      console.verbose("AUTO scroll", layoutInfo.activedIndex);
+      this.console.verbose("AUTO scroll", layoutInfo.activedIndex);
     }
 
     this._selectTab(at(this._tabElements, Math.round(layoutInfo.activedIndex), true));
@@ -143,10 +142,10 @@ export class CccSliderTabs implements ComponentInterface {
    */
   @throttle()
   private async _calcCursorSlotLayouts() {
-    if (!this._tabListEle) {
+    if (this._tabListEle === undefined) {
       return;
     }
-    console.log("_calcCursorSlotLayouts");
+    this.console.log("_calcCursorSlotLayouts");
     const offsetLeftStart = this._tabListEle.offsetLeft;
     const cursorLayouts = this._cursorLayouts;
     cursorLayouts.length = 0;
@@ -159,27 +158,27 @@ export class CccSliderTabs implements ComponentInterface {
     this._cursorLayouts = cursorLayouts;
     // 布局变更，重新绘制
     if (Number.isNaN(this._activedIndex)) {
-      this.watchActivedIndex(this.defaultActivedIndex ?? this.activedIndex ?? 0);
+      this._setActivedIndex(this.defaultActivedIndex ?? this.activedIndex ?? 0);
     } else {
       this._effectCursorLayout(this._activedIndex);
     }
   }
   private _resizeOb = new ResizeObserver(() => {
-    console.log("resize");
+    this.console.log("resize");
     this._calcCursorSlotLayouts();
   });
   private _mutationOb = new MutationObserver(() => {
-    console.log("mutation");
+    this.console.log("mutation");
     this._calcCursorSlotLayouts();
   });
   connectedCallback() {
     this.watchFor();
-    console.log("connectedCallback");
+    this.console.log("connectedCallback");
   }
   private _tabListEle?: HTMLElement;
   private _cursorEle?: HTMLElement;
   componentDidLoad() {
-    console.log("componentDidLoad");
+    this.console.log("componentDidLoad");
     this._mutationOb.observe(this.hostEle, { childList: true });
     this._cursorEle = querySelector(this.hostEle.shadowRoot, ".cursor");
     this._resizeOb.observe((this._tabListEle = querySelector(this.hostEle.shadowRoot, ".tab-list")!));
@@ -205,7 +204,7 @@ export class CccSliderTabs implements ComponentInterface {
         : null
       : null;
     if (forEle !== _forEle) {
-      console.error("for attribute can only binding <ccc-slider> element");
+      this.console.error("for attribute can only binding <ccc-slider> element");
     }
     if (forEle === this._forEle) {
       return;
@@ -240,7 +239,7 @@ export class CccSliderTabs implements ComponentInterface {
     if (!ele) {
       return;
     }
-    console.info("clicked");
+    this.console.info("clicked");
     let tabEle = ele.closest<HTMLElement>(`[slot="tab"]`);
     /// 无法在结构上找到，那么只能根据X坐标来寻找
     if (tabEle === null) {
@@ -274,14 +273,14 @@ export class CccSliderTabs implements ComponentInterface {
 
     /// 触发事件更新
     this.activedTabChange.emit([newTabEle, activedIndex]);
-    console.log("activedTabChange", newTabEle, activedIndex);
+    this.console.log("activedTabChange", newTabEle, activedIndex);
     return activedIndex;
   }
 
   /**引用游标的插槽布局 */
   @throttle()
   private async _effectCursorLayout(activedIndex = this._activedIndex) {
-    console.log("_effectCursorLayout");
+    this.console.log("_effectCursorLayout");
 
     const cursorEle = this._cursorEle;
     if (!cursorEle) {

@@ -28,7 +28,6 @@ export type $Slider = {
 export type $Reason = "user" | "auto";
 type $InternalReason = "touch" | "mousewheel" | "into" | "init";
 
-let console!: Logger;
 @Component({
   tag: "ccc-slider",
   styleUrl: "ccc-slider.scss",
@@ -36,7 +35,7 @@ let console!: Logger;
 })
 export class CccSlider implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
-  readonly logger = (console = new Logger(this.hostEle));
+  readonly console = new Logger(() => this.hostEle);
   //#region 与tabs节点的联动
   get id() {
     return this.hostEle.id;
@@ -59,6 +58,12 @@ export class CccSlider implements ComponentInterface {
     }
   }
 
+  private _resizeOb = new ResizeObserver(() => {
+    this.console.log("resize");
+    // 清理布局缓存，确保重新计算
+    this._cachedLayoutInfo = undefined;
+    this._updateSliderStates();
+  });
   /**
    * watch id changed
    */
@@ -66,9 +71,11 @@ export class CccSlider implements ComponentInterface {
     if (this._inDOM) {
       for (const entry of entries) {
         if (entry.type === "attributes") {
+          this.console.log("MutationObserver attributes changed");
           this._unbindTabs();
           this._bindingTabs();
         } else if (entry.type === "childList") {
+          this.console.log("MutationObserver childList changed");
           this._querySliders();
           // 进行布局计算，并更新状态
           this._updateSliderStates();
@@ -81,6 +88,7 @@ export class CccSlider implements ComponentInterface {
   connectedCallback() {
     this._inDOM = true;
     this._bindingTabs();
+    this._resizeOb.observe(this.hostEle);
     this._mutationOb.observe(this.hostEle, {
       attributeFilter: ["id"],
       attributes: true,
@@ -94,6 +102,7 @@ export class CccSlider implements ComponentInterface {
   disconnectedCallback() {
     this._inDOM = false;
     this._unbindTabs();
+    this._resizeOb.unobserve(this.hostEle);
     this._mutationOb.disconnect();
   }
   //#endregion
@@ -117,7 +126,7 @@ export class CccSlider implements ComponentInterface {
       };
       return slider;
     });
-    console.info("set sliderEles", this._sliderList);
+    this.console.info("set sliderEles", this._sliderList);
   }
 
   private _cachedLayoutInfo?: ReturnType<CccSlider["_calcLayoutInfo"]>;
@@ -167,10 +176,15 @@ export class CccSlider implements ComponentInterface {
         : this._activedIndex,
     };
   }
+  private _calc_frame_id?: number;
   calcLayoutInfo() {
     if (this._cachedLayoutInfo === undefined) {
       this._cachedLayoutInfo = this._calcLayoutInfo();
-      requestAnimationFrame(() => {
+      if (this._calc_frame_id !== undefined) {
+        cancelAnimationFrame(this._calc_frame_id);
+      }
+      this._calc_frame_id = requestAnimationFrame(() => {
+        this._calc_frame_id = undefined;
         this._cachedLayoutInfo = undefined;
       });
     }
@@ -198,7 +212,7 @@ export class CccSlider implements ComponentInterface {
       return;
     }
     const slider = at(this._sliderList, activedIndex, true);
-    console.info("setActivedIndex", activedIndex, slider);
+    this.console.info("setActivedIndex", activedIndex, slider);
     if (slider) {
       const { scrollLeft, offsetLeft } = this.hostEle;
       const left = slider.offsetLeft - offsetLeft;
@@ -215,7 +229,7 @@ export class CccSlider implements ComponentInterface {
     this._inScrollInto = true;
     // 这里不时用 closestSlider.ele.scrollIntoView，因为如果ele在滚动，那么可能久失效
     this.hostEle.scrollTo({ left, behavior });
-    console.info("scroll Into", left, behavior);
+    this.console.info("scroll Into", left, behavior);
   }
 
   @Method()
@@ -252,7 +266,7 @@ export class CccSlider implements ComponentInterface {
    */
   @throttle()
   private _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
-    console.info("updateSliderStates", "reasons:", this._reasons, this._reason);
+    this.console.info("updateSliderStates", "reasons:", this._reasons, this._reason);
     const {
       closestSlider,
       viewbox: { offsetCenter: viewboxOffsetCenter },
@@ -284,12 +298,16 @@ export class CccSlider implements ComponentInterface {
     }
 
     /// 计算出 activedIndex
-    const progress = (viewboxOffsetCenter - closestSlider.offsetCenter) / closestSlider.offsetWidth;
+    const progress =
+      closestSlider.offsetWidth === 0
+        ? 0
+        : (viewboxOffsetCenter - closestSlider.offsetCenter) / closestSlider.offsetWidth;
     this._activedIndex = closestSlider.index + progress;
+    layoutInfo.activedIndex = this._activedIndex;
 
     /// 触发事件
     if (changed) {
-      console.info("emit activedSilderChange", this._activedIndex, closestSlider);
+      this.console.info("emit activedSilderChange", this._activedIndex, closestSlider);
       this.activedSilderChange.emit([closestSlider.ele!, this._activedIndex]);
     }
   }
@@ -301,9 +319,9 @@ export class CccSlider implements ComponentInterface {
    * 在滚动停下的时候，强制滚动确保进入到卡片中
    */
   private _handleScrollStop() {
-    console.success("scroll stop");
+    this.console.success("scroll stop");
     const { closestSlider, viewbox } = this.calcLayoutInfo();
-    console.info("closestSlider:", closestSlider);
+    this.console.info("closestSlider:", closestSlider);
     if (closestSlider.offsetCenter !== viewbox.offsetCenter) {
       this._scrollInto(closestSlider.offsetCenter - viewbox.offsetWidth / 2, "smooth");
     } else {
@@ -319,7 +337,7 @@ export class CccSlider implements ComponentInterface {
       if (this._inTouch === false) {
         this._scrollTick -= 1;
       }
-      console.verbose("scroll tick", this._scrollTick);
+      this.console.verbose("scroll tick", this._scrollTick);
       if (this._scrollTick <= 0) {
         this._handleScrollStop();
         this._tickFrame = 0;
@@ -354,7 +372,7 @@ export class CccSlider implements ComponentInterface {
     //   event.cancelBubble = true;
     // }
     if (this._scrolling.startTime > 0) {
-      console.info("scroll end");
+      this.console.info("scroll end");
       this._inScrollInto = false;
       this._scrolling.startTime = 0;
     }
@@ -365,7 +383,7 @@ export class CccSlider implements ComponentInterface {
     this._updateSliderStates();
   };
   private get _reason(): $Reason {
-    if (this._reasons.has("mousewheel") || this._reasons.has("touch")) {
+    if (this._reasons.size === 0 || this._reasons.has("mousewheel") || this._reasons.has("touch")) {
       return "user";
     }
     return "auto";
@@ -382,12 +400,12 @@ export class CccSlider implements ComponentInterface {
     this._reasons.add("touch");
     this._inTouch = true;
     this._inScrollInto = false;
-    console.info("touch start");
+    this.console.info("touch start");
   };
   onTouchStop = () => {
     this._reasons.delete("touch");
     this._inTouch = false;
-    console.info("touch stop");
+    this.console.info("touch stop");
   };
   //#endregion
 
