@@ -130,25 +130,8 @@ export const With_Tabs_And_Default_Index = cccSliderKit
       </ccc-slider-tabs>
     `,
     "before",
-  ).addStyle(`
-    #root {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    ccc-slider-tabs > .tab{
-     width: 3em;
-     text-align:center;
-    }
-    ccc-slider-tabs > .tab[data-ccc-slider-tabs="actived"]{
-      font-weight: bold;
-      transform: scale(1.1);
-      transition-duration: 250ms;
-    }
-    ccc-slider {
-      border-radius: 2em;
-    }
-    `);
+  )
+  .addStyle(WITH_TABS_ADD_STYLE);
 
 export const Nested_Slider = cccSliderKit
   .storyFactory(
@@ -203,25 +186,12 @@ export const Nested_Slider = cccSliderKit
       </ccc-slider-tabs>
     `,
     "before",
-  ).addStyle(`
-  #root {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  ccc-slider-tabs > .tab{
-   width: 3em;
-   text-align:center;
-  }
-  ccc-slider-tabs > .tab[data-ccc-slider-tabs="actived"]{
-    font-weight: bold;
-    transform: scale(1.1);
-    transition-duration: 250ms;
-  }
-  ccc-slider {
-    border-radius: 2em;
-  }
+  )
+  .addStyle(
+    WITH_TABS_ADD_STYLE +
+      `
   .slider ccc-slider {
     width: 260px;
   }
-  `);
+  `,
+  );

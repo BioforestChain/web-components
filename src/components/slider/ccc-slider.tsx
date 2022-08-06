@@ -17,9 +17,13 @@ const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
 export type $Slider = {
   index: number;
   ele: HTMLElement;
-  offsetLeft: number;
-  offsetWidth: number;
-  offsetCenter: number;
+  /**计算时，缓存的一些数值
+   * 只在一些特定情况下使用，比如在同一帧里，基于这些缓存结果做“后续的计算”
+   * 如果时DOM操作，请使用“实时数据”！
+   */
+  offsetLeftCache: number;
+  offsetWidthCache: number;
+  offsetCenterCache: number;
 };
 /**当前的“原因”
  * 如果是 user ，说明是用户在控制，此时应该避免去对它进行任何覆盖操作，避免行为不跟手
@@ -59,10 +63,10 @@ export class CccSlider implements ComponentInterface {
   }
 
   private _resizeOb = new ResizeObserver(() => {
-    this.console.log("resize");
+    this.console.log("resize start");
     // 清理布局缓存，确保重新计算
-    this._cachedLayoutInfo = undefined;
-    this._updateSliderStates();
+    this._scrollToIndex(this.activedIndex, "auto");
+    this.console.log("resize end");
   });
   /**
    * watch id changed
@@ -95,8 +99,24 @@ export class CccSlider implements ComponentInterface {
       childList: true,
     });
   }
+  /**初始化渲染完毕的时候 */
   componentDidLoad() {
-    this.update();
+    this.console.log("componentDidLoad");
+    // 加载节点
+    this._querySliders();
+    // 进行布局计算
+    this.calcLayoutInfo();
+    /// 需要进行初始化
+    this._reasons.add("init");
+    this.console.log(
+      "componentDidLoad",
+      "!! scroll into defaultIndex",
+      this.defaultActivedIndex,
+      "activedIndex:",
+      this.activedIndex,
+    );
+    this._scrollToIndex(this.defaultActivedIndex ?? this.activedIndex, "auto" /* 初始化的时候减少动画 */);
+    this._reasons.delete("init");
   }
 
   disconnectedCallback() {
@@ -107,11 +127,6 @@ export class CccSlider implements ComponentInterface {
   }
   //#endregion
 
-  /**
-   * 是否可以跨越多个slider进行滚动
-   */
-  @Prop({ reflect: true }) cross?: boolean;
-
   private _sliderList: $Slider[] = [];
 
   private _querySliders() {
@@ -120,9 +135,9 @@ export class CccSlider implements ComponentInterface {
       const slider: $Slider = {
         index: i,
         ele,
-        offsetLeft: 0,
-        offsetWidth: 0,
-        offsetCenter: 0,
+        offsetLeftCache: 0,
+        offsetWidthCache: 0,
+        offsetCenterCache: 0,
       };
       return slider;
     });
@@ -134,29 +149,25 @@ export class CccSlider implements ComponentInterface {
    * 获取这一帧的布局信息
    * @returns
    */
-  private _calcLayoutInfo() {
-    const {
-      offsetLeft: viewboxOffsetLeft,
-      offsetWidth: viewboxOffsetWidth,
-      scrollLeft: viewboxScrollLeft,
-    } = this.hostEle;
+  private _calcLayoutInfo(viewboxScrollLeft: number = this.hostEle.scrollLeft) {
+    const { offsetLeft: viewboxOffsetLeft, offsetWidth: viewboxOffsetWidth } = this.hostEle;
     const viewboxOffsetCenter = viewboxOffsetLeft + viewboxScrollLeft + viewboxOffsetWidth / 2;
 
     let closestSlider = {
       index: -1,
       ele: undefined as HTMLElement | undefined,
-      offsetLeft: 0,
-      offsetWidth: 0,
-      offsetCenter: 0,
+      offsetLeftCache: 0,
+      offsetWidthCache: 0,
+      offsetCenterCache: 0,
     };
     /// 更新slider的布局信息；并寻找"中线"现在进入到哪一个视图中
     for (const sliderLayoutInfo of this._sliderList) {
       const { offsetLeft, offsetWidth } = sliderLayoutInfo.ele;
       const offsetRight = offsetLeft + offsetWidth;
 
-      sliderLayoutInfo.offsetLeft = offsetLeft;
-      sliderLayoutInfo.offsetWidth = offsetWidth;
-      sliderLayoutInfo.offsetCenter = offsetLeft + offsetWidth / 2;
+      sliderLayoutInfo.offsetLeftCache = offsetLeft;
+      sliderLayoutInfo.offsetWidthCache = offsetWidth;
+      sliderLayoutInfo.offsetCenterCache = offsetLeft + offsetWidth / 2;
 
       if (offsetLeft <= viewboxOffsetCenter && viewboxOffsetCenter <= offsetRight) {
         closestSlider = sliderLayoutInfo;
@@ -170,16 +181,20 @@ export class CccSlider implements ComponentInterface {
         offsetWidth: viewboxOffsetWidth,
         offsetCenter: viewboxOffsetCenter,
       },
+      sliderList: this._sliderList,
       reason: this._reason,
-      activedIndex: Number.isNaN(this._activedIndex)
-        ? this.defaultActivedIndex ?? this.activedIndex ?? 0
-        : this._activedIndex,
+      activedIndex: this.activedIndex,
+      scrollProgress: this._scrollProgress,
     };
   }
   private _calc_frame_id?: number;
-  calcLayoutInfo() {
-    if (this._cachedLayoutInfo === undefined) {
-      this._cachedLayoutInfo = this._calcLayoutInfo();
+  calcLayoutInfo(viewboxScrollLeft?: number, force?: boolean) {
+    if (
+      force ||
+      this._cachedLayoutInfo === undefined ||
+      (viewboxScrollLeft !== undefined && viewboxScrollLeft !== this._cachedLayoutInfo.viewbox.scrollLeft)
+    ) {
+      this._cachedLayoutInfo = this._calcLayoutInfo(viewboxScrollLeft);
       if (this._calc_frame_id !== undefined) {
         cancelAnimationFrame(this._calc_frame_id);
       }
@@ -196,73 +211,110 @@ export class CccSlider implements ComponentInterface {
     return this.calcLayoutInfo();
   }
 
-  @Prop({ reflect: true }) defaultActivedIndex?: number;
-  @Prop({ reflect: true }) activedIndex?: number;
+  @Prop({}) defaultActivedIndex?: number;
+  @Prop({ mutable: true }) activedIndex: number = 0;
   @Watch("activedIndex")
   watchActivedIndex(newVal: number) {
-    this._setActivedIndex(newVal);
-  }
-  private _activedIndex = NaN;
-  @Method()
-  async getActivedIndex() {
-    return this._activedIndex;
-  }
-  private _setActivedIndex(activedIndex?: number, behavior: ScrollBehavior = "smooth") {
-    if (activedIndex === undefined) {
+    if (Number.isSafeInteger(newVal) === false) {
       return;
     }
+
+    /// 对数据进行格式化
+    newVal = Math.floor(newVal % this._sliderList.length);
+    if (newVal < 0) {
+      newVal += this._sliderList.length;
+    }
+    /// 不会发生变化
+    if (newVal === this.calcLayoutInfo().closestSlider.index) {
+      return;
+    }
+    // 发生变化了，进行滑动
+    this._scrollToIndex(newVal, "smooth");
+  }
+  private _scrollProgress = 0;
+
+  @Method()
+  async getScrollProgress() {
+    return this._scrollProgress;
+  }
+  /**滚动到指定的第几个元素上 */
+  private _scrollToIndex(activedIndex: number, behavior: ScrollBehavior) {
     const slider = at(this._sliderList, activedIndex, true);
     this.console.info("setActivedIndex", activedIndex, slider);
-    if (slider) {
-      const { scrollLeft, offsetLeft } = this.hostEle;
-      const left = slider.offsetLeft - offsetLeft;
-      if (scrollLeft !== left) {
-        this._scrollInto(slider.offsetLeft - offsetLeft, behavior);
-      } else if (Number.isNaN(this._activedIndex)) {
-        this._updateSliderStates();
+
+    /// 使用真实的scrollLeft，而不是缓存的，缓存是给
+    const scrollLeft = slider ? slider.ele.offsetLeft - this.hostEle.offsetLeft : 0;
+
+    /// 计算布局，将更新布局的计算结果
+    const layoutInfo = this.calcLayoutInfo(scrollLeft, true);
+
+    let setScrollLeftBehavior: ScrollBehavior | "set" = behavior;
+    /**
+     * 如果根据scrollLeft计算出来的 closestSlider 与 scrollLeft 对不上，那么就需要用一些特殊的手段来干预接下来的 updateState
+     * > 比如说不可见的情况下，大家的 width 与 left 都是 0，这时候 二者就有可能对不上
+     */
+    if (slider && layoutInfo.closestSlider.index !== slider.index) {
+      layoutInfo.closestSlider = slider;
+      setScrollLeftBehavior = "set";
+    }
+
+    // 执行滚动
+    this._setScrollLeft(scrollLeft, setScrollLeftBehavior);
+  }
+  /**滚动到指定的坐标位置上 */
+  private _scrollToLeft(left: number, behavior: ScrollBehavior) {
+    // 执行滚动
+    this._setScrollLeft(left, behavior);
+  }
+
+  /**
+   * scrollTo 是瞬发的函数，它不会触发 onscroll 与 onscrollend。behavior:smooth 只是一个硬件加速的滚动
+   * 所以在执行完该函数后，需要立即进行相关的布局计算与事件触发
+   * @param left
+   * @param behavior
+   */
+  private _setScrollLeft(left: number, behavior: ScrollBehavior | "set") {
+    this._reasons.add("into");
+    this._inScrollInto = true;
+    /// 如果不需要滚动，那么只需要手动触发一下滚动的函数回调函数就行
+    if (left === this.hostEle.scrollLeft) {
+      // 这里不需要raf，因为 scroll 回调函数的触发本来就是瞬发的
+      this.onScrollEnd();
+    } else {
+      if (behavior === "set") {
+        this.hostEle.scrollLeft = left;
+      } else {
+        // 这里不时用 closestSlider.ele.scrollIntoView，因为如果ele在滚动，那么可能久失效
+        this.hostEle.scrollTo({ left, behavior });
       }
     }
-  }
-  private _scrollInto(left: number, behavior: ScrollBehavior) {
-    this._reasons.add("into");
-    /// 校准滚动坐标
-    this._inScrollInto = true;
-    // 这里不时用 closestSlider.ele.scrollIntoView，因为如果ele在滚动，那么可能久失效
-    this.hostEle.scrollTo({ left, behavior });
-    this.console.info("scroll Into", left, behavior);
+    this.console.info("set scrollLeft:", left, behavior);
 
-    // 如果滚动时瞬发的，基于浏览器行为或者behavior配置，那么可能不会触发scrolleEnd函数，所以这里手动触发状态基的变更
-    if (this.hostEle.scrollLeft === left) {
-      this._cachedLayoutInfo = undefined; //强制清理这一帧的布局缓存
-      this._updateSliderStates();
-    }
+    queueMicrotask(() => {
+      this._reasons.delete("into");
+    });
   }
 
   @Method()
   async setActivedIndex(activedIndex: number) {
-    this._setActivedIndex(activedIndex);
+    this._scrollToIndex(activedIndex, "smooth");
   }
   /**兼容ionic-sliders的语法 */
   @Method()
-  async slideTo(activedIndex: number, behavior?: ScrollBehavior) {
-    this._setActivedIndex(activedIndex, behavior);
+  async slideTo(activedIndex: number, behavior: ScrollBehavior = "smooth") {
+    this._scrollToIndex(activedIndex, behavior);
   }
   @Method()
   async update() {
     this._querySliders();
-    // 进行布局计算
-    this.calcLayoutInfo();
-    /// 需要进行初始化
-    if (Number.isNaN(this._activedIndex)) {
-      this._reasons.add("init");
-      this._setActivedIndex(this.defaultActivedIndex ?? this.activedIndex, "auto" /* 初始化的时候减少动画 */);
-      requestAnimationFrame(() => {
-        this._reasons.delete("init");
-      });
-    }
+    // 进行布局计算，并更新状态
+    this._updateSliderStates();
   }
 
-  @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement, activedIndex: number]>;
+  /**
+   * 在初始化的时候，只要有元素，那么它总会触发
+   */
+  @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement | undefined, activedIndex: number]>;
 
   private _preSliderStates: { list: $Slider[]; activedIndex: number } = { list: [], activedIndex: -1 };
   /**
@@ -272,7 +324,7 @@ export class CccSlider implements ComponentInterface {
    */
   // @throttle()
   private _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
-    this.console.info("updateSliderStates", "reasons:", this._reasons, this._reason);
+    this.console.lazyInfo(() => ["updateSliderStates", "reasons:", this._reasons, this._reason, { ...layoutInfo }]);
     const {
       closestSlider,
       viewbox: { offsetCenter: viewboxOffsetCenter },
@@ -303,18 +355,20 @@ export class CccSlider implements ComponentInterface {
       }
     }
 
-    /// 计算出 activedIndex
+    /// 计算出 activedIndex 与 scrollProgress
     const progress =
-      closestSlider.offsetWidth === 0
+      closestSlider.offsetWidthCache === 0
         ? 0
-        : (viewboxOffsetCenter - closestSlider.offsetCenter) / closestSlider.offsetWidth;
-    this._activedIndex = closestSlider.index + progress;
-    layoutInfo.activedIndex = this._activedIndex;
+        : (viewboxOffsetCenter - closestSlider.offsetCenterCache) / closestSlider.offsetWidthCache;
+    this._scrollProgress = closestSlider.index + progress;
+    this.activedIndex = closestSlider.index;
+    layoutInfo.activedIndex = this.activedIndex;
+    layoutInfo.scrollProgress = this._scrollProgress;
 
     /// 触发事件
     if (changed) {
-      this.console.info("emit activedSilderChange", this._activedIndex, closestSlider);
-      this.activedSilderChange.emit([closestSlider.ele!, this._activedIndex]);
+      this.console.info("emit activedSilderChange", this._scrollProgress, closestSlider);
+      this.activedSilderChange.emit([closestSlider.ele, closestSlider.index]);
     }
   }
 
@@ -328,8 +382,8 @@ export class CccSlider implements ComponentInterface {
     this.console.success("scroll stop");
     const { closestSlider, viewbox } = this.calcLayoutInfo();
     this.console.info("closestSlider:", closestSlider);
-    if (closestSlider.offsetCenter !== viewbox.offsetCenter) {
-      this._scrollInto(closestSlider.offsetCenter - viewbox.offsetWidth / 2, "smooth");
+    if (closestSlider.offsetCenterCache !== viewbox.offsetCenter) {
+      this._scrollToLeft(closestSlider.offsetCenterCache - viewbox.offsetWidth / 2, "smooth");
     } else {
       this.onScrollEnd();
     }
@@ -360,7 +414,7 @@ export class CccSlider implements ComponentInterface {
     if (event && event.target !== this.hostEle) {
       return;
     }
-    // event.cancelBubble = true;
+
     this._scrolling = { startTime: event.timeStamp };
     this._updateSliderStates();
 
@@ -374,19 +428,17 @@ export class CccSlider implements ComponentInterface {
     if (event && event.target !== this.hostEle) {
       return;
     }
-    // if (event) {
-    //   event.cancelBubble = true;
-    // }
+
     if (this._scrolling.startTime > 0) {
       this.console.info("scroll end");
-      this._inScrollInto = false;
       this._scrolling.startTime = 0;
     }
+    this._inScrollInto = false;
 
-    this._reasons.delete("mousewheel");
-    this._reasons.delete("into");
     /// 尝试触发事件
     this._updateSliderStates();
+
+    this._reasons.delete("mousewheel");
   };
   private get _reason(): $Reason {
     if (this._reasons.size === 0 || this._reasons.has("mousewheel") || this._reasons.has("touch")) {
