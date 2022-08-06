@@ -8,7 +8,7 @@ import { bindThis, Logger } from "../../utils/utils";
 })
 export class CccTemplate implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
-  readonly console = new Logger(() => this.hostEle);
+  readonly console = new Logger(this.hostEle);
 
   /**
    * click count

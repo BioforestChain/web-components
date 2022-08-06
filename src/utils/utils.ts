@@ -356,10 +356,7 @@ export const enum LOGGER_LEVEL {
   disable,
 }
 export class Logger {
-  constructor(private hostEleGetter: () => HTMLElement) {}
-  get hostEle() {
-    return this.hostEleGetter();
-  }
+  constructor(private hostEle: HTMLElement) {}
   private _tagName = this.hostEle.tagName.toLocaleLowerCase();
   private get _tagInfo() {
     if (this.hostEle.id) {

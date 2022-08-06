@@ -35,7 +35,7 @@ type $InternalReason = "touch" | "mousewheel" | "into" | "init";
 })
 export class CccSlider implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
-  readonly console = new Logger(() => this.hostEle);
+  readonly console = new Logger(this.hostEle);
   //#region 与tabs节点的联动
   get id() {
     return this.hostEle.id;

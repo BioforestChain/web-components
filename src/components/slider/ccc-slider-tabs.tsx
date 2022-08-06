@@ -27,9 +27,9 @@ const TAB_STATE_DATASET_KEY = "data-ccc-slider-tabs";
 })
 export class CccSliderTabs implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
-  readonly console = new Logger(() => this.hostEle);
+  readonly console = new Logger(this.hostEle);
   /**
-   * the <ccc-silder> element id
+   * the `<ccc-silder>` element id
    */
   @Prop({ reflect: true, mutable: true }) for?: string;
   private _canWriteAttr_for = true;
@@ -194,8 +194,8 @@ export class CccSliderTabs implements ComponentInterface {
   }
 
   /**
-   * 手动绑定或者解绑for元素
-   * 从而栏 <ccc-slider> 元素能主动 根据自己的生命周期来与 tabs 进行绑定联动
+   * 手动绑定或者解绑 for 元素
+   * 从而让 `<ccc-slider>` 元素能主动 根据自己的生命周期来与 tabs 进行绑定联动
    * @param _forEle
    * @returns
    */

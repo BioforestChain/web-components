@@ -79,6 +79,21 @@ yarn g YOUR_COMPONENT_NAME
 
 与此同时，组件中会自动生成 `stories` 文件夹下会出现一个对应的“故事文件”，比如`your-component.stories.ts`。在该文件中，也同样享有严格的类型检查。前提是你要安装 vscode-lit 插件
 
+## 📦 贡献者·调试
+
+1. 在组件开发时，你可以使用 `this.console.verbose/log/info/warn/error/success` 这几个接口来进行日志打印。它们的日志等级依次提高
+1. 在组件部署的环境中，通过将全局变量 `self.__ccc_dev__ = true` 来开启调试。
+1. 使用 `localStorage.getItem('ccc-debug')` 来进行全局的调试配置：
+   1. `*`代表调试任何组件
+   1. `ccc-tag-name:*` 代表调试指定组件
+   1. `ccc-tag-name:warn` 代表将指定组件设定为特定的最低日志等级
+   1. `*,ccc-tag-name:warn` 使用逗号`,`来进行多项配置
+1. 使用 `ele.dataset.cccDebug` （也就是`data-ccc-debug`）来对指定的元素进行最低日志等级配置
+   1. 比如说 `<ccc-tag-name data-ccc-debug="*"></ccc-tag-name>` 代表日志全开
+   1. 比如说 `<ccc-tag-name data-ccc-debug="info"></ccc-tag-name>` 代表只打印 `info` 及以上的日志
+   1. 比如说 `<ccc-tag-name data-ccc-debug="disable"></ccc-tag-name>` 代表关闭该元素的打印。
+1. 可以通过为元素配置 `id` 属性，来使得日志打印的时候带上 id 信息，使得更有可分辨性
+
 ## 📦 贡献者·一些已知的问题
 
 1. 在 Angular 项目开发时，的 HMR 模式下（通过`yarn dev:hmr`）启动，webcomponet 是无法正确重载的（因为 WebComponent 无法重新注册）。所以建议是：
