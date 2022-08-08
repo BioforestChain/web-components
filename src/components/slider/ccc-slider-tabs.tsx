@@ -10,374 +10,354 @@ import {
   Prop,
   Watch,
 } from "@stencil/core";
-import { at, cssAnimationDurationToMs, Logger, throttle, querySelector, querySelectorAll } from "../../utils/utils";
+import { at, Logger, querySelector, querySelectorAll } from "../../utils/utils";
+import { $CccLayout, $CccLayoutFollower, $CccSlider, $CccSliderFollower, isCccSlider } from "./ccc-slider.const";
 
-type CursorLayout = {
-  width: number;
-  left: number;
+export type $Tab = {
+  index: number;
+  ele: HTMLElement;
+  offsetWidthCache: number;
+  offsetLeftCache: number;
+  size: number;
 };
-const DEFAULT_CURSOR_LAYOUT: CursorLayout = { width: 0, left: 0 };
+export type $NullableTab = Omit<$Tab, "ele"> & { ele?: $Tab["ele"] };
+// const DEFAULT_CURSOR_LAYOUT: $Tab = { width: 0, left: 0 };
 
 const TAB_STATE_DATASET_KEY = "data-ccc-slider-tabs";
 
+export interface $CccSliderTabsFollower {
+  bindLayoutFollowerElement(ele?: HTMLElement | null): void;
+}
+/**
+ * slider-tabs有两个核心部件组成：
+ * 1. 一个是滚动动画
+ * 1. 一个是触发器
+ *
+ * 其中触发器有两种模式：
+ * 1. 一种是找不到 for=slider 元素的情况下，它会有自己的触发器，就是基于 click 事件来进行触发
+ * 1. 一种是能找到 for=slider 元素的情况下，它的所有“滚动动画”都是跟随着 slider 的滚动事件来进行执行的。
+ *    > 在这种模式下，click 事件会转化成对 slider 的控制，然后基于 slider 的变化再回来影响 tabs 的动画
+ */
 @Component({
   tag: "ccc-slider-tabs",
   styleUrl: "ccc-slider-tabs.scss",
   shadow: true,
 })
-export class CccSliderTabs implements ComponentInterface {
+export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $CccLayout, $CccSlider {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
-  /**
-   * the `<ccc-silder>` element id
-   */
-  @Prop({ reflect: true, mutable: true }) for?: string;
-  private _canWriteAttr_for = true;
-  @Watch("for")
-  watchFor() {
-    this._canWriteAttr_for = false;
-    this.bindForElement(this.for ? querySelector<HTMLCccSliderElement>(document, `#${this.for}`) : null);
-    this._canWriteAttr_for = true;
+  //#region 与其它节点的联动
+  get id() {
+    return this.hostEle.id;
   }
-  private _syncToForActivedIndex(activedIndex: number) {
-    if (this._forEle) {
-      this.console.log("set forEle activedIndex as", activedIndex);
-      this._forEle.slideTo(activedIndex);
+
+  private _bindingEles: $CccLayoutFollower[] = [];
+  private _bindingFollowers() {
+    if (this.id) {
+      for (const tabsEle of (this._bindingEles = querySelectorAll<$CccLayoutFollower>(
+        document,
+        `[for-layout=${this.id}]`,
+      ))) {
+        tabsEle.bindLayoutElement?.(this.hostEle); // 绑定
+      }
     }
   }
+  private _unbindFollowers() {
+    for (const tabsEle of this._bindingEles) {
+      tabsEle.bindLayoutElement?.(null); // 解绑
+    }
+    this._bindingEles.length = 0;
+  }
 
-  // /**
-  //  * 是否跟随着for元素
-  //  * 如果true，那么它的activedIndex不会反应给for元素
-  //  * 在for元素要对其进行控制的时候，它会被控制成true
-  //  */
-  // @Prop({ reflect: true, mutable: true }) followFor?: boolean;
+  connectedCallback() {
+    this._bindingFollowers();
+  }
 
-  @Prop({ reflect: true }) defaultActivedIndex?: number;
-  @Prop({ reflect: true }) activedIndex?: number;
+  //#endregion
+
+  //#region 与 slider 元素通过 for 属性进行联动绑定
+  /**
+   * the `<ccc-slider>` element id
+   */
+  @Prop({}) forSlider?: string;
+  @Watch("forSlider")
+  watchForSlider() {
+    return this._bindSliderElement(
+      this.forSlider ? querySelector<$CccSlider.HTMLCccSliderElement>(document, `#${this.forSlider}`) : null,
+    );
+  }
+  private _sliderEle: $CccSlider.HTMLCccSliderElement | null = null;
+
+  @Prop({}) forTabs?: string;
+
+  /**
+   * 手动绑定或者解绑 for 元素
+   * 从而让 `<ccc-slider>` 元素能主动 根据自己的生命周期来与 tabs 进行绑定联动
+   * @param _sliderEle
+   * @returns
+   */
+  @Method()
+  async bindSliderElement(_sliderEle?: HTMLElement | null) {
+    await this._bindSliderElement(_sliderEle);
+  }
+  private async _bindSliderElement(_sliderEle?: HTMLElement | null) {
+    const sliderEle = isCccSlider(_sliderEle) ? _sliderEle : null;
+    if (sliderEle !== _sliderEle) {
+      this.console.error("for attribute can only binding <ccc-slider> element");
+    }
+    if (sliderEle === this._sliderEle) {
+      return;
+    }
+    /// 解绑
+    if (this._sliderEle) {
+      this._sliderEle.removeEventListener("activedIndexChange", this._onForEleActivedIndexChange);
+    }
+
+    /// 绑定
+    if (sliderEle) {
+      this._sliderEle = sliderEle;
+      sliderEle.addEventListener("activedIndexChange", this._onForEleActivedIndexChange);
+      // 立刻进行渲染绑定
+      this._updateTabLayoutInfo(this._calcLayoutInfo(await sliderEle.getActivedIndex()));
+    }
+    return sliderEle;
+  }
+
+  private _onForEleActivedIndexChange = (event: CustomEvent<$CccSlider.ActivedIndexChangeDetail>) => {
+    const ele = event.target;
+    if (ele !== this._sliderEle) {
+      return;
+    }
+    this._updateTabLayoutInfo(this._calcLayoutInfo(event.detail));
+  };
+
+  //#endregion
+
+  @Prop({}) defaultActivedIndex?: number;
+  @Prop({}) readonly activedIndex!: number;
+  private _activedIndex = 0;
   @Watch("activedIndex")
-  watchActivedIndex(newVal: number | undefined) {
+  watchActivedIndex(newVal: number) {
+    if (Number.isSafeInteger(newVal) === false) {
+      return;
+    }
+
+    /// 对数据进行格式化
+    newVal = Math.floor(newVal % this._tabList.length);
+    if (newVal < 0) {
+      newVal += this._tabList.length;
+    }
+
     this._setActivedIndex(newVal);
   }
 
-  private _activedIndex = NaN;
-  @Method()
-  async getActivedIndex() {
-    return this._activedIndex;
-  }
-  private _setActivedIndex(activedIndex?: number, _behavior: ScrollBehavior = "smooth", userGesture = false) {
-    if (activedIndex === undefined || Number.isSafeInteger(activedIndex) === false) {
-      return;
-    }
+  private _setActivedIndex(activedIndex: number, _behavior: ScrollBehavior = "smooth") {
     /// 如果有 for 绑定，那么跟随for绑定
-    if (this._forEle) {
-      const selectedIndex = this._tabElements.indexOf(at(this._tabElements, activedIndex, true)!);
-      if (selectedIndex !== -1) {
-        /// 如果用户正在手势操作中，那么下一帧再生效，避免冲突
-        if (userGesture) {
-          requestAnimationFrame(() => {
-            this._syncToForActivedIndex(selectedIndex);
-          });
-        } else {
-          this._syncToForActivedIndex(selectedIndex);
-        }
-      }
+    if (this._sliderEle) {
+      this._sliderEle.slideTo(activedIndex);
     }
     /// 没有for绑定，自己进行渲染
-    if (Number.isNaN(this._activedIndex) || this._forEle === null) {
-      // 尝试选中新的tab对象
-      this._selectTab(at(this._tabElements, activedIndex, true));
-
-      // 更新插槽的css属性来做出动画，这里不和 selectTab 一起。因为 activedIndex 可能是小数
-      this._effectCursorLayout(activedIndex);
+    else {
+      // 选中新的tab对象
+      this._updateTabLayoutInfo(this._calcLayoutInfo(activedIndex));
     }
   }
 
-  @Event() activedTabChange!: EventEmitter<[HTMLElement | null, number]>;
-
-  private _forEle: HTMLCccSliderElement | null = null;
-  private _onForEleActivedSliderChange = (event: CustomEvent<[sliderEle: HTMLElement, activedIndex: number]>) => {
-    this.console.log("ActivedSliderChange", event.detail);
-    this._onForEleScroll(event);
-    // if (event.target !== this._forEle) {
-    //   return;
-    // }
-    // const [_, activedIndex, isInControll] = event.detail;
-    // if (isInControll) {
-    //   this.logger.success("ActivedSliderChange", activedIndex);
-    //   this.selectTab(at(this._tabElements, Math.round(activedIndex), true));
-    //   // 更新插槽的css属性来做出动画
-    //   this._effectCursorLayout(activedIndex);
-    // } else {
-    //   this.logger.info("ActivedSliderChange", activedIndex);
-    // }
-  };
-
-  private _onForEleScroll = (event: Event) => {
-    const ele = event.target as HTMLCccSliderElement;
-    if (ele !== this._forEle) {
-      return;
-    }
-    requestAnimationFrame(async () => {
-      const layoutInfo = await ele.getLayoutInfo();
-      if (layoutInfo.reason === "user") {
-        this.console.verbose("USER scroll", layoutInfo.activedIndex);
-      } else {
-        this.console.verbose("AUTO scroll", layoutInfo.activedIndex);
-      }
-
-      this._selectTab(at(this._tabElements, Math.round(layoutInfo.activedIndex), true));
-      // 更新插槽的css属性来做出动画
-      this._effectCursorLayout(layoutInfo.activedIndex);
-    });
-  };
-
-  private _tabElements: Array<HTMLElement> = [];
-  public get tabElements() {
-    return this._tabElements;
-  }
-  public set tabElements(value) {
-    this._tabElements = value;
-  }
-  private _cursorLayouts: Array<CursorLayout> = [];
   /**
-   * 计算底部浮标的布局位置
+   * 提供基础的布局信息，虽然自己不用，但是方便外部开发相关的组件
    */
-  @throttle()
-  private async _calcCursorSlotLayouts() {
-    if (this._tabListEle === undefined) {
-      return;
-    }
-    this.console.log("_calcCursorSlotLayouts");
-    const offsetLeftStart = this._tabListEle.offsetLeft;
-    const cursorLayouts = this._cursorLayouts;
-    cursorLayouts.length = 0;
-
-    for (const tabEle of (this.tabElements = querySelectorAll<HTMLElement>(this.hostEle, ':scope > [slot="tab"]'))) {
-      const left = tabEle.offsetLeft - offsetLeftStart;
-      const width = tabEle.offsetWidth;
-      cursorLayouts.push({ left, width });
-    }
-    this._cursorLayouts = cursorLayouts;
-    // 布局变更，重新绘制
-    if (Number.isNaN(this._activedIndex)) {
-      this._setActivedIndex(this.defaultActivedIndex ?? this.activedIndex ?? 0);
-    } else {
-      this._effectCursorLayout(this._activedIndex);
-    }
+  @Event() layoutChange!: EventEmitter<$CccLayout.LayoutChangeDetail>;
+  private _emitLayoutChange() {
+    this.layoutChange.emit(this.calcLayoutInfo());
   }
+  @Method()
+  async getLayoutInfo() {
+    return this.calcLayoutInfo();
+  }
+
+  private _tabList: Array<$Tab> = [];
+  private _queryTabs() {
+    const tabEles = querySelectorAll<HTMLElement>(this.hostEle, ':scope > [slot="tab"]');
+    this._tabList = tabEles.map((ele, i) => {
+      const slider: $Tab = {
+        index: i,
+        ele,
+        offsetLeftCache: 0,
+        offsetWidthCache: 0,
+        size: 0,
+      };
+      return slider;
+    });
+  }
+
   private _resizeOb = new ResizeObserver(() => {
     this.console.log("resize");
-    this._calcCursorSlotLayouts();
+    this.calcLayoutInfo(undefined, true);
   });
-  private _mutationOb = new MutationObserver(() => {
-    this.console.log("mutation");
-    this._calcCursorSlotLayouts();
+  private _mutationOb = new MutationObserver(entries => {
+    for (const entry of entries) {
+      if (entry.type === "attributes") {
+        this.console.log("MutationObserver attributes changed");
+        this._unbindFollowers();
+        this._bindingFollowers();
+      } else if (entry.type === "childList") {
+        this.console.log("MutationObserver childList changed");
+        this._queryTabs();
+        this.calcLayoutInfo(undefined, true);
+        this._updateTabLayoutInfo();
+        this._emitLayoutChange();
+      }
+    }
   });
-  connectedCallback() {
-    this.watchFor();
-    this.console.log("connectedCallback");
-  }
+
   private _tabListEle?: HTMLElement;
-  private _cursorEle?: HTMLElement;
-  componentDidLoad() {
+  async componentDidLoad() {
     this.console.log("componentDidLoad");
     this._mutationOb.observe(this.hostEle, { childList: true });
-    this._cursorEle = querySelector(this.hostEle.shadowRoot, ".cursor");
-    this._resizeOb.observe((this._tabListEle = querySelector(this.hostEle.shadowRoot, ".tab-list")!));
+    this._tabListEle = querySelector(this.hostEle.shadowRoot, ".tab-list");
+    this._resizeOb.observe(this._tabListEle!);
+
+    this._queryTabs();
+    this.calcLayoutInfo(undefined, true);
+
+    if (!(await this.watchForSlider())) {
+      this._updateTabLayoutInfo();
+      this._emitLayoutChange();
+    }
   }
   disconnectedCallback() {
     if (this._tabListEle) {
       this._resizeOb.unobserve(this._tabListEle);
     }
     this._mutationOb.disconnect();
+    this._unbindFollowers();
   }
 
-  /**
-   * 手动绑定或者解绑 for 元素
-   * 从而让 `<ccc-slider>` 元素能主动 根据自己的生命周期来与 tabs 进行绑定联动
-   * @param _forEle
-   * @returns
-   */
-  @Method()
-  async bindForElement(_forEle?: HTMLElement | null) {
-    const forEle = _forEle
-      ? _forEle instanceof HTMLElement && _forEle.tagName === "CCC-SLIDER"
-        ? (_forEle as HTMLCccSliderElement)
-        : null
-      : null;
-    if (forEle !== _forEle) {
-      this.console.error("for attribute can only binding <ccc-slider> element");
-    }
-    if (forEle === this._forEle) {
-      return;
-    }
-    /// 解绑
-    if (this._forEle) {
-      (this._forEle as any).removeEventListener("activedSilderChange", this._onForEleActivedSliderChange);
-      (this._forEle as any).removeEventListener("scroll", this._onForEleScroll);
-      (this._forEle as any).removeEventListener("scrollend", this._onForEleScroll);
-    }
-
-    /// 绑定
-    if (forEle) {
-      this._forEle = forEle;
-      (forEle as any).addEventListener("activedSilderChange", this._onForEleActivedSliderChange);
-      (this._forEle as any).addEventListener("scroll", this._onForEleScroll);
-      (this._forEle as any).addEventListener("scrollend", this._onForEleScroll);
-    }
-
-    if (this._canWriteAttr_for) {
-      this.for = forEle?.id ?? undefined;
-    }
-  }
-
-  static _childrenObs = new MutationObserver(mutationRecords => {
-    for (const record of mutationRecords) {
-      record.addedNodes;
-    }
-  });
-
-  private _activiedTabEle: HTMLElement | null = null;
   onClick = (event: MouseEvent) => {
     const ele = event.target ? (event.target instanceof HTMLElement ? event.target : null) : null;
     if (!ele) {
       return;
     }
-    this.console.info("clicked");
     let tabEle = ele.closest<HTMLElement>(`[slot="tab"]`);
     /// 无法在结构上找到，那么只能根据X坐标来寻找
     if (tabEle === null) {
-      for (const ele of this.tabElements) {
+      for (const { ele } of this._tabList) {
         if (ele.offsetLeft <= event.clientX && event.clientX <= ele.offsetLeft + ele.offsetWidth) {
           tabEle = ele;
           break;
         }
       }
     }
-    /// 如果还是找不到，那么点击的区域有问题，直接跳过
-    if (tabEle === null || tabEle.getAttribute(TAB_STATE_DATASET_KEY) === "disabled") {
-      return;
-    }
+    this.console.info("clicked", tabEle);
 
-    this._setActivedIndex(this._tabElements.indexOf(tabEle), undefined, true);
+    this._setActivedIndex(this._tabList.findIndex(tab => tab.ele === tabEle));
   };
-  private _selectTab(_newTabEle: HTMLElement | null | undefined = at(this._tabElements, this._activedIndex, true)) {
-    const newTabEle = _newTabEle instanceof HTMLElement ? _newTabEle : null;
-    const oldTabEle = this._activiedTabEle;
-    if (newTabEle === oldTabEle) {
-      return;
-    }
-    oldTabEle?.removeAttribute(TAB_STATE_DATASET_KEY);
-    newTabEle?.setAttribute(TAB_STATE_DATASET_KEY, "actived");
-    const activedIndex = newTabEle ? this._tabElements.indexOf(newTabEle) : -1;
 
-    /// 更新属性
-    this._activiedTabEle = newTabEle; // 务必要先写入这个值，因为后面activedIndex的写入会引发selectTab被在此调用
-    this._activedIndex = activedIndex;
+  private _preTabStates: { list: $Tab[]; activedTab?: $Tab } = { list: [], activedTab: undefined };
+  private _updateTabLayoutInfo(layoutInfo = this.calcLayoutInfo()) {
+    let changed = false;
+    const { _preTabStates: preTabStates } = this;
+    if (preTabStates.list !== layoutInfo.blockList || preTabStates.activedTab !== layoutInfo.activedTab) {
+      changed = true;
+      this._preTabStates = {
+        list: layoutInfo.blockList,
+        activedTab: layoutInfo.activedTab,
+      };
 
-    /// 触发事件更新
-    this.activedTabChange.emit([newTabEle, activedIndex]);
-    this.console.log("activedTabChange", newTabEle, activedIndex);
-    return activedIndex;
-  }
-
-  /**引用游标的插槽布局 */
-  @throttle()
-  private async _effectCursorLayout(activedIndex = this._activedIndex) {
-    this.console.log("_effectCursorLayout");
-
-    const cursorEle = this._cursorEle;
-    if (!cursorEle) {
-      return;
-    }
-
-    const cursorEleStyle = cursorEle.style;
-    /// 获取新的布局目标
-    let nextCursorLayout = DEFAULT_CURSOR_LAYOUT;
-    let useAnimation = true;
-
-    const progress = activedIndex % 1;
-    const cursorLayout = at(this._cursorLayouts, activedIndex, true);
-    if (cursorLayout) {
-      nextCursorLayout = cursorLayout;
-    }
-    /// 如果有特殊的进度，那么不使用动画，直接依赖于属性过去
-    if (progress > 0 /* NaN>0 === false */) {
-      useAnimation = false;
-      const cursorLayout = at(this._cursorLayouts, activedIndex + 1, true);
-      if (cursorLayout) {
-        nextCursorLayout = {
-          left: (cursorLayout.left - nextCursorLayout.left) * progress + nextCursorLayout.left,
-          width: (cursorLayout.width - nextCursorLayout.width) * progress + nextCursorLayout.width,
-        };
+      for (const tab of this._tabList) {
+        if (tab.index === layoutInfo.activedIndex - 1) {
+          tab.ele.setAttribute(TAB_STATE_DATASET_KEY, "prev");
+        } else if (tab.index === layoutInfo.activedIndex) {
+          tab.ele.setAttribute(TAB_STATE_DATASET_KEY, "actived");
+        } else if (tab.index === layoutInfo.activedIndex + 1) {
+          tab.ele.setAttribute(TAB_STATE_DATASET_KEY, "next");
+        } else {
+          tab.ele.removeAttribute(TAB_STATE_DATASET_KEY);
+        }
       }
     }
 
-    /// 获取动画配置以及旧的布局目标
+    this._activedIndex = layoutInfo.activedIndex;
 
-    const cursorStyleMap = getComputedStyle(cursorEle);
-    const { animationDuration, width, paddingLeft, paddingRight } = cursorStyleMap;
-    const leftIn = cursorStyleMap.getPropertyValue("--cursor-left-in-easing") || "ease-out";
-    const leftOut = cursorStyleMap.getPropertyValue("--cursor-left-out-easing") || "ease-in";
-    const rightIn = cursorStyleMap.getPropertyValue("--cursor-right-in-easing") || "ease-in";
-    const rightOut = cursorStyleMap.getPropertyValue("--cursor-right-out-easing") || "ease-out";
-    const durationMs = cssAnimationDurationToMs(animationDuration);
-    const widthPx = parseFloat(width);
-    const paddingLeftPx = parseFloat(paddingLeft);
-    // const paddingRightPx = parseFloat(paddingRight);
-
-    let diretion: string;
-    if (widthPx === 0 || nextCursorLayout.width === 0) {
-      diretion = "center";
-    } else if (nextCursorLayout.left > paddingLeftPx) {
-      diretion = "right";
-    } else {
-      diretion = "left";
-    }
-
-    cursorEleStyle.setProperty("--cursor-from-left", paddingLeft);
-    cursorEleStyle.setProperty("--cursor-from-right", paddingRight);
-
-    cursorEleStyle.setProperty("--cursor-to-left", nextCursorLayout.left + "px");
-    cursorEleStyle.setProperty("--cursor-to-right", `${widthPx - (nextCursorLayout.left + nextCursorLayout.width)}px`);
-    if (useAnimation || true) {
-      const optionsDuration = useAnimation ? durationMs : 20;
-      const optionsEasing = "ease-in"; // "ease-out" | "linear"
-      cursorEle.animate(
-        [
-          {
-            composite: "replace",
-            paddingLeft: paddingLeft,
-          },
-          {
-            paddingLeft: `var(--cursor-to-left)`,
-          },
-        ],
-        {
-          duration: optionsDuration,
-          easing: useAnimation ? (diretion === "right" ? leftOut : leftIn) : optionsEasing,
-          fill: "forwards",
-        },
-      );
-      cursorEle.animate(
-        [
-          {
-            composite: "replace",
-            paddingRight: paddingRight,
-          },
-          {
-            paddingRight: `var(--cursor-to-right)`,
-          },
-        ],
-        {
-          duration: optionsDuration,
-          easing: useAnimation ? (diretion === "left" ? rightIn : rightOut) : optionsEasing,
-          fill: "forwards",
-        },
-      );
+    /// 触发事件更新
+    if (changed) {
+      this._emitActivedChange(layoutInfo.activedTab?.ele, layoutInfo.activedIndex);
+      this.console.log("activedTabChange", layoutInfo.activedTab);
     }
   }
+
+  private _cachedLayoutInfo?: ReturnType<CccSliderTabs["_calcLayoutInfo"]>;
+  private _calcLayoutInfo(activedIndex = this._activedIndex) {
+    this.console.log("calcLayoutInfo", activedIndex);
+
+    const {
+      offsetLeft: viewboxOffsetLeft,
+      offsetWidth: viewboxOffsetWidth,
+      scrollLeft: viewboxScrollLeft,
+    } = this.hostEle;
+
+    for (const tabLayoutInfo of this._tabList) {
+      const { offsetLeft, offsetWidth } = tabLayoutInfo.ele;
+
+      tabLayoutInfo.offsetLeftCache = offsetLeft;
+      tabLayoutInfo.offsetWidthCache = offsetWidth;
+      tabLayoutInfo.size = offsetWidth;
+    }
+    const activedTab = at(this._tabList, activedIndex);
+
+    return {
+      box: {
+        viewOffsetLeft: viewboxOffsetLeft,
+        viewOffsetWidth: viewboxOffsetWidth,
+        viewSize: viewboxOffsetWidth,
+        scrollSize: viewboxScrollLeft,
+      },
+      blockList: this._tabList,
+      activedIndex: activedTab?.index ?? -1,
+      activedTab: activedTab,
+    };
+  }
+  private _calc_frame_id?: number;
+  calcLayoutInfo(activedIndex?: number, force?: boolean) {
+    if (
+      force ||
+      this._cachedLayoutInfo === undefined ||
+      (activedIndex !== undefined && this._cachedLayoutInfo?.activedIndex !== activedIndex)
+    ) {
+      this._cachedLayoutInfo = this._calcLayoutInfo(activedIndex);
+      if (this._calc_frame_id !== undefined) {
+        cancelAnimationFrame(this._calc_frame_id);
+      }
+      this._calc_frame_id = requestAnimationFrame(() => {
+        this._calc_frame_id = undefined;
+        this._cachedLayoutInfo = undefined;
+      });
+    }
+    return this._cachedLayoutInfo;
+  }
+
+  //#region 一些必要的接口
+
+  @Event() activedTabChange!: EventEmitter<[tabEle: HTMLElement | undefined, index: number]>;
+  @Event() activedIndexChange!: EventEmitter<number>;
+  private _emitActivedChange(tabEle: HTMLElement | undefined, index: number) {
+    this.activedTabChange.emit([tabEle, index]);
+    this.activedIndexChange.emit(index);
+  }
+
+  @Method()
+  async slideTo(activedIndex: number) {
+    this._setActivedIndex(activedIndex);
+  }
+  @Method()
+  async getScrollProgress() {
+    return this._activedIndex;
+  }
+  @Method()
+  async getActivedIndex(): Promise<number> {
+    return this._activedIndex;
+  }
+  //#endregion
 
   render() {
     return (
@@ -385,9 +365,7 @@ export class CccSliderTabs implements ComponentInterface {
         <div class="tab-list" part="tabs">
           <slot name="tab"></slot>
         </div>
-        <div class="cursor" part="cursor">
-          <div class="spirit" part="spirit"></div>
-        </div>
+        <slot></slot>
       </Host>
     );
   }

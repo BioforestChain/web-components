@@ -11,6 +11,7 @@ import {
   Watch,
 } from "@stencil/core";
 import { at, Logger, querySelectorAll } from "../../utils/utils";
+import { $CccSlider, $CccSliderFollower } from "./ccc-slider.const";
 
 const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
 
@@ -25,6 +26,7 @@ export type $Slider = {
   offsetWidthCache: number;
   offsetCenterCache: number;
 };
+export type $NullableSlider = Omit<$Slider, "ele"> & { ele?: $Slider["ele"] };
 /**当前的“原因”
  * 如果是 user ，说明是用户在控制，此时应该避免去对它进行任何覆盖操作，避免行为不跟手
  * 如果是 auto ，说明是机器在控制
@@ -37,61 +39,58 @@ type $InternalReason = "touch" | "mousewheel" | "into" | "init";
   styleUrl: "ccc-slider.scss",
   shadow: true,
 })
-export class CccSlider implements ComponentInterface {
+export class CccSlider implements ComponentInterface, $CccSlider {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
-  //#region 与tabs节点的联动
+  //#region 与其它节点的联动
   get id() {
     return this.hostEle.id;
   }
 
-  private _tabs: HTMLCccSliderTabsElement[] = [];
-  private _bindingTabs() {
+  private _bindingEles: $CccSliderFollower[] = [];
+  private _bindingFollowers() {
     if (this.id) {
-      for (const tabsEle of (this._tabs = querySelectorAll<HTMLCccSliderTabsElement>(
+      for (const tabsEle of (this._bindingEles = querySelectorAll<$CccSliderFollower>(
         document,
-        `ccc-silder-tabs[for=${this.id}]`,
+        `[for-slider=${this.id}]`,
       ))) {
-        tabsEle.bindForElement(this.hostEle); // 绑定
+        tabsEle.bindSliderElement?.(this.hostEle); // 绑定
       }
     }
   }
-  private _unbindTabs() {
-    for (const tabsEle of this._tabs) {
-      tabsEle.bindForElement(null); // 解绑
+  private _unbindFollowers() {
+    for (const tabsEle of this._bindingEles) {
+      tabsEle.bindSliderElement?.(null); // 解绑
     }
+    this._bindingEles.length = 0;
   }
 
   private _resizeOb = new ResizeObserver(() => {
     this.console.log("resize start");
     // 清理布局缓存，确保重新计算
-    this._scrollToIndex(this.activedIndex, "auto");
+    this._scrollToIndex(this._activedIndex, "auto");
     this.console.log("resize end");
   });
   /**
    * watch id changed
    */
   private _mutationOb = new MutationObserver(entries => {
-    if (this._inDOM) {
-      for (const entry of entries) {
-        if (entry.type === "attributes") {
-          this.console.log("MutationObserver attributes changed");
-          this._unbindTabs();
-          this._bindingTabs();
-        } else if (entry.type === "childList") {
-          this.console.log("MutationObserver childList changed");
-          this._querySliders();
-          // 进行布局计算，并更新状态
-          this._updateSliderStates();
-        }
+    for (const entry of entries) {
+      if (entry.type === "attributes") {
+        this.console.log("MutationObserver attributes changed");
+        this._unbindFollowers();
+        this._bindingFollowers();
+      } else if (entry.type === "childList") {
+        this.console.log("MutationObserver childList changed");
+        this._querySliders();
+        // 进行布局计算，并更新状态
+        this._updateSliderStates();
       }
     }
   });
 
-  private _inDOM = false;
   connectedCallback() {
-    this._inDOM = true;
-    this._bindingTabs();
+    this._bindingFollowers();
     this._resizeOb.observe(this.hostEle);
     this._mutationOb.observe(this.hostEle, {
       attributeFilter: ["id"],
@@ -113,15 +112,14 @@ export class CccSlider implements ComponentInterface {
       "!! scroll into defaultIndex",
       this.defaultActivedIndex,
       "activedIndex:",
-      this.activedIndex,
+      this._activedIndex,
     );
-    this._scrollToIndex(this.defaultActivedIndex ?? this.activedIndex, "auto" /* 初始化的时候减少动画 */);
+    this._scrollToIndex(this.defaultActivedIndex ?? this._activedIndex, "auto" /* 初始化的时候减少动画 */);
     this._reasons.delete("init");
   }
 
   disconnectedCallback() {
-    this._inDOM = false;
-    this._unbindTabs();
+    this._unbindFollowers();
     this._resizeOb.unobserve(this.hostEle);
     this._mutationOb.disconnect();
   }
@@ -153,9 +151,9 @@ export class CccSlider implements ComponentInterface {
     const { offsetLeft: viewboxOffsetLeft, offsetWidth: viewboxOffsetWidth } = this.hostEle;
     const viewboxOffsetCenter = viewboxOffsetLeft + viewboxScrollLeft + viewboxOffsetWidth / 2;
 
-    let closestSlider = {
+    let closestSlider: $NullableSlider = {
       index: -1,
-      ele: undefined as HTMLElement | undefined,
+      ele: undefined,
       offsetLeftCache: 0,
       offsetWidthCache: 0,
       offsetCenterCache: 0,
@@ -183,7 +181,7 @@ export class CccSlider implements ComponentInterface {
       },
       sliderList: this._sliderList,
       reason: this._reason,
-      activedIndex: this.activedIndex,
+      activedIndex: this._activedIndex,
       scrollProgress: this._scrollProgress,
     };
   }
@@ -212,7 +210,8 @@ export class CccSlider implements ComponentInterface {
   }
 
   @Prop({}) defaultActivedIndex?: number;
-  @Prop({ mutable: true }) activedIndex: number = 0;
+  @Prop({ mutable: true }) readonly activedIndex!: number;
+  private _activedIndex = 0;
   @Watch("activedIndex")
   watchActivedIndex(newVal: number) {
     if (Number.isSafeInteger(newVal) === false) {
@@ -236,6 +235,10 @@ export class CccSlider implements ComponentInterface {
   @Method()
   async getScrollProgress() {
     return this._scrollProgress;
+  }
+  @Method()
+  async getActivedIndex() {
+    return this._activedIndex;
   }
   /**滚动到指定的第几个元素上 */
   private _scrollToIndex(activedIndex: number, behavior: ScrollBehavior) {
@@ -295,15 +298,12 @@ export class CccSlider implements ComponentInterface {
     });
   }
 
-  @Method()
-  async setActivedIndex(activedIndex: number) {
-    this._scrollToIndex(activedIndex, "smooth");
-  }
-  /**兼容ionic-sliders的语法 */
+  /**滚动到特定的 activedIndex */
   @Method()
   async slideTo(activedIndex: number, behavior: ScrollBehavior = "smooth") {
     this._scrollToIndex(activedIndex, behavior);
   }
+  /**强制刷新渲染 */
   @Method()
   async update() {
     this._querySliders();
@@ -314,13 +314,18 @@ export class CccSlider implements ComponentInterface {
   /**
    * 在初始化的时候，只要有元素，那么它总会触发
    */
-  @Event() activedSilderChange!: EventEmitter<[sliderEle: HTMLElement | undefined, activedIndex: number]>;
+  @Event() activedSliderChange!: EventEmitter<[sliderEle: HTMLElement | undefined, index: number]>;
+  @Event() activedIndexChange!: EventEmitter<$CccSlider.ActivedIndexChangeDetail>;
+  private _emitActivedChange(sliderEle: HTMLElement | undefined, index: number) {
+    this.activedSliderChange.emit([sliderEle, index]);
+    this.activedIndexChange.emit(index);
+  }
 
   private _preSliderStates: { list: $Slider[]; activedIndex: number } = { list: [], activedIndex: -1 };
   /**
    * 通知slider-ele的状态变更
    * 更新activedIndex的值变更
-   * 触发activedSilderChange事件
+   * 触发activedSliderChange事件
    */
   // @throttle()
   private _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
@@ -329,10 +334,9 @@ export class CccSlider implements ComponentInterface {
       closestSlider,
       viewbox: { offsetCenter: viewboxOffsetCenter },
     } = layoutInfo;
-    const { _sliderList: sliderList } = this;
+    const { _sliderList: sliderList, _preSliderStates: preSliderStates } = this;
     let changed = false;
-    if (this._preSliderStates.list !== sliderList || this._preSliderStates.activedIndex !== closestSlider.index) {
-      const preSliderStates = this._preSliderStates;
+    if (preSliderStates.list !== sliderList || preSliderStates.activedIndex !== closestSlider.index) {
       const newSliderStates = {
         list: sliderList,
         activedIndex: closestSlider.index,
@@ -361,14 +365,14 @@ export class CccSlider implements ComponentInterface {
         ? 0
         : (viewboxOffsetCenter - closestSlider.offsetCenterCache) / closestSlider.offsetWidthCache;
     this._scrollProgress = closestSlider.index + progress;
-    this.activedIndex = closestSlider.index;
-    layoutInfo.activedIndex = this.activedIndex;
+    this._activedIndex = closestSlider.index;
+    layoutInfo.activedIndex = this._activedIndex;
     layoutInfo.scrollProgress = this._scrollProgress;
 
     /// 触发事件
     if (changed) {
-      this.console.info("emit activedSilderChange", this._scrollProgress, closestSlider);
-      this.activedSilderChange.emit([closestSlider.ele, closestSlider.index]);
+      this.console.info("emit activedSliderChange", this._scrollProgress, closestSlider);
+      this._emitActivedChange(closestSlider.ele, closestSlider.index);
     }
   }
 

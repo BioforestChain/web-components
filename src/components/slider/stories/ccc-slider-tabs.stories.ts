@@ -6,23 +6,42 @@ export default {
   argTypes: cccSliderTabsKit.argsFactory.toArgTypes(),
 };
 
-export const Base_Usage = cccSliderTabsKit.storyFactory(
-  () =>
-    html`
-      <span slot="tab">
-        <button>关注~~</button>
-      </span>
-      <span slot="tab">
-        <button>最新最新最新最新!!</button>
-      </span>
-      <span slot="tab">热榜</span>
-    `,
-  {
-    // init property/attribute
-    // data: 0,
-  },
-).addStyle(`
-ccc-tabs-slider {
+const BASE_HTML = html`
+  <span slot="tab"> 关 </span>
+  <span slot="tab"> 最新 </span>
+  <span slot="tab"> 热榜注 </span>
+  <span slot="tab"> 你好 </span>
+  <span slot="tab"> 世 </span>
+`;
+const BASE_STYLE = `
+ccc-slider-tabs {
   outline: 1px solid red;
 }
-`);
+
+[slot="tab"]{
+  padding: 0.5em 1em;
+  transition-duration: 300ms;
+}
+[slot="tab"][data-ccc-slider-tabs="prev"]{
+  background: #c8e6c9;
+}
+[slot="tab"][data-ccc-slider-tabs="actived"]{
+  background: #f44336;
+  color: #FFF;
+}
+[slot="tab"][data-ccc-slider-tabs="next"]{
+  background: #b3e5fc;
+}
+`;
+
+export const Base_Usage = cccSliderTabsKit.storyFactory(() => BASE_HTML, {}).addStyle(BASE_STYLE);
+
+export const WithScrollBar = cccSliderTabsKit
+  .storyFactory(
+    () => html`${BASE_HTML}
+      <ccc-slider-scrollbar for-layout="qaq" for-slider="qaq"></ccc-slider-scrollbar> `,
+  )
+  .addStyle(BASE_STYLE)
+  .onMount((_, ele) => {
+    ele.id = "qaq";
+  });

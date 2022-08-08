@@ -63,6 +63,9 @@
    yarn build # 编译
    ```
    > 如果你同时在开发 Crabon-App 的 Angular 项目，那么 build 的结果也能实时联动到 angular 项目中进行预览
+4. 插件
+   - [lit-html.vsix](http://192.168.110.154:8000/bierner.lit-html-1.11.1.vsix)
+     > 测试的编写是使用 lit-html 来进行开发的，所以该插件可以很好地改进相关的开发体验
 
 ## 📦 贡献者·创建组件
 

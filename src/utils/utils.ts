@@ -322,11 +322,11 @@ export const throttle =
 
 type DomQueryer = Document | Element | DocumentFragment;
 
-export const querySelectorAll = <T>(root: DomQueryer | null | undefined, selector: string) => {
+export const querySelectorAll = <T = HTMLElement>(root: DomQueryer | null | undefined, selector: string) => {
   return Array.prototype.slice.call(root?.querySelectorAll(selector) ?? { length: 0 }) as T[];
 };
 
-export const querySelector = <T>(root: DomQueryer | null | undefined, selector: string) => {
+export const querySelector = <T = HTMLElement>(root: DomQueryer | null | undefined, selector: string) => {
   return (root?.querySelector(selector) || undefined) as T | undefined;
 };
 
@@ -416,34 +416,83 @@ export class Logger {
   isEnable(level: LOGGER_LEVEL) {
     return !!(self as any).__ccc_dev__ && this._getLogLevel() <= level;
   }
+  private _verbose(args: (string | number)[]) {
+    console.debug(`%c ${this._tagInfo} ${args.join(" ")}`, "color:#9e9e9e;font-size:0.8em;");
+  }
+  private _log(args: unknown[]) {
+    console.debug("%c" + this._tagInfo, "color:#9e9e9e", ...args);
+  }
+  private _info(args: unknown[]) {
+    console.info("%c" + this._tagInfo, "color:#00bcd4", ...args);
+  }
+  private _warn(args: unknown[]) {
+    console.warn(this._tagInfo, ...args);
+  }
+  private _error(args: unknown[]) {
+    console.error(this._tagInfo, ...args);
+  }
+  private _success(args: unknown[]) {
+    console.log("%c" + this._tagInfo + "✔", "color:#4caf50", ...args);
+  }
   verbose(...args: (string | number)[]) {
     if (this.isEnable(LOGGER_LEVEL.verbose)) {
-      console.debug(`%c ${this._tagInfo} ${args.join(" ")}`, "color:#9e9e9e;font-size:0.8em;");
+      this._verbose(args);
     }
   }
   log(...args: unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.log)) {
-      console.debug("%c" + this._tagInfo, "color:#9e9e9e", ...args);
+      this._log(args);
     }
   }
   info(...args: unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.info)) {
-      console.info("%c" + this._tagInfo, "color:#00bcd4", ...args);
+      this._info(args);
     }
   }
   warn(...args: unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.warn)) {
-      console.warn(this._tagInfo, ...args);
+      this._warn(args);
     }
   }
   error(...args: unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.error)) {
-      console.error(this._tagInfo, ...args);
+      this._error(args);
     }
   }
   success(...args: unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.success)) {
-      console.log("%c" + this._tagInfo + "✔", "color:#4caf50", ...args);
+      this._success(args);
+    }
+  }
+
+  lazyVerbose(fun: () => (string | number)[]) {
+    if (this.isEnable(LOGGER_LEVEL.verbose)) {
+      this._verbose(fun());
+    }
+  }
+  lazyLog(fun: () => unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.log)) {
+      this._log(fun());
+    }
+  }
+  lazyInfo(fun: () => unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.info)) {
+      this._info(fun());
+    }
+  }
+  lazyWarn(fun: () => unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.warn)) {
+      this._warn(fun());
+    }
+  }
+  lazyError(fun: () => unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.error)) {
+      this._error(fun());
+    }
+  }
+  lazySuccess(fun: () => unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.success)) {
+      this._success(fun());
     }
   }
 }
@@ -459,4 +508,8 @@ export const cssAnimationDurationToMs = (animationDuration: string) => {
     ms = parseFloat(animationDuration) || 0;
   }
   return ms;
+};
+
+export const asSafeInteger = (number: unknown) => {
+  return Number.isSafeInteger(number) ? (number as number) : undefined;
 };

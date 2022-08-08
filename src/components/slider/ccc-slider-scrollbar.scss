@@ -1,0 +1,52 @@
+:host {
+  display: block;
+  width: 100%;
+  line-height: 0;
+}
+
+.cursor {
+  /// 布局
+  margin-top: 0.2em;
+  height: 0.25em;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  pointer-events: none;
+
+  // 样式
+  width: 100%;
+  display: inline-block;
+
+  // 动画
+  --cursor-duration: 200ms;
+  --cursor-left-easing: cubic-bezier(0.22, 0.61, 0.36, 1); //Out · Cubic
+  --cursor-right-easing: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  transition-duration: var(--cursor-duration);
+  animation-fill-mode: forwards;
+  animation-duration: var(--cursor-duration);
+  > .spirit {
+    height: 100%;
+    // contain: strict;
+
+    --cursor-start-color: #1e80f7;
+    --cursor-end-color: #3fbdfc;
+    background-image: linear-gradient(to right, var(--cursor-start-color), var(--cursor-end-color));
+    border-radius: 0.25em;
+    margin: 0 12%;
+  }
+}
+
+// @keyframes ccc-slider-tabs-cursor-scale {
+//   0% {
+//     transform: scaleX(1) translateX(var(--cursor-from-left));
+//     width: var(--cursor-old-width);
+//   }
+//   50% {
+//     transform: scaleX(var(--cursor-max-scale));
+//   }
+//   100% {
+//     transform: scaleX(1) translateX(var(--cursor-to-left));
+//     width: var(--cursor-to-width);
+//   }
+// }

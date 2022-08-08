@@ -25,6 +25,13 @@
 | `clickUser` |             | `CustomEvent<void>` |
 
 
+## Shadow Parts
+
+| Part           | Description |
+| -------------- | ----------- |
+| `"actionsbar"` |             |
+
+
 ----------------------------------------------
 
 Copyright (c) BFChain
