@@ -8,21 +8,24 @@
   background: #f1f2f3;
   border-radius: 0.86em;
   border: 1px solid #f1f2f3;
-  height: 1.714em;
+  // height: 1.714em;
   // width: 6.214em;
-  padding: 0 0.86em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  line-height: 1.714em;
+  padding: 0 0.9em;
+  line-height: var(--row-line-height, inherit);
+  height: var(--row-line-height, inherit);
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+  // line-height: 1.714em;
   span {
-    font-size: 0.9em;
+    font-size: 1em;
   }
   .reply {
     margin: 0 0.285em;
   }
   ion-icon {
-    width: 0.5em;
-    height: 0.7em;
+    // width: 0.5em;
+    // height: 0.7em;
+    font-size: 0.7em;
   }
 }
