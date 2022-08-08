@@ -74,9 +74,11 @@ export class CccUserCommentCard implements ComponentInterface {
                 <span class="name">
                   <slot name="username">{this.userName}</slot>
                 </span>
-                {this.isAuthor?(<span class="author">
-                  <slot name="author">作者</slot>
-                </span>):undefined}
+                {this.isAuthor ? (
+                  <span class="author">
+                    <slot name="author">楼主</slot>
+                  </span>
+                ) : undefined}
                 <span class="flag">
                   <slot name="userflag">
                     <span class="flag-badge">{this.userFlag}</span>
@@ -103,7 +105,7 @@ export class CccUserCommentCard implements ComponentInterface {
               {this.isFlod ? <slot name="unfold">展开</slot> : <slot name="fold">收起</slot>}
             </button>
           ) : undefined}
-          <div class="actions-bar">
+          <div class="actions-bar" part="actionsBar">
             <div class="actions">
               <div class="left-actions">
                 <slot name="reply" />
