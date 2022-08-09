@@ -35,6 +35,24 @@ export type $NullableSlider = Omit<$Slider, "ele"> & { ele?: $Slider["ele"] };
 export type $Reason = "user" | "auto";
 type $InternalReason = "touch" | "mousewheel" | "into" | "init";
 
+/**
+ * slider 有三个底层函数，理解这三个函数就能控制整个slider，三个依次是：
+ * 1. _querySliders 更新slider元素
+ * 1. calcLayoutInfo 基于slider元素，与scrollLeft的值：计算slider与box的布局、滚动进度。这是最关键的一个函数，就是渲染所需的函数
+ * 1. _updateSliderStates 根据计算出来的布局，将之反应到DOM元素上，并按需进行DOM事件的触发
+ *
+ * 基于这三个函数，衍生出了其它两个工具函数
+ * 1. _scrollToIndex 滚动到指定的slider
+ * 1. _scrollToLeft 滚动到指定的scrollLeft
+ * 这两个函数有点不同，指定的left上可能会重叠slider，所以它们的使用场景并不完全相同
+ * 一般情况下，这两个工具函数可以独立运作，当有时候还是需要搭配底层函数才能达到所需的效果
+ *
+ * 组件的生命周期都是围绕这这五个核心函数展开工作的，主要有以下的生命周期
+ * 1. componentDidLoad 组件初始化到DOM-Tree中的时候，需要根据defaultActivedIndex进行渲染
+ * 1. resize change 布局变化的时候，需要重新计算布局
+ * 1. childList change 子元素变化的时候，需要重新获取slider元素
+ * 1. onscroll 用户触发滚动的时候，需要实时计算状态并触发相应的更新
+ */
 @Component({
   tag: "ccc-slider",
   styleUrl: "ccc-slider.scss",
@@ -133,6 +151,13 @@ export class CccSlider implements ComponentInterface, $CccSlider {
 
   private _querySliders() {
     const sliderEles = querySelectorAll<HTMLElement>(this.hostEle, `:scope > [slot="slider"]`);
+    /// 没有发生任何改变
+    if (
+      this._sliderList.length === sliderEles.length &&
+      this._sliderList.every((slider, index) => sliderEles[index] === slider.ele)
+    ) {
+      return;
+    }
     this._sliderList = sliderEles.map((ele, i) => {
       const slider: $Slider = {
         index: i,
