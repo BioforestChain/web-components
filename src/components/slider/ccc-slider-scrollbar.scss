@@ -1,12 +1,12 @@
 :host {
-  display: block;
+  display: flex;
   width: 100%;
   line-height: 0;
+  pointer-events: none;
 }
 
 .cursor {
   /// 布局
-  margin-top: 0.2em;
   height: 0.25em;
   align-self: flex-start;
   display: flex;
