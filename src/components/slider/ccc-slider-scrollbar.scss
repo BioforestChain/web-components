@@ -13,6 +13,7 @@
   flex-direction: row;
   box-sizing: border-box;
   pointer-events: none;
+  position: relative;
 
   // 样式
   width: 100%;
@@ -20,9 +21,10 @@
 
   // 动画
   --cursor-duration: 200ms;
-  --cursor-left-easing: cubic-bezier(0.22, 0.61, 0.36, 1); //Out · Cubic
-  --cursor-right-easing: cubic-bezier(0.55, 0.06, 0.68, 0.19);
-  transition-duration: var(--cursor-duration);
+  --cursor-left-in-easing: cubic-bezier(0.22, 0.61, 0.36, 1); // Out · Cubic
+  --cursor-left-out-easing: cubic-bezier(0.55, 0.06, 0.68, 0.19); // In · Cubic
+  --cursor-right-in-easing: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --cursor-right-out-easing: cubic-bezier(0.55, 0.06, 0.68, 0.19);
   animation-fill-mode: forwards;
   animation-duration: var(--cursor-duration);
   > .spirit {
@@ -37,16 +39,16 @@
   }
 }
 
-// @keyframes ccc-slider-tabs-cursor-scale {
-//   0% {
-//     transform: scaleX(1) translateX(var(--cursor-from-left));
-//     width: var(--cursor-old-width);
-//   }
-//   50% {
-//     transform: scaleX(var(--cursor-max-scale));
-//   }
-//   100% {
-//     transform: scaleX(1) translateX(var(--cursor-to-left));
-//     width: var(--cursor-to-width);
-//   }
-// }
+.ani-shadow {
+  visibility: hidden;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  flex-grow: 0;
+  .ani-item {
+    position: absolute;
+  }
+  // .left-in {
+  //   animation-duration: var(--cursor-left-in-easing);
+  // }
+}

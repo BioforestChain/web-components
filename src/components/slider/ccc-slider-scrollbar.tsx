@@ -75,12 +75,15 @@ export class CccSliderScrollbar implements ComponentInterface {
     return this._followSliderElement(ele, event.type);
   };
 
-  private _for_onEleScroll = (event: Event) => {
+  private _for_onEleScroll = async (event: Event) => {
     const ele = event.target as $CccSlider.HTMLCccSliderElement;
     if (ele !== this._sliderEle) {
       return;
     }
-    return this._followSliderElement(ele, event.type);
+    const reason = await ele.getReason();
+    if (reason === "user") {
+      return this._followSliderElement(ele, `reason: ${reason} ${event.type}`);
+    }
   };
   private async _followSliderElement(ele: $CccSlider.HTMLCccSliderElement, _reason?: unknown) {
     const scrollProgress = await ele.getScrollProgress();
@@ -165,105 +168,108 @@ export class CccSliderScrollbar implements ComponentInterface {
   //#region 渲染与动画
   @Prop() duration?: number;
 
-  private _cursorEle?: HTMLElement;
+  // private _cursorEle?: HTMLElement;
+  private _eles?: {
+    cursor: HTMLElement;
+    leftIn: HTMLElement;
+    leftOut: HTMLElement;
+    rightIn: HTMLElement;
+    rightOut: HTMLElement;
+  };
+
   private _cursorList: $Cursor[] = [];
+  private _cursorTotalWidth: number = 0;
 
   /// 将布局信息反应到css动画上
   private _anis: Animation[] = [];
   private _aniDuration = 0;
-  private _aniTotalDuration = 0;
+  // private _aniTotalDuration = 0;
   private _prepareAnimations() {
-    const { _cursorEle: cursorEle, _cursorList: cursorList } = this;
-    if (!cursorEle) {
+    const { _eles: eles, _cursorList: cursorList } = this;
+    if (!eles) {
       return;
     }
 
     /// 取消原有的动画
+    if (this._playFrameId !== undefined) {
+      cancelAnimationFrame(this._playFrameId);
+      this._playFrameId = undefined;
+    }
     for (const ani of this._anis) {
       ani.cancel();
     }
     this._anis.length = 0;
 
-    /// 生成新的动画
-    const leftList: number[] = [];
-    const rightList: number[] = [];
-    const offsetList: number[] = [];
-    const widthList: number[] = [];
+    /// 计算动画的布局
+    const totalWidth = cursorList.reduce((w, c) => w + c.width, 0);
+    this._cursorTotalWidth = totalWidth;
 
-    if (cursorList) {
-      const totalWidth = cursorList.reduce((w, c) => w + c.width, 0);
-      const unitOffset = 1 / (cursorList.length - 1);
-      for (const cursor of cursorList) {
-        const offset = offsetList.length * unitOffset;
-        offsetList.push(offset);
-
-        const width = cursor.width / totalWidth;
-        widthList.push(width);
-
-        // const left = cursor.left / totalWidth;
-        // leftList.push(left / width);
-        leftList.push(cursor.left);
-
-        const right = (totalWidth - cursor.left - cursor.width) / totalWidth;
-        rightList.push(right / width);
-      }
-    }
-
+    /// 生成四向动画
+    const cursorStyles = getComputedStyle(eles.cursor);
     const cursorAniDuration =
       asSafeInteger(this.duration) ??
-      (cssAnimationDurationToMs(getComputedStyle(cursorEle).animationDuration) ||
-        1); /* 不小于等于0，避免计算toTime的时候出错 */
-
-    const totalDuration = (offsetList.length - 1) * cursorAniDuration;
-
+      (cssAnimationDurationToMs(cursorStyles.animationDuration) || 1); /* 不小于等于0，避免计算toTime的时候出错 */
     this._aniDuration = cursorAniDuration;
-    this._aniTotalDuration = totalDuration;
 
-    /**
-     * baseAni 不会有任何实际的渲染，只是用它来作为系统的动画控制器的连接桥梁
-     * 也就是所用系统的动画控制器去计算动画的进度。其它动画在暂停状态下，跟随它的动画进度就好了
-     */
-    const baseAni = cursorEle.animate(
-      {
-        "offset": offsetList,
-        "--progress": [0, 1],
-      },
-      { easing: "linear", duration: totalDuration, fill: "forwards" },
-    );
-    baseAni.pause();
+    const leftInEasing = cursorStyles.getPropertyValue("--cursor-left-in-easing") || "ease-out";
+    const leftOutEasing = cursorStyles.getPropertyValue("--cursor-left-out-easing") || "ease-in";
+    const rightInEasing = cursorStyles.getPropertyValue("--cursor-right-in-easing") || "ease-out";
+    const rightOutEasing = cursorStyles.getPropertyValue("--cursor-right-out-easing") || "ease-in";
 
-    const leftAni = cursorEle.animate(
+    const generateAnimation = (
+      ele: HTMLElement,
+      keyframes: PropertyIndexedKeyframes,
+      options: KeyframeAnimationOptions,
+    ) => {
+      const ani = ele.animate(keyframes, options);
+      ani.pause();
+      this._anis.push(ani);
+    };
+
+    generateAnimation(
+      eles.leftIn,
       {
-        // easing: `ease-in`,
-        offset: offsetList,
-        transform: leftList.map(left => `translateX(${left}px)`),
+        top: ["0px", "1000px"],
       },
       {
-        easing: "linear",
-        duration: totalDuration,
+        easing: leftInEasing,
+        duration: cursorAniDuration,
         fill: "forwards",
       },
     );
-    leftAni.pause();
-    const rightAni = cursorEle.animate(
+    generateAnimation(
+      eles.leftOut,
       {
-        // easing: `ease-out`,
-        offset: offsetList,
-        width: widthList.map(width => `${width * 100}%`),
+        top: ["0px", "1000px"],
       },
       {
-        easing: "linear",
-        duration: totalDuration,
+        easing: leftOutEasing,
+        duration: cursorAniDuration,
         fill: "forwards",
       },
     );
-    rightAni.pause();
-    this._anis.push(baseAni, leftAni, rightAni);
-
-    this.console.log("animate-offset", offsetList);
-    this.console.log("animate-left", leftList);
-    this.console.log("animate-width", widthList);
-    this.console.log("animate-right", rightList);
+    generateAnimation(
+      eles.rightIn,
+      {
+        top: ["0px", "1000px"],
+      },
+      {
+        easing: rightInEasing,
+        duration: cursorAniDuration,
+        fill: "forwards",
+      },
+    );
+    generateAnimation(
+      eles.rightOut,
+      {
+        top: ["0px", "1000px"],
+      },
+      {
+        easing: rightOutEasing,
+        duration: cursorAniDuration,
+        fill: "forwards",
+      },
+    );
   }
 
   private _scrollProgressToAniProgress(scrollProgress: number) {
@@ -273,12 +279,40 @@ export class CccSliderScrollbar implements ComponentInterface {
     return 0;
   }
 
+  private _calcLayout(progress: number) {
+    const index = progress * (this._cursorList.length - 1);
+    const float = index % 1;
+    const int = index - float;
+    const base = this._cursorList[int];
+    if (float === 0) {
+      return base;
+    }
+    const next = this._cursorList[int + 1];
+    const mix = {
+      left: base.left + (next.left - base.left) * float,
+      width: base.width + (next.width - base.width) * float,
+    };
+    return mix;
+  }
+
   private _playFrameId?: number;
-  private _playAnimations(toAniProgress: number) {
-    const baseAni = this._anis[0];
-    if (!baseAni) {
+  private _aniProgress: number = 0;
+  private _playAnimations(toAniProgress: number, duration = this._aniDuration) {
+    if (this._anis.length === 0) {
       return;
     }
+    if (this._eles === undefined) {
+      return;
+    }
+
+    const [leftInAni, leftOutAni, rightInAni, rightOutAni] = this._anis;
+    const {
+      leftIn: leftInEle,
+      leftOut: leftOutEle,
+      rightIn: rightInEle,
+      rightOut: rightOutEle,
+      cursor: cursorEle,
+    } = this._eles;
     if (Number.isFinite(toAniProgress) === false) {
       return;
     }
@@ -288,74 +322,109 @@ export class CccSliderScrollbar implements ComponentInterface {
     } else if (toAniProgress > 1) {
       toAniProgress = 1;
     }
-    const toTime = toAniProgress * this._aniTotalDuration;
-    const getCurTime = () => baseAni.currentTime ?? 0;
-    const fromTime = getCurTime();
-    if (toTime === fromTime) {
+
+    /// 先暂停所有动画
+    if (this._playFrameId !== undefined) {
+      cancelAnimationFrame(this._playFrameId);
+      this._anis.forEach(ani => ani.pause());
+    }
+
+    /// 计算出动画目标
+
+    const cursorStyle = cursorEle.style;
+    const totalWidth = this._cursorTotalWidth;
+    let fromLeft = 0;
+    let fromRight = 0;
+    {
+      const { left, width } = cursorStyle;
+      fromLeft = parseFloat(left);
+      fromRight = totalWidth - parseFloat(width) - fromLeft;
+    }
+    let toLeft = 0;
+    let toRight = 0;
+    {
+      const { left, width } = this._calcLayout(toAniProgress);
+      toLeft = left;
+      toRight = totalWidth - width - toLeft;
+    }
+
+    const fromAniProgress = this._aniProgress;
+    const baseAniDuration = this._aniDuration;
+    /**播放速率 */
+    const playbackBaseRate = 1 / Math.min(Math.abs(toAniProgress - fromAniProgress) * this._cursorList.length, 1);
+
+    let leftAni: Animation;
+    let leftEle: HTMLElement;
+    let rightAni: Animation;
+    let rightEle: HTMLElement;
+
+    /// 正向
+    if (toAniProgress > fromAniProgress) {
+      leftAni = leftOutAni;
+      leftEle = leftOutEle;
+
+      rightAni = rightInAni;
+      rightEle = rightInEle;
+    } /// 反向
+    else if (toAniProgress < fromAniProgress) {
+      leftAni = leftInAni;
+      leftEle = leftInEle;
+
+      rightAni = rightOutAni;
+      rightEle = rightOutEle;
+    }
+    /// 已经完成动画了 fromAniProgress === toAniProgress
+    else if (fromLeft !== toLeft || fromRight !== toRight) {
+      cursorStyle.left = toLeft + "px";
+      cursorStyle.width = totalWidth - toLeft - toRight + "px";
+      return;
+    } else {
       return;
     }
 
-    this.console.log("play animations to", (toAniProgress * 100).toFixed(2) + "%");
-    let playRate: number = (toTime - fromTime) / this._aniDuration;
-    /// 一帧帧检查是否播放到特定的进度
-    let checkFinish: (curTime: number) => boolean;
-    /// 正向播放，AniProgress越来越大
-    if (fromTime < toTime) {
-      checkFinish = curTime => curTime >= toTime;
-      // playRate = 1;
-      if (playRate < 1) {
-        playRate = 1;
-      }
-    }
-    /// 方向播放，AniProgress越来越小
-    else {
-      checkFinish = curTime => curTime <= toTime;
-      // playRate = -1;
-      if (playRate > -1) {
-        playRate = -1;
-      }
-    }
-    this.console.log("play animations rate", playRate);
-
+    /// 开始根据双向动画跟进渲染
     const doPlayAni = () => {
-      let curTime = getCurTime();
-      if (checkFinish(curTime)) {
-        curTime = toTime;
+      if (leftAni.playState === "finished") {
         this._playFrameId = undefined;
-        baseAni.pause();
       } else {
         this._playFrameId = requestAnimationFrame(doPlayAni);
       }
-      for (const ani of this._anis) {
-        ani.currentTime = curTime;
-      }
+      const progress = (leftAni.currentTime ?? 0) / baseAniDuration;
+      this._aniProgress = fromAniProgress + (toAniProgress - fromAniProgress) * progress;
+
+      const leftProgress = leftEle.offsetTop / 1000;
+      const leftPx = fromLeft + (toLeft - fromLeft) * leftProgress;
+      cursorStyle.left = leftPx + "px";
+
+      const rightProgress = rightEle.offsetTop / 1000;
+      const rightPx = fromRight + (toRight - fromRight) * rightProgress;
+      cursorStyle.width = totalWidth - leftPx - rightPx + "px";
     };
+    if (duration === 0 || Number.isFinite(playbackBaseRate) === false) {
+      leftAni.finish();
+      rightAni.finish();
+      doPlayAni();
+    } else {
+      const playbackRate = (baseAniDuration / duration) * playbackBaseRate;
 
-    /// 先暂停
-    if (this._playFrameId !== undefined) {
-      cancelAnimationFrame(this._playFrameId);
+      leftAni.currentTime = 0;
+      leftAni.playbackRate = playbackRate;
+      leftAni.play();
+      rightAni.currentTime = 0;
+      rightAni.playbackRate = playbackRate;
+      rightAni.play();
+      this._playFrameId = requestAnimationFrame(doPlayAni);
     }
-    baseAni.pause();
-    /// 再重启
-    baseAni.playbackRate = playRate;
-    baseAni.play();
-    this._playFrameId = requestAnimationFrame(doPlayAni);
   }
-  // private _pauseAnimations() {
-  //   if (this._playFrameId === undefined) {
-  //     return;
-  //   }
-  //   cancelAnimationFrame(this._playFrameId);
-  //   this._playFrameId = undefined;
-
-  //   // for (const ani of this._anis) {
-  //   //   ani.pause();
-  //   // }
-  // }
-  //#endregion
 
   componentDidLoad() {
-    this._cursorEle = querySelector(this.hostEle.shadowRoot, ".cursor");
+    this._eles = {
+      cursor: querySelector(this.hostEle.shadowRoot, ".cursor")!,
+      leftIn: querySelector(this.hostEle.shadowRoot, ".left-in")!,
+      leftOut: querySelector(this.hostEle.shadowRoot, ".left-out")!,
+      rightIn: querySelector(this.hostEle.shadowRoot, ".right-in")!,
+      rightOut: querySelector(this.hostEle.shadowRoot, ".right-out")!,
+    };
 
     this.watchForLayout(this.forLayout);
     this.watchForSlider(this.forSlider);
@@ -368,8 +437,21 @@ export class CccSliderScrollbar implements ComponentInterface {
   render() {
     return (
       <Host>
-        <div class="cursor" part="cursor">
+        <div
+          class="cursor"
+          part="cursor"
+          style={{
+            left: "0px",
+            width: "100%",
+          }}
+        >
           <div class="spirit" part="spirit"></div>
+          <div class="ani-shadow">
+            <div class="ani-item left-in"></div>
+            <div class="ani-item left-out"></div>
+            <div class="ani-item right-in"></div>
+            <div class="ani-item right-out"></div>
+          </div>
         </div>
       </Host>
     );

@@ -28,11 +28,7 @@ export type $Slider = {
   offsetCenterCache: number;
 };
 export type $NullableSlider = Omit<$Slider, "ele"> & { ele?: $Slider["ele"] };
-/**当前的“原因”
- * 如果是 user ，说明是用户在控制，此时应该避免去对它进行任何覆盖操作，避免行为不跟手
- * 如果是 auto ，说明是机器在控制
- */
-export type $Reason = "user" | "auto";
+
 type $InternalReason = "touch" | "mousewheel" | "into" | "init";
 
 /**
@@ -327,15 +323,12 @@ export class CccSlider implements ComponentInterface, $CccSlider {
         this.hostEle.scrollTo({ left, behavior });
       }
     }
-
-    queueMicrotask(() => {
-      this._reasons.delete("into");
-    });
   }
 
   /**滚动到特定的 activedIndex */
   @Method()
   async slideTo(activedIndex: number, behavior: ScrollBehavior = "smooth") {
+    this._reasons.add("into");
     this._scrollToIndex(activedIndex, behavior);
   }
   /**强制刷新渲染 */
@@ -469,14 +462,19 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     this._updateSliderStates();
 
     this._reasons.delete("mousewheel");
+    this._reasons.delete("into");
   };
-  private get _reason(): $Reason {
+  private get _reason(): $CccSlider.Reason {
     if (this._reasons.size === 0 || this._reasons.has("mousewheel") || this._reasons.has("touch")) {
       return "user";
     }
     return "auto";
   }
   private _reasons = new Set<$InternalReason>();
+  @Method()
+  async getReason() {
+    return this._reason;
+  }
   onMouseWheel = () => {
     this._reasons.add("mousewheel");
   };

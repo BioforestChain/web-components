@@ -13,7 +13,14 @@ export namespace $CccSlider {
     getActivedIndex(): Promise<number>;
     slideTo(activedIndex: number): Promise<void>;
     getScrollProgress(): Promise<number>;
+    getReason(): Promise<Reason>;
   }
+  /**
+   * 当前的状态变动的“原因”
+   * 如果是 user ，说明是用户在控制，此时应该避免去对它进行任何覆盖操作，避免行为不跟手
+   * 如果是 auto ，说明是机器在控制
+   */
+  export type Reason = "user" | "auto";
   export type ActivedIndexChangeDetail = number; // [sliderEle: HTMLElement | undefined, activedIndex: number];
 
   export type HTMLCccSliderElementEventMap = HTMLElementEventMap & {

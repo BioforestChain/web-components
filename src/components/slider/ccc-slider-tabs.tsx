@@ -371,6 +371,14 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   async getActivedIndex(): Promise<number> {
     return this._activedIndex;
   }
+  @Method()
+  async getReason() {
+    if (this._sliderEle) {
+      return "auto";
+    } else {
+      return "user";
+    }
+  }
   //#endregion
 
   render() {

@@ -57,6 +57,16 @@ Type: `Promise<{ box: { viewOffsetLeft: number; viewOffsetWidth: number; viewSiz
 
 
 
+### `getReason() => Promise<"auto" | "user">`
+
+
+
+#### Returns
+
+Type: `Promise<"auto" | "user">`
+
+
+
 ### `getScrollProgress() => Promise<number>`
 
 
