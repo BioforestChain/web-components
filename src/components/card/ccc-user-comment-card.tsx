@@ -7,6 +7,7 @@ import { querySelector } from "../../utils/utils";
   shadow: true,
 })
 export class CccUserCommentCard implements ComponentInterface {
+  @Prop() replyContent = "";
   @Prop() userAvator = "";
   @Prop() userName = "some one";
   @Prop() userFlag = "";
@@ -90,11 +91,13 @@ export class CccUserCommentCard implements ComponentInterface {
               </span>
             </div>
           </slot>
-          {/* <div class="text-wrapper gray" style={{ "--line-clamp": `1` }}>
-            <div class="text fold ">
-              <slot name="replyComment">{this.text}</slot>
+          {this.replyContent.length > 0 ? (
+            <div class="text-wrapper gray" style={{ "--line-clamp": `1` }}>
+              <div class="text fold ">
+                <slot name="replyComment">{this.replyContent}</slot>
+              </div>
             </div>
-          </div> */}
+          ) : undefined}
           <div class="text-wrapper" style={{ "--line-clamp": `${this.lineClamp}` }}>
             <div class={{ text: true, fold: this.isFlod }}>
               <slot name="text">{this.text}</slot>
