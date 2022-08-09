@@ -200,6 +200,13 @@ export class CccSlider implements ComponentInterface, $CccSlider {
         closestSlider = sliderLayoutInfo;
       }
     }
+
+    /// 计算出 scrollProgress
+    const progress =
+      closestSlider.offsetWidthCache === 0
+        ? 0
+        : (viewboxOffsetCenter - closestSlider.offsetCenterCache) / closestSlider.offsetWidthCache;
+
     return {
       closestSlider,
       viewbox: {
@@ -209,9 +216,8 @@ export class CccSlider implements ComponentInterface, $CccSlider {
         offsetCenter: viewboxOffsetCenter,
       },
       sliderList: this._sliderList,
-      reason: this._reason,
-      activedIndex: this._activedIndex,
-      scrollProgress: this._scrollProgress,
+      activedIndex: closestSlider.index,
+      scrollProgress: closestSlider.index + progress,
     };
   }
   private _calc_frame_id?: number;
@@ -290,11 +296,13 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     }
 
     // 执行滚动
+    this.console.info("scroll to index:", activedIndex, behavior);
     this._setScrollLeft(scrollLeft, behavior);
   }
   /**滚动到指定的坐标位置上 */
   private _scrollToLeft(left: number, behavior: ScrollBehavior) {
     // 执行滚动
+    this.console.info("scroll to left:", left, behavior);
     this._setScrollLeft(left, behavior);
   }
 
@@ -319,7 +327,6 @@ export class CccSlider implements ComponentInterface, $CccSlider {
         this.hostEle.scrollTo({ left, behavior });
       }
     }
-    this.console.info("set scrollLeft:", left, behavior);
 
     queueMicrotask(() => {
       this._reasons.delete("into");
@@ -358,10 +365,7 @@ export class CccSlider implements ComponentInterface, $CccSlider {
   // @throttle()
   private _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
     this.console.lazyInfo(() => ["updateSliderStates", "reasons:", this._reasons, this._reason, { ...layoutInfo }]);
-    const {
-      closestSlider,
-      viewbox: { offsetCenter: viewboxOffsetCenter },
-    } = layoutInfo;
+    const { closestSlider } = layoutInfo;
     const { _sliderList: sliderList, _preSliderStates: preSliderStates } = this;
     let changed = false;
     if (preSliderStates.list !== sliderList || preSliderStates.activedIndex !== closestSlider.index) {
@@ -387,15 +391,9 @@ export class CccSlider implements ComponentInterface, $CccSlider {
       }
     }
 
-    /// 计算出 activedIndex 与 scrollProgress
-    const progress =
-      closestSlider.offsetWidthCache === 0
-        ? 0
-        : (viewboxOffsetCenter - closestSlider.offsetCenterCache) / closestSlider.offsetWidthCache;
-    this._scrollProgress = closestSlider.index + progress;
-    this._activedIndex = closestSlider.index;
-    layoutInfo.activedIndex = this._activedIndex;
-    layoutInfo.scrollProgress = this._scrollProgress;
+    /// 绑定计算出的 activedIndex 与 scrollProgress
+    this._scrollProgress = layoutInfo.scrollProgress;
+    this._activedIndex = layoutInfo.activedIndex;
 
     /// 触发事件
     if (changed) {
