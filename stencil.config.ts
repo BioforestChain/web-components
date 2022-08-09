@@ -26,7 +26,7 @@ export const config: Config = {
         ? [
             (() => {
               let checkTi: any;
-              const CHECK_MAX_TIMES = 10;
+              const CHECK_MAX_TIMES = 20;
               let checkTimes = 0;
 
               return {
@@ -259,6 +259,7 @@ export const config: Config = {
       if (withAngular === false) {
         return [];
       }
+      debugger
       return [
         angularOutputTarget({
           componentCorePackage: packageJson.name,

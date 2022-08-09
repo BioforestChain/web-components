@@ -82,6 +82,8 @@ yarn g YOUR_COMPONENT_NAME
 
 与此同时，组件中会自动生成 `stories` 文件夹下会出现一个对应的“故事文件”，比如`your-component.stories.ts`。在该文件中，也同样享有严格的类型检查。前提是你要安装 vscode-lit 插件
 
+`.const.ts(x)` 后缀的文件是特殊的文件，它所定义的“类型”最终会被一并导出。所以贡献者可以将跨组件“共享的类型”定义到这些文件中以统一导出。
+
 ## 📦 贡献者·调试
 
 1. 在组件开发时，你可以使用 `this.console.verbose/log/info/warn/error/success` 这几个接口来进行日志打印。它们的日志等级依次提高
@@ -102,7 +104,7 @@ yarn g YOUR_COMPONENT_NAME
 1. 在 Angular 项目开发时，的 HMR 模式下（通过`yarn dev:hmr`）启动，webcomponet 是无法正确重载的（因为 WebComponent 无法重新注册）。所以建议是：
    1. 如果在编写 Angular-HTML 或者是开发调试 WebComponent，那么关闭 HMR，等将元素的结构放置完成后，再进入 .scss 的编写
    1. 如果再编写 Angular-SCSS，那么开启 HMR，.scss 文件可以动态重载，但是这时候如果有修改到 .html 文件的时候，可能需要手动刷新才能让 WebComponent 正确渲染
-2. 当你在组件中配置了 assetDir 的属性后，需要重启编译，否则无法正确进行资源拷贝
+1. 当你在组件中配置了 assetDir 的属性后，需要重启编译，否则无法正确进行资源拷贝
 
 ## 📦 贡献者·动态图标
 
