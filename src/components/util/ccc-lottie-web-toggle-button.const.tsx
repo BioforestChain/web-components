@@ -1,8 +1,7 @@
 import { h } from "@stencil/core";
 
-export type $Direction = "tb" | "lr"; // "column" | "row";
-export const colorsMap = new WeakMap<object, { checked: string; unchecked: string }>();
-export const forceGetColors = (aniData: object) => {
+const colorsMap = new WeakMap<object, { checked: string; unchecked: string }>();
+export const forceGetLottieToggleButtonColors = (aniData: object) => {
   let colors = colorsMap.get(aniData);
   if (colors === undefined) {
     colors = {
@@ -14,17 +13,21 @@ export const forceGetColors = (aniData: object) => {
   return colors;
 };
 
-export interface $ToggleButton {
+export interface $LottieToggleButton {
   checked: boolean;
-  direction: $Direction;
+  direction: $LottieToggleButton.Direction;
   disabled: boolean;
   icononly: boolean;
   onChange: (event: CustomEvent<boolean>) => void;
 }
-export const toggleButtonRender = (
+export namespace $LottieToggleButton {
+  export type Direction = "tb" | "lr"; // "column" | "row";
+}
+
+export const lottieToggleButtonRender = (
   name: string,
   animationData: object,
-  button: $ToggleButton,
+  button: $LottieToggleButton,
   slotRender: () => unknown,
 ) => {
   return (

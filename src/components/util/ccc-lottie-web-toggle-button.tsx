@@ -1,6 +1,6 @@
 import { Component, ComponentInterface, Event, EventEmitter, h, Host, Prop, Watch } from "@stencil/core";
 import { bindThis } from "../../utils/utils";
-import { $Direction } from "./ccc-lottie-web-toggle-button.const";
+import { $LottieToggleButton } from "./ccc-lottie-web-toggle-button.const";
 
 @Component({
   tag: "ccc-lottie-web-toggle-button",
@@ -13,7 +13,7 @@ export class CccLottieWebToggleButton implements ComponentInterface {
   @Prop() label = "";
   @Prop({ reflect: true, mutable: true }) labelColor = "";
   @Prop({ reflect: true }) name = "";
-  @Prop({ reflect: true }) direction: $Direction = "lr";
+  @Prop({ reflect: true }) direction: $LottieToggleButton.Direction = "lr";
   @Prop() animationData: object | undefined = undefined;
 
   @Prop({ reflect: true, mutable: true }) checked = false;

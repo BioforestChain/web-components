@@ -1,6 +1,6 @@
 import { Component, ComponentInterface, Event, EventEmitter, h, Prop, Watch } from "@stencil/core";
 import { bindThis } from "../../utils/utils";
-import { $Direction, $Color } from "./ccc-image-toggle-button.const";
+import { $ImageToggleButton } from "./ccc-image-toggle-button.const";
 
 @Component({
   tag: "ccc-image-toggle-button",
@@ -12,12 +12,12 @@ export class CccImageToggleButton implements ComponentInterface {
   @Prop() frames!: number;
   @Prop() duration!: string;
 
-  @Prop({ reflect: true }) color: $Color = "black";
+  @Prop({ reflect: true }) color: $ImageToggleButton.Color = "black";
   @Prop({ reflect: true }) disabled = false;
   @Prop({ reflect: true }) icononly = false;
   @Prop() label = "";
   @Prop({ reflect: true, mutable: true }) checkedColor = "";
-  @Prop({ reflect: true }) direction: $Direction = "lr";
+  @Prop({ reflect: true }) direction: $ImageToggleButton.Direction = "lr";
 
   @Prop({ reflect: true, mutable: true }) checked = false;
   @Event() checkedChange!: EventEmitter<boolean>;

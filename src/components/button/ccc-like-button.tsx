@@ -1,6 +1,6 @@
 import { Component, ComponentInterface, getAssetPath, h, Prop, State, Watch } from "@stencil/core";
 import { bindThis } from "../../utils/utils";
-import { $Color, $Direction, toggleButtonRender } from "../util/ccc-image-toggle-button.const";
+import { $ImageToggleButton, imageToggleButtonRender } from "../util/ccc-image-toggle-button.const";
 
 @Component({
   tag: "ccc-like-button",
@@ -9,7 +9,7 @@ import { $Color, $Direction, toggleButtonRender } from "../util/ccc-image-toggle
   assetsDirs: ["./assets"],
 })
 export class CccButtonLike implements ComponentInterface {
-  @Prop({ reflect: true }) color: $Color = "black";
+  @Prop({ reflect: true }) color: $ImageToggleButton.Color = "black";
   @Prop({ reflect: true }) disabled = false;
   @Prop({ reflect: true }) icononly = false;
   @Prop({ mutable: true }) count = 0;
@@ -18,7 +18,7 @@ export class CccButtonLike implements ComponentInterface {
     this.updateCount();
   }
   @Prop({ mutable: true, reflect: true }) checked = false;
-  @Prop() direction: $Direction = "lr";
+  @Prop() direction: $ImageToggleButton.Direction = "lr";
 
   @State() count_uncheck = 0;
   @State() count_checked = 0;
@@ -43,7 +43,7 @@ export class CccButtonLike implements ComponentInterface {
   }
 
   render() {
-    return toggleButtonRender(
+    return imageToggleButtonRender(
       {
         src: getAssetPath("./assets/like.webp"),
         frames: 48,

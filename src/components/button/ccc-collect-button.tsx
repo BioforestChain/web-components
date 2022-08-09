@@ -1,6 +1,6 @@
 import { Component, ComponentInterface, getAssetPath, h, Prop } from "@stencil/core";
 import { bindThis } from "../../utils/utils";
-import { $Color, $Direction, toggleButtonRender } from "../util/ccc-image-toggle-button.const";
+import { $ImageToggleButton, imageToggleButtonRender } from "../util/ccc-image-toggle-button.const";
 
 @Component({
   tag: "ccc-collect-button",
@@ -9,14 +9,14 @@ import { $Color, $Direction, toggleButtonRender } from "../util/ccc-image-toggle
   assetsDirs: ["./assets"],
 })
 export class CccButtonCollect implements ComponentInterface {
-  @Prop({ reflect: true }) color: $Color = "black";
+  @Prop({ reflect: true }) color: $ImageToggleButton.Color = "black";
   @Prop({ reflect: true }) disabled = false;
   @Prop({ reflect: true }) icononly = false;
   @Prop() checkLabel: string = "";
   @Prop() unCheckLabel: string = "";
 
   @Prop({ mutable: true, reflect: true }) checked = false;
-  @Prop() direction: $Direction = "lr";
+  @Prop() direction: $ImageToggleButton.Direction = "lr";
 
   @bindThis
   onChange(event: CustomEvent<boolean>) {
@@ -25,7 +25,7 @@ export class CccButtonCollect implements ComponentInterface {
   }
 
   render() {
-    return toggleButtonRender(
+    return imageToggleButtonRender(
       {
         src: getAssetPath("./assets/collect.webp"),
         frames: 48,

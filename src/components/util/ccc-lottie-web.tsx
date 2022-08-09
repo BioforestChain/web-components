@@ -12,7 +12,7 @@ import {
 } from "@stencil/core";
 import lottie, { AnimationItem, RendererType } from "lottie-web";
 import { querySelectorAll } from "../../utils/utils";
-import { forceGetColors } from "./ccc-lottie-web-toggle-button.const";
+import { forceGetLottieToggleButtonColors } from "./ccc-lottie-web-toggle-button.const";
 
 export interface BMEnterFrameEvent {
   currentTime: number;
@@ -89,7 +89,7 @@ export class CccLottieWeb implements ComponentInterface {
   }
 
   private async _firstLoad(lottieAniIns: AnimationItem) {
-    const colors = forceGetColors(this.data!);
+    const colors = forceGetLottieToggleButtonColors(this.data!);
     if (!colors.checked) {
       /// 跳到最后一帧，获取主色调
       this.goToAndStop(lottieAniIns.totalFrames, true);

@@ -1,24 +1,26 @@
 import { h } from "@stencil/core";
 
-export type $Direction = "tb" | "lr"; // "column" | "row";
-export type $Color = "white" | "black"; // "column" | "row";
-
-export interface $ToggleButton {
+export interface $ImageToggleButton {
   checked: boolean;
-  color: $Color;
-  direction: $Direction;
+  color: $ImageToggleButton.Color;
+  direction: $ImageToggleButton.Direction;
   disabled: boolean;
   icononly: boolean;
   onChange: (event: CustomEvent<boolean>) => void;
 }
-export const toggleButtonRender = (
+export namespace $ImageToggleButton {
+  export type Color = "white" | "black";
+  export type Direction = "tb" | "lr";
+}
+
+export const imageToggleButtonRender = (
   aniConfig: {
     src: string;
     frames: number;
     duration: string;
     checkedColor: string;
   },
-  button: $ToggleButton,
+  button: $ImageToggleButton,
   slotRender: () => unknown,
 ) => {
   return (
