@@ -121,7 +121,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
       this._sliderEle = sliderEle;
       sliderEle.addEventListener("activedIndexChange", this._onForEleActivedIndexChange);
       // 立刻进行渲染绑定
-      this._updateTabLayoutInfo(this._calcLayoutInfo(await sliderEle.getActivedIndex()));
+      this._updateTabLayoutInfo(this.calcLayoutInfo(await sliderEle.getActivedIndex()));
     }
     return sliderEle;
   }
@@ -131,7 +131,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     if (ele !== this._sliderEle) {
       return;
     }
-    this._updateTabLayoutInfo(this._calcLayoutInfo(event.detail));
+    this._updateTabLayoutInfo(this.calcLayoutInfo(event.detail));
   };
 
   //#endregion
@@ -162,7 +162,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     /// 没有for绑定，自己进行渲染
     else {
       // 选中新的tab对象
-      this._updateTabLayoutInfo(this._calcLayoutInfo(activedIndex));
+      this._updateTabLayoutInfo(this.calcLayoutInfo(activedIndex));
     }
   }
 
@@ -205,6 +205,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
 
   private _resizeOb = new ResizeObserver(() => {
     this.console.log("resize");
+    // 这里只是触发resize相关的计算，不用 updateTabLayoutInfo
     this.calcLayoutInfo(undefined, true);
   });
   private _mutationOb = new MutationObserver(entries => {
@@ -228,8 +229,8 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     this._tabListEle = querySelector(this.hostEle.shadowRoot, ".tab-list");
     this._resizeOb.observe(this._tabListEle!);
 
+    // 初始化tabs
     this._queryTabs();
-    this.calcLayoutInfo(undefined, true);
 
     /// 如果没有找到需要跟随的slider，那么就将自己当成slider来使用
     if (!(await this.watchForSlider(this.forSlider))) {
@@ -299,7 +300,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
 
   private _cachedLayoutInfo?: ReturnType<CccSliderTabs["_calcLayoutInfo"]>;
   private _calcLayoutInfo(activedIndex = this._activedIndex) {
-    this.console.log("calcLayoutInfo", activedIndex);
+    this.console.log("calcLayoutInfo  activedIndex:", activedIndex);
 
     const {
       offsetLeft: viewboxOffsetLeft,
