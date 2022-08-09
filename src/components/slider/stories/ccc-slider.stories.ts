@@ -1,4 +1,4 @@
-import { html } from "lit-html";
+import { html, TemplateResult } from "lit-html";
 import { cccSliderKit } from "./autogen";
 
 export default {
@@ -46,14 +46,16 @@ const DEMO_STYLE = `
 
 export const Base_Usage = cccSliderKit.storyFactory(() => DEMO_HTML, {}).addStyle(DEMO_STYLE);
 
-const WITH_TABS_ADD_HTML_TPL = html`
-  <ccc-slider-tabs for-slider="qaq">
+const TABS_HTML = (slot?: () => TemplateResult) => html`
+  <ccc-slider-tabs id="tabs" for-slider="qaq">
     <span class="tab" slot="tab">s1</span>
     <span class="tab" slot="tab">s2</span>
     <span class="tab" slot="tab">s3</span>
+    ${slot?.()}
   </ccc-slider-tabs>
 `;
-const WITH_TABS_ADD_STYLE = `
+
+const TABS_STYLE = `
 #root {
   display: flex;
   flex-direction: column;
@@ -78,18 +80,18 @@ export const With_Tabs = cccSliderKit
   .onMount((_, ele) => {
     ele.id = "qaq";
   })
-  .addHtmlTpl(WITH_TABS_ADD_HTML_TPL, "before")
-  .addStyle(WITH_TABS_ADD_STYLE);
+  .addHtmlTpl(TABS_HTML(), "before")
+  .addStyle(TABS_STYLE);
 
-export const Delay_Init = cccSliderKit
+export const Delay_Visible = cccSliderKit
   .storyFactory(() => DEMO_HTML, {})
   .addStyle(DEMO_STYLE)
   .onMount((_, ele) => {
     ele.id = "qaq";
     ele.classList.add("hide");
   })
-  .addHtmlTpl(WITH_TABS_ADD_HTML_TPL, "before")
-  .addStyle(WITH_TABS_ADD_STYLE)
+  .addHtmlTpl(TABS_HTML(), "before")
+  .addStyle(TABS_STYLE)
   .addStyle(
     `
   #wrapper{
@@ -123,17 +125,24 @@ export const With_Tabs_And_Default_Index = cccSliderKit
   .onMount((_, ele) => {
     ele.id = "qaq";
   })
+  .addHtmlTpl(TABS_HTML(), "before")
+  .addStyle(TABS_STYLE);
+
+export const With_Tabs_And_Scrollbar = cccSliderKit
+  .storyFactory(() => DEMO_HTML, {
+    defaultActivedIndex: 1,
+  })
+  .addStyle(DEMO_STYLE)
+  .onMount((_, ele) => {
+    ele.id = "qaq";
+  })
   .addHtmlTpl(
-    html`
-      <ccc-slider-tabs for-slider="qaq">
-        <span class="tab" slot="tab">s1</span>
-        <span class="tab" slot="tab">s2</span>
-        <span class="tab" slot="tab">s3</span>
-      </ccc-slider-tabs>
-    `,
+    TABS_HTML(
+      () => html` <ccc-slider-scrollbar id="scrollbar" for-slider="qaq" for-layout="tabs"> </ccc-slider-scrollbar> `,
+    ),
     "before",
   )
-  .addStyle(WITH_TABS_ADD_STYLE);
+  .addStyle(TABS_STYLE);
 
 export const Nested_Slider = cccSliderKit
   .storyFactory(
@@ -190,7 +199,7 @@ export const Nested_Slider = cccSliderKit
     "before",
   )
   .addStyle(
-    WITH_TABS_ADD_STYLE +
+    TABS_STYLE +
       `
   .slider ccc-slider {
     width: 260px;
