@@ -26,7 +26,7 @@ ccc-slider-tabs {
   background: #c8e6c9;
 }
 [slot="tab"][data-ccc-slider-tabs="actived"]{
-  background: #f44336;
+  background: #009688;
   color: #FFF;
 }
 [slot="tab"][data-ccc-slider-tabs="next"]{
@@ -35,6 +35,10 @@ ccc-slider-tabs {
 `;
 
 export const Base_Usage = cccSliderTabsKit.storyFactory(() => BASE_HTML, {}).addStyle(BASE_STYLE);
+
+export const WithDefaultIndex = cccSliderTabsKit
+  .storyFactory(() => BASE_HTML, { defaultActivedIndex: 1 })
+  .addStyle(BASE_STYLE);
 
 export const WithScrollBar = cccSliderTabsKit
   .storyFactory(

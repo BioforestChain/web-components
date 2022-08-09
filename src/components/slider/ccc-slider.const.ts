@@ -52,6 +52,21 @@ export interface $CccLayout extends $CccLayout.CccLayoutBase {
 export const isCccLayout = (ele: unknown): ele is $CccLayout.HTMLCccLayoutElement => {
   return ele instanceof HTMLElement && typeof (ele as any).getLayoutInfo === "function";
 };
+export const isCccLayoutEqual = (layout1: $CccLayout.LayoutChangeDetail, layout2: $CccLayout.LayoutChangeDetail) => {
+  if (layout1 === layout2) {
+    return true;
+  }
+  if (layout1.box.viewSize !== layout2.box.viewSize || layout1.box.scrollSize !== layout2.box.scrollSize) {
+    return false;
+  }
+  if (layout1.blockList.length !== layout2.blockList.length) {
+    return false;
+  }
+  if (layout1.blockList.some((block1, index) => layout2.blockList[index].size !== block1.size)) {
+    return false;
+  }
+  return true;
+};
 export namespace $CccLayout {
   export interface CccLayoutBase {
     getLayoutInfo(): Promise<LayoutChangeDetail>;

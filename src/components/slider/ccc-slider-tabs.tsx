@@ -11,7 +11,14 @@ import {
   Watch,
 } from "@stencil/core";
 import { at, Logger, querySelector, querySelectorAll } from "../../utils/utils";
-import { $CccLayout, $CccLayoutFollower, $CccSlider, $CccSliderFollower, isCccSlider } from "./ccc-slider.const";
+import {
+  $CccLayout,
+  $CccLayoutFollower,
+  $CccSlider,
+  $CccSliderFollower,
+  isCccLayoutEqual,
+  isCccSlider,
+} from "./ccc-slider.const";
 
 export type $Tab = {
   index: number;
@@ -29,14 +36,10 @@ export interface $CccSliderTabsFollower {
   bindLayoutFollowerElement(ele?: HTMLElement | null): void;
 }
 /**
- * slider-tabs有两个核心部件组成：
- * 1. 一个是滚动动画
- * 1. 一个是触发器
- *
- * 其中触发器有两种模式：
- * 1. 一种是找不到 for=slider 元素的情况下，它会有自己的触发器，就是基于 click 事件来进行触发
- * 1. 一种是能找到 for=slider 元素的情况下，它的所有“滚动动画”都是跟随着 slider 的滚动事件来进行执行的。
- *    > 在这种模式下，click 事件会转化成对 slider 的控制，然后基于 slider 的变化再回来影响 tabs 的动画
+ * slider-tabs有两个底层函数：
+ * 1. _queryTabs 查询[slot=tab]的元素
+ * 1. calcLayoutInfo 计算布局情况，该函数没有实际作用，只是为了满足 $CccLayout 的实现
+ * 1. _updateTabLayoutInfo 将计算布局情况更新到DOM中，并触发相关的DOM事件
  */
 @Component({
   tag: "ccc-slider-tabs",
@@ -167,8 +170,15 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
    * 提供基础的布局信息，虽然自己不用，但是方便外部开发相关的组件
    */
   @Event() layoutChange!: EventEmitter<$CccLayout.LayoutChangeDetail>;
-  private _emitLayoutChange() {
-    this.layoutChange.emit(this.calcLayoutInfo());
+
+  private _preLayoutInfo?: $CccLayout.LayoutChangeDetail;
+  private _tryEmitLayoutChange(layoutInfo: $CccLayout.LayoutChangeDetail) {
+    if (this._preLayoutInfo && isCccLayoutEqual(this._preLayoutInfo, layoutInfo)) {
+      return;
+    }
+    this._preLayoutInfo = layoutInfo;
+
+    this.layoutChange.emit(layoutInfo);
   }
   @Method()
   async getLayoutInfo() {
@@ -178,6 +188,9 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   private _tabList: Array<$Tab> = [];
   private _queryTabs() {
     const tabEles = querySelectorAll<HTMLElement>(this.hostEle, ':scope > [slot="tab"]');
+    if (this._tabList.length === tabEles.length && this._tabList.every((tab, index) => tabEles[index] === tab.ele)) {
+      return;
+    }
     this._tabList = tabEles.map((ele, i) => {
       const slider: $Tab = {
         index: i,
@@ -203,9 +216,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
       } else if (entry.type === "childList") {
         this.console.log("MutationObserver childList changed");
         this._queryTabs();
-        this.calcLayoutInfo(undefined, true);
-        this._updateTabLayoutInfo();
-        this._emitLayoutChange();
+        this._updateTabLayoutInfo(this.calcLayoutInfo(undefined, true));
       }
     }
   });
@@ -220,9 +231,9 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     this._queryTabs();
     this.calcLayoutInfo(undefined, true);
 
+    /// 如果没有找到需要跟随的slider，那么就将自己当成slider来使用
     if (!(await this.watchForSlider(this.forSlider))) {
-      this._updateTabLayoutInfo();
-      this._emitLayoutChange();
+      this._updateTabLayoutInfo(this.calcLayoutInfo(this.defaultActivedIndex));
     }
   }
   disconnectedCallback() {
@@ -324,7 +335,9 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
       this._cachedLayoutInfo === undefined ||
       (activedIndex !== undefined && this._cachedLayoutInfo?.activedIndex !== activedIndex)
     ) {
-      this._cachedLayoutInfo = this._calcLayoutInfo(activedIndex);
+      const layoutInfo = this._calcLayoutInfo(activedIndex);
+      this._tryEmitLayoutChange(layoutInfo);
+      this._cachedLayoutInfo = layoutInfo;
       if (this._calc_frame_id !== undefined) {
         cancelAnimationFrame(this._calc_frame_id);
       }
