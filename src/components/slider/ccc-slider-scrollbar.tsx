@@ -81,9 +81,9 @@ export class CccSliderScrollbar implements ComponentInterface {
       return;
     }
     const reason = await ele.getReason();
-    if (reason === "user") {
-      return this._followSliderElement(ele, `reason: ${reason} ${event.type}`);
-    }
+    // if (reason === "user") {
+    return this._followSliderElement(ele, `reason: ${reason} ${event.type}`);
+    // }
   };
   private async _followSliderElement(ele: $CccSlider.HTMLCccSliderElement, _reason?: unknown) {
     const scrollProgress = await ele.getScrollProgress();
@@ -323,10 +323,9 @@ export class CccSliderScrollbar implements ComponentInterface {
       toAniProgress = 1;
     }
 
-    /// 先暂停所有动画
+    /// 先注销原先的所有动画钩子
     if (this._playFrameId !== undefined) {
       cancelAnimationFrame(this._playFrameId);
-      this._anis.forEach(ani => ani.pause());
     }
 
     /// 计算出动画目标
@@ -353,11 +352,21 @@ export class CccSliderScrollbar implements ComponentInterface {
     /**播放速率 */
     const playbackBaseRate = 1 / Math.min(Math.abs(toAniProgress - fromAniProgress) * this._cursorList.length, 1);
 
+    const doFinishAni = () => {
+      this._anis.forEach(ani => ani.pause());
+      cursorStyle.left = toLeft + "px";
+      cursorStyle.width = totalWidth - toLeft - toRight + "px";
+    };
+
     let leftAni: Animation;
     let leftEle: HTMLElement;
     let rightAni: Animation;
     let rightEle: HTMLElement;
 
+    if (duration === 0 || Number.isFinite(playbackBaseRate) === false) {
+      doFinishAni();
+      return;
+    }
     /// 正向
     if (toAniProgress > fromAniProgress) {
       leftAni = leftOutAni;
@@ -375,8 +384,7 @@ export class CccSliderScrollbar implements ComponentInterface {
     }
     /// 已经完成动画了 fromAniProgress === toAniProgress
     else if (fromLeft !== toLeft || fromRight !== toRight) {
-      cursorStyle.left = toLeft + "px";
-      cursorStyle.width = totalWidth - toLeft - toRight + "px";
+      doFinishAni();
       return;
     } else {
       return;
@@ -400,21 +408,29 @@ export class CccSliderScrollbar implements ComponentInterface {
       const rightPx = fromRight + (toRight - fromRight) * rightProgress;
       cursorStyle.width = totalWidth - leftPx - rightPx + "px";
     };
-    if (duration === 0 || Number.isFinite(playbackBaseRate) === false) {
-      leftAni.finish();
-      rightAni.finish();
-      doPlayAni();
-    } else {
-      const playbackRate = (baseAniDuration / duration) * playbackBaseRate;
 
-      leftAni.currentTime = 0;
-      leftAni.playbackRate = playbackRate;
-      leftAni.play();
-      rightAni.currentTime = 0;
-      rightAni.playbackRate = playbackRate;
-      rightAni.play();
-      this._playFrameId = requestAnimationFrame(doPlayAni);
+    const playbackRate = (baseAniDuration / duration) * playbackBaseRate;
+
+    for (const ani of this._anis) {
+      if (ani === leftAni || ani === rightAni) {
+        /// 如果已经在动画中了，那么改变它的播放速率就好了
+        if (ani.playState === "running") {
+          /* @TODO 这里应该有更好的算法来使得特效更加符合预期? */
+          ani.currentTime = ani.currentTime! * Math.SQRT1_2;
+          ani.playbackRate = playbackRate;
+        }
+        /// 否则重新开始动画
+        else {
+          ani.currentTime = 0;
+          ani.playbackRate = playbackRate;
+          ani.play();
+        }
+      } else {
+        ani.pause();
+      }
     }
+
+    this._playFrameId = requestAnimationFrame(doPlayAni);
   }
 
   componentDidLoad() {
