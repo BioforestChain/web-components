@@ -170,6 +170,7 @@ export class CccSliderScrollbar implements ComponentInterface {
 
   /// 将布局信息反应到css动画上
   private _anis: Animation[] = [];
+  private _aniDuration = 0;
   private _aniTotalDuration = 0;
   private _prepareAnimations() {
     const { _cursorEle: cursorEle, _cursorList: cursorList } = this;
@@ -184,14 +185,14 @@ export class CccSliderScrollbar implements ComponentInterface {
     this._anis.length = 0;
 
     /// 生成新的动画
-    const leftList = [0];
-    const rightList = [0];
-    const offsetList = [0];
-    const widthList = [1];
+    const leftList: number[] = [];
+    const rightList: number[] = [];
+    const offsetList: number[] = [];
+    const widthList: number[] = [];
 
     if (cursorList) {
       const totalWidth = cursorList.reduce((w, c) => w + c.width, 0);
-      const unitOffset = 1 / cursorList.length;
+      const unitOffset = 1 / (cursorList.length - 1);
       for (const cursor of cursorList) {
         const offset = offsetList.length * unitOffset;
         offsetList.push(offset);
@@ -214,7 +215,23 @@ export class CccSliderScrollbar implements ComponentInterface {
         1); /* 不小于等于0，避免计算toTime的时候出错 */
 
     const totalDuration = (offsetList.length - 1) * cursorAniDuration;
+
+    this._aniDuration = cursorAniDuration;
     this._aniTotalDuration = totalDuration;
+
+    /**
+     * baseAni 不会有任何实际的渲染，只是用它来作为系统的动画控制器的连接桥梁
+     * 也就是所用系统的动画控制器去计算动画的进度。其它动画在暂停状态下，跟随它的动画进度就好了
+     */
+    const baseAni = cursorEle.animate(
+      {
+        "offset": offsetList,
+        "--progress": [0, 1],
+      },
+      { easing: "linear", duration: totalDuration, fill: "forwards" },
+    );
+    baseAni.pause();
+
     const leftAni = cursorEle.animate(
       {
         // easing: `ease-in`,
@@ -241,7 +258,7 @@ export class CccSliderScrollbar implements ComponentInterface {
       },
     );
     rightAni.pause();
-    this._anis.push(leftAni, rightAni);
+    this._anis.push(baseAni, leftAni, rightAni);
 
     this.console.log("animate-offset", offsetList);
     this.console.log("animate-left", leftList);
@@ -251,7 +268,7 @@ export class CccSliderScrollbar implements ComponentInterface {
 
   private _scrollProgressToAniProgress(scrollProgress: number) {
     if (this._cursorList.length > 0) {
-      return (1 + scrollProgress) / this._cursorList.length;
+      return scrollProgress / (this._cursorList.length - 1);
     }
     return 0;
   }
@@ -278,55 +295,63 @@ export class CccSliderScrollbar implements ComponentInterface {
       return;
     }
 
-    debugger;
     this.console.log("play animations to", (toAniProgress * 100).toFixed(2) + "%");
-    let playRate: 1 | -1;
+    let playRate: number = (toTime - fromTime) / this._aniDuration;
     /// 一帧帧检查是否播放到特定的进度
     let checkFinish: (curTime: number) => boolean;
     /// 正向播放，AniProgress越来越大
     if (fromTime < toTime) {
       checkFinish = curTime => curTime >= toTime;
-      playRate = 1;
+      // playRate = 1;
+      if (playRate < 1) {
+        playRate = 1;
+      }
     }
     /// 方向播放，AniProgress越来越小
     else {
       checkFinish = curTime => curTime <= toTime;
-      playRate = -1;
+      // playRate = -1;
+      if (playRate > -1) {
+        playRate = -1;
+      }
     }
+    this.console.log("play animations rate", playRate);
+
     const doPlayAni = () => {
       let curTime = getCurTime();
       if (checkFinish(curTime)) {
         curTime = toTime;
         this._playFrameId = undefined;
-        for (const ani of this._anis) {
-          ani.currentTime = curTime;
-          ani.pause();
-        }
+        baseAni.pause();
       } else {
         this._playFrameId = requestAnimationFrame(doPlayAni);
+      }
+      for (const ani of this._anis) {
+        ani.currentTime = curTime;
       }
     };
 
     /// 先暂停
-    this._pauseAnimations();
-    /// 再重启
-    for (const ani of this._anis) {
-      ani.playbackRate = playRate;
-      ani.play();
+    if (this._playFrameId !== undefined) {
+      cancelAnimationFrame(this._playFrameId);
     }
+    baseAni.pause();
+    /// 再重启
+    baseAni.playbackRate = playRate;
+    baseAni.play();
     this._playFrameId = requestAnimationFrame(doPlayAni);
   }
-  private _pauseAnimations() {
-    if (this._playFrameId === undefined) {
-      return;
-    }
-    cancelAnimationFrame(this._playFrameId);
-    this._playFrameId = undefined;
+  // private _pauseAnimations() {
+  //   if (this._playFrameId === undefined) {
+  //     return;
+  //   }
+  //   cancelAnimationFrame(this._playFrameId);
+  //   this._playFrameId = undefined;
 
-    for (const ani of this._anis) {
-      ani.pause();
-    }
-  }
+  //   // for (const ani of this._anis) {
+  //   //   ani.pause();
+  //   // }
+  // }
   //#endregion
 
   componentDidLoad() {

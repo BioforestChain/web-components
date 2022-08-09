@@ -47,7 +47,7 @@ const DEMO_STYLE = `
 export const Base_Usage = cccSliderKit.storyFactory(() => DEMO_HTML, {}).addStyle(DEMO_STYLE);
 
 const WITH_TABS_ADD_HTML_TPL = html`
-  <ccc-slider-tabs for="qaq">
+  <ccc-slider-tabs for-slider="qaq">
     <span class="tab" slot="tab">s1</span>
     <span class="tab" slot="tab">s2</span>
     <span class="tab" slot="tab">s3</span>
@@ -116,14 +116,16 @@ export const Delay_Init = cccSliderKit
   });
 
 export const With_Tabs_And_Default_Index = cccSliderKit
-  .storyFactory(() => DEMO_HTML, {})
+  .storyFactory(() => DEMO_HTML, {
+    defaultActivedIndex: 1,
+  })
   .addStyle(DEMO_STYLE)
   .onMount((_, ele) => {
     ele.id = "qaq";
   })
   .addHtmlTpl(
     html`
-      <ccc-slider-tabs for="qaq" default-actived-index="1">
+      <ccc-slider-tabs for-slider="qaq">
         <span class="tab" slot="tab">s1</span>
         <span class="tab" slot="tab">s2</span>
         <span class="tab" slot="tab">s3</span>
@@ -136,7 +138,7 @@ export const With_Tabs_And_Default_Index = cccSliderKit
 export const Nested_Slider = cccSliderKit
   .storyFactory(
     () => html`<div slot="slider" class="slider item-1">
-        <ccc-slider-tabs for="s1">
+        <ccc-slider-tabs for-slider="s1">
           <span class="tab" slot="tab">s1.1</span>
           <span class="tab" slot="tab">s1.2</span>
           <span class="tab" slot="tab">s1.3</span>
@@ -148,7 +150,7 @@ export const Nested_Slider = cccSliderKit
         </ccc-slider>
       </div>
       <div slot="slider" class="slider item-2">
-        <ccc-slider-tabs for="s2">
+        <ccc-slider-tabs for-slider="s2">
           <span class="tab" slot="tab">s2.1</span>
           <span class="tab" slot="tab">s2.2</span>
           <span class="tab" slot="tab">s2.3</span>
@@ -160,7 +162,7 @@ export const Nested_Slider = cccSliderKit
         </ccc-slider>
       </div>
       <div slot="slider" class="slider item-3">
-        <ccc-slider-tabs for="s3">
+        <ccc-slider-tabs for-slider="s3">
           <span class="tab" slot="tab">s3.1</span>
           <span class="tab" slot="tab">s3.2</span>
           <span class="tab" slot="tab">s3.3</span>
@@ -179,7 +181,7 @@ export const Nested_Slider = cccSliderKit
   })
   .addHtmlTpl(
     html`
-      <ccc-slider-tabs for="qaq">
+      <ccc-slider-tabs for-slider="qaq">
         <span class="tab" slot="tab">s1</span>
         <span class="tab" slot="tab">s2</span>
         <span class="tab" slot="tab">s3</span>

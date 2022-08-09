@@ -14,6 +14,7 @@ import { at, Logger, querySelectorAll } from "../../utils/utils";
 import { $CccSlider, $CccSliderFollower } from "./ccc-slider.const";
 
 const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
+type $ScrollToBehavior = ScrollBehavior | "set";
 
 export type $Slider = {
   index: number;
@@ -67,8 +68,10 @@ export class CccSlider implements ComponentInterface, $CccSlider {
 
   private _resizeOb = new ResizeObserver(() => {
     this.console.log("resize start");
-    // 清理布局缓存，确保重新计算
-    this._scrollToIndex(this._activedIndex, "auto");
+    /// 重新计算布局，判断是否有必要进行滚动
+    if (this.calcLayoutInfo(undefined, true).scrollProgress !== this._scrollProgress) {
+      this._scrollToIndex(this._activedIndex, "auto");
+    }
     this.console.log("resize end");
   });
   /**
@@ -91,30 +94,31 @@ export class CccSlider implements ComponentInterface, $CccSlider {
 
   connectedCallback() {
     this._bindingFollowers();
+  }
+  /**初始化渲染完毕的时候 */
+  componentDidLoad() {
+    this.console.log("componentDidLoad");
     this._resizeOb.observe(this.hostEle);
     this._mutationOb.observe(this.hostEle, {
       attributeFilter: ["id"],
       attributes: true,
       childList: true,
     });
-  }
-  /**初始化渲染完毕的时候 */
-  componentDidLoad() {
-    this.console.log("componentDidLoad");
     // 加载节点
     this._querySliders();
     // 进行布局计算
     this.calcLayoutInfo();
     /// 需要进行初始化
     this._reasons.add("init");
-    this.console.log(
-      "componentDidLoad",
-      "!! scroll into defaultIndex",
-      this.defaultActivedIndex,
-      "activedIndex:",
-      this._activedIndex,
-    );
-    this._scrollToIndex(this.defaultActivedIndex ?? this._activedIndex, "auto" /* 初始化的时候减少动画 */);
+    if (this.defaultActivedIndex) {
+      this.console.log("componentDidLoad", "!! scroll into defaultIndex", this.defaultActivedIndex);
+      this._scrollToIndex(this.defaultActivedIndex, "set" /* 初始化的时候减少动画 */);
+      // 这里确保 this._activedIndex 等状态值立刻变动到对应的值上来，避免接下来可能会立刻触发其它的更新，读取了 this._activedIndex 的原来的默认值
+      this._updateSliderStates();
+    } else {
+      this.console.log("componentDidLoad", "!! scroll into activedIndex", this._activedIndex);
+      this._scrollToIndex(this.defaultActivedIndex ?? this._activedIndex, "set" /* 初始化的时候减少动画 */);
+    }
     this._reasons.delete("init");
   }
 
@@ -241,7 +245,7 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     return this._activedIndex;
   }
   /**滚动到指定的第几个元素上 */
-  private _scrollToIndex(activedIndex: number, behavior: ScrollBehavior) {
+  private _scrollToIndex(activedIndex: number, behavior: $ScrollToBehavior) {
     const slider = at(this._sliderList, activedIndex, true);
     this.console.info("setActivedIndex", activedIndex, slider);
 
@@ -251,18 +255,17 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     /// 计算布局，将更新布局的计算结果
     const layoutInfo = this.calcLayoutInfo(scrollLeft, true);
 
-    let setScrollLeftBehavior: ScrollBehavior | "set" = behavior;
     /**
      * 如果根据scrollLeft计算出来的 closestSlider 与 scrollLeft 对不上，那么就需要用一些特殊的手段来干预接下来的 updateState
      * > 比如说不可见的情况下，大家的 width 与 left 都是 0，这时候 二者就有可能对不上
      */
     if (slider && layoutInfo.closestSlider.index !== slider.index) {
       layoutInfo.closestSlider = slider;
-      setScrollLeftBehavior = "set";
+      behavior = "set";
     }
 
     // 执行滚动
-    this._setScrollLeft(scrollLeft, setScrollLeftBehavior);
+    this._setScrollLeft(scrollLeft, behavior);
   }
   /**滚动到指定的坐标位置上 */
   private _scrollToLeft(left: number, behavior: ScrollBehavior) {
@@ -276,7 +279,7 @@ export class CccSlider implements ComponentInterface, $CccSlider {
    * @param left
    * @param behavior
    */
-  private _setScrollLeft(left: number, behavior: ScrollBehavior | "set") {
+  private _setScrollLeft(left: number, behavior: $ScrollToBehavior) {
     this._reasons.add("into");
     this._inScrollInto = true;
     /// 如果不需要滚动，那么只需要手动触发一下滚动的函数回调函数就行

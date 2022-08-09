@@ -81,9 +81,9 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
    */
   @Prop({}) forSlider?: string;
   @Watch("forSlider")
-  watchForSlider() {
+  watchForSlider(forSlider: string | undefined) {
     return this._bindSliderElement(
-      this.forSlider ? querySelector<$CccSlider.HTMLCccSliderElement>(document, `#${this.forSlider}`) : null,
+      forSlider ? querySelector<$CccSlider.HTMLCccSliderElement>(document, `#${this.forSlider}`) : null,
     );
   }
   private _sliderEle: $CccSlider.HTMLCccSliderElement | null = null;
@@ -220,7 +220,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     this._queryTabs();
     this.calcLayoutInfo(undefined, true);
 
-    if (!(await this.watchForSlider())) {
+    if (!(await this.watchForSlider(this.forSlider))) {
       this._updateTabLayoutInfo();
       this._emitLayoutChange();
     }
