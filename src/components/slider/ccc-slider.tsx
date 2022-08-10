@@ -10,7 +10,8 @@ import {
   Prop,
   Watch,
 } from "@stencil/core";
-import { at, Logger, querySelectorAll } from "../../utils/utils";
+import { at, Logger, querySlotAssignedElements } from "../../utils/utils";
+import { BindFollowerHelper } from "../util/twoWayBinding.helper";
 import { $CccSlider, $CccSliderFollower } from "./ccc-slider.const";
 
 const SLIDER_STATE_DATASET_KEY = "data-ccc-slider";
@@ -57,28 +58,19 @@ type $InternalReason = "touch" | "mousewheel" | "into" | "init";
 export class CccSlider implements ComponentInterface, $CccSlider {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
-  //#region 与其它节点的联动
-  get id() {
-    return this.hostEle.id;
-  }
-
-  private _bindingEles: $CccSliderFollower[] = [];
-  private _bindingFollowers() {
-    if (this.id) {
-      for (const tabsEle of (this._bindingEles = querySelectorAll<$CccSliderFollower>(
-        document,
-        `[for-slider=${this.id}]`,
-      ))) {
-        tabsEle.bindSliderElement?.(this.hostEle); // 绑定
-      }
-    }
-  }
-  private _unbindFollowers() {
-    for (const tabsEle of this._bindingEles) {
-      tabsEle.bindSliderElement?.(null); // 解绑
-    }
-    this._bindingEles.length = 0;
-  }
+  /**
+   * 与其它节点的联动
+   */
+  private _followerHelper = new BindFollowerHelper<$CccSliderFollower>(
+    this.hostEle,
+    "for-slider",
+    ele => {
+      ele.bindSliderElement?.(this.hostEle); // 绑定
+    },
+    ele => {
+      ele.bindSliderElement?.(null); // 解绑
+    },
+  );
 
   private _resizeOb = new ResizeObserver(() => {
     this.console.log("resize start");
@@ -93,11 +85,7 @@ export class CccSlider implements ComponentInterface, $CccSlider {
    */
   private _mutationOb = new MutationObserver(entries => {
     for (const entry of entries) {
-      if (entry.type === "attributes") {
-        this.console.log("MutationObserver attributes changed");
-        this._unbindFollowers();
-        this._bindingFollowers();
-      } else if (entry.type === "childList") {
+      if (entry.type === "childList") {
         this.console.log("MutationObserver childList changed");
         this._querySliders();
         // 进行布局计算，并更新状态
@@ -107,15 +95,13 @@ export class CccSlider implements ComponentInterface, $CccSlider {
   });
 
   connectedCallback() {
-    this._bindingFollowers();
+    this._followerHelper.connectedCallback();
   }
   /**初始化渲染完毕的时候 */
   componentDidLoad() {
     this.console.log("componentDidLoad");
     this._resizeOb.observe(this.hostEle);
     this._mutationOb.observe(this.hostEle, {
-      attributeFilter: ["id"],
-      attributes: true,
       childList: true,
     });
     // 加载节点
@@ -137,16 +123,15 @@ export class CccSlider implements ComponentInterface, $CccSlider {
   }
 
   disconnectedCallback() {
-    this._unbindFollowers();
+    this._followerHelper.disconnectedCallback();
     this._resizeOb.unobserve(this.hostEle);
     this._mutationOb.disconnect();
   }
-  //#endregion
 
   private _sliderList: $Slider[] = [];
 
   private _querySliders() {
-    const sliderEles = querySelectorAll<HTMLElement>(this.hostEle, `:scope > [slot="slider"]`);
+    const sliderEles = querySlotAssignedElements(this.hostEle, "slider");
     /// 没有发生任何改变
     if (
       this._sliderList.length === sliderEles.length &&
@@ -241,7 +226,7 @@ export class CccSlider implements ComponentInterface, $CccSlider {
   }
 
   @Prop({}) defaultActivedIndex?: number;
-  @Prop({ mutable: true }) readonly activedIndex!: number;
+  @Prop({}) readonly activedIndex?: number;
   private _activedIndex = 0;
   @Watch("activedIndex")
   watchActivedIndex(newVal: number) {

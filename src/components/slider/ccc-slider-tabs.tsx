@@ -10,7 +10,8 @@ import {
   Prop,
   Watch,
 } from "@stencil/core";
-import { at, Logger, querySelector, querySelectorAll } from "../../utils/utils";
+import { at, Logger, querySelector, querySlotAssignedElements } from "../../utils/utils";
+import { BindFollowerHelper } from "../util/twoWayBinding.helper";
 import {
   $CccLayout,
   $CccLayoutFollower,
@@ -49,34 +50,29 @@ export interface $CccSliderTabsFollower {
 export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $CccLayout, $CccSlider {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
-  //#region 与其它节点的联动
-  get id() {
-    return this.hostEle.id;
-  }
-
-  private _bindingEles: $CccLayoutFollower[] = [];
-  private _bindingFollowers() {
-    if (this.id) {
-      for (const tabsEle of (this._bindingEles = querySelectorAll<$CccLayoutFollower>(
-        document,
-        `[for-layout=${this.id}]`,
-      ))) {
-        tabsEle.bindLayoutElement?.(this.hostEle); // 绑定
-      }
-    }
-  }
-  private _unbindFollowers() {
-    for (const tabsEle of this._bindingEles) {
-      tabsEle.bindLayoutElement?.(null); // 解绑
-    }
-    this._bindingEles.length = 0;
-  }
-
-  connectedCallback() {
-    this._bindingFollowers();
-  }
-
-  //#endregion
+  /**
+   * 与其它节点的联动
+   */
+  private _layoutFollower = new BindFollowerHelper<$CccLayoutFollower>(
+    this.hostEle,
+    "for-layout",
+    ele => {
+      ele.bindLayoutElement?.(this.hostEle); // 绑定
+    },
+    ele => {
+      ele.bindLayoutElement?.(null); // 解绑
+    },
+  );
+  private _sliderFollower = new BindFollowerHelper<$CccSliderFollower>(
+    this.hostEle,
+    "for-slider",
+    ele => {
+      ele.bindSliderElement?.(this.hostEle); // 绑定
+    },
+    ele => {
+      ele.bindSliderElement?.(null); // 解绑
+    },
+  );
 
   //#region 与 slider 元素通过 for 属性进行联动绑定
   /**
@@ -105,7 +101,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   }
   private async _bindSliderElement(_sliderEle?: HTMLElement | null) {
     const sliderEle = isCccSlider(_sliderEle) ? _sliderEle : null;
-    if (sliderEle !== _sliderEle) {
+    if (sliderEle !== _sliderEle && _sliderEle != undefined) {
       this.console.error("for attribute can only binding <ccc-slider> element");
     }
     if (sliderEle === this._sliderEle) {
@@ -137,7 +133,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   //#endregion
 
   @Prop({}) defaultActivedIndex?: number;
-  @Prop({}) readonly activedIndex!: number;
+  @Prop({}) readonly activedIndex?: number;
   private _activedIndex = 0;
   @Watch("activedIndex")
   watchActivedIndex(newVal: number) {
@@ -187,7 +183,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
 
   private _tabList: Array<$Tab> = [];
   private _queryTabs() {
-    const tabEles = querySelectorAll<HTMLElement>(this.hostEle, ':scope > [slot="tab"]');
+    const tabEles = querySlotAssignedElements(this.hostEle, "tab");
     if (this._tabList.length === tabEles.length && this._tabList.every((tab, index) => tabEles[index] === tab.ele)) {
       return;
     }
@@ -210,11 +206,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   });
   private _mutationOb = new MutationObserver(entries => {
     for (const entry of entries) {
-      if (entry.type === "attributes") {
-        this.console.log("MutationObserver attributes changed");
-        this._unbindFollowers();
-        this._bindingFollowers();
-      } else if (entry.type === "childList") {
+      if (entry.type === "childList") {
         this.console.log("MutationObserver childList changed");
         this._queryTabs();
         this._updateTabLayoutInfo(this.calcLayoutInfo(undefined, true));
@@ -223,6 +215,11 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   });
 
   private _tabListEle?: HTMLElement;
+
+  connectedCallback() {
+    this._layoutFollower.connectedCallback();
+    this._sliderFollower.connectedCallback();
+  }
   async componentDidLoad() {
     this.console.log("componentDidLoad");
     this._mutationOb.observe(this.hostEle, { childList: true });
@@ -242,7 +239,8 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
       this._resizeOb.unobserve(this._tabListEle);
     }
     this._mutationOb.disconnect();
-    this._unbindFollowers();
+    this._layoutFollower.disconnectedCallback();
+    this._sliderFollower.disconnectedCallback();
   }
 
   onClick = (event: MouseEvent) => {

@@ -39,7 +39,7 @@ export class CccSliderScrollbar implements ComponentInterface {
   }
   private async _bindSliderElement(_sliderEle?: HTMLElement | null) {
     const sliderEle = isCccSlider(_sliderEle) ? _sliderEle : null;
-    if (sliderEle !== _sliderEle) {
+    if (sliderEle !== _sliderEle && _sliderEle != undefined) {
       this.console.error("for attribute can only binding <ccc-slider> element");
     }
     if (sliderEle === this._sliderEle) {
@@ -115,10 +115,10 @@ export class CccSliderScrollbar implements ComponentInterface {
   }
   private async _bindLayoutElement(_layoutEle?: HTMLElement | null) {
     const layoutEle = isCccLayout(_layoutEle) ? _layoutEle : null;
-    if (layoutEle !== _layoutEle) {
+    if (layoutEle !== _layoutEle && _layoutEle != undefined) {
       this.console.error("for attribute can only binding <ccc-layout> element");
     }
-    if (layoutEle === this._sliderEle) {
+    if (layoutEle === this._layoutEle) {
       return;
     }
     this.console.info("bind layout", layoutEle);
@@ -151,14 +151,8 @@ export class CccSliderScrollbar implements ComponentInterface {
   private async _followLayoutElement(ele: $CccLayout.HTMLCccLayoutElement, _reason: unknown) {
     this.console.log("follow layout", _reason);
     const layoutInfo = await ele.getLayoutInfo();
-    let accLeft = 0;
-    this._cursorList = layoutInfo.blockList.map((block, i) => {
-      const cursor = { index: i, width: block.size, left: accLeft };
-      accLeft += block.size;
-      return cursor;
-    });
-    // 更新插槽的css属性来做出动画
-    this._prepareAnimations();
+    this._calcCursorLayout(layoutInfo);
+    // 更新动画
     if (this._sliderEle) {
       this._followSliderElement(this._sliderEle, "prepared");
     }
@@ -179,13 +173,22 @@ export class CccSliderScrollbar implements ComponentInterface {
 
   private _cursorList: $Cursor[] = [];
   private _cursorTotalWidth: number = 0;
+  private _calcCursorLayout(layoutInfo: $CccLayout.LayoutChangeDetail) {
+    /// 计算光标的基本布局的布局
+    let accLeft = 0;
+    this._cursorList = layoutInfo.blockList.map((block, i) => {
+      const cursor = { index: i, width: block.size, left: accLeft };
+      accLeft += block.size;
+      return cursor;
+    });
+    this._cursorTotalWidth = accLeft;
+  }
 
   /// 将布局信息反应到css动画上
   private _anis: Animation[] = [];
   private _aniDuration = 0;
-  // private _aniTotalDuration = 0;
-  private _prepareAnimations() {
-    const { _eles: eles, _cursorList: cursorList } = this;
+
+  private _prepareAnimations(eles = this._eles) {
     if (!eles) {
       return;
     }
@@ -199,10 +202,6 @@ export class CccSliderScrollbar implements ComponentInterface {
       ani.cancel();
     }
     this._anis.length = 0;
-
-    /// 计算动画的布局
-    const totalWidth = cursorList.reduce((w, c) => w + c.width, 0);
-    this._cursorTotalWidth = totalWidth;
 
     /// 生成四向动画
     const cursorStyles = getComputedStyle(eles.cursor);
@@ -279,7 +278,7 @@ export class CccSliderScrollbar implements ComponentInterface {
     return 0;
   }
 
-  private _calcLayout(progress: number) {
+  private _calcAnimateLayout(progress: number) {
     const index = progress * (this._cursorList.length - 1);
     const float = index % 1;
     const int = index - float;
@@ -342,7 +341,7 @@ export class CccSliderScrollbar implements ComponentInterface {
     let toLeft = 0;
     let toRight = 0;
     {
-      const { left, width } = this._calcLayout(toAniProgress);
+      const { left, width } = this._calcAnimateLayout(toAniProgress);
       toLeft = left;
       toRight = totalWidth - width - toLeft;
     }
@@ -433,21 +432,34 @@ export class CccSliderScrollbar implements ComponentInterface {
     this._playFrameId = requestAnimationFrame(doPlayAni);
   }
 
-  componentDidLoad() {
-    this._eles = {
+  async componentDidLoad() {
+    const eles = (this._eles = {
       cursor: querySelector(this.hostEle.shadowRoot, ".cursor")!,
       leftIn: querySelector(this.hostEle.shadowRoot, ".left-in")!,
       leftOut: querySelector(this.hostEle.shadowRoot, ".left-out")!,
       rightIn: querySelector(this.hostEle.shadowRoot, ".right-in")!,
       rightOut: querySelector(this.hostEle.shadowRoot, ".right-out")!,
-    };
+    });
+    this._prepareAnimations(eles);
 
-    this.watchForLayout(this.forLayout);
-    this.watchForSlider(this.forSlider);
+    await this.watchForLayout(this.forLayout);
+
+    await this.watchForSlider(this.forSlider);
   }
-  connectedCallback() {
-    this._bindLayoutElement(null);
-    this._bindLayoutElement(null);
+  async connectedCallback() {
+    await this._bindLayoutElement(null);
+    await this._bindLayoutElement(null);
+  }
+  @Method()
+  async update() {
+    /// 更新动画相关的属性
+    this._prepareAnimations();
+    if (this._layoutEle) {
+      await this._followLayoutElement(this._layoutEle, "update");
+    }
+    if (this._sliderEle) {
+      await this._followSliderElement(this._sliderEle, "update");
+    }
   }
 
   render() {

@@ -7,12 +7,12 @@
 
 ## Properties
 
-| Property                    | Attribute               | Description                   | Type                  | Default     |
-| --------------------------- | ----------------------- | ----------------------------- | --------------------- | ----------- |
-| `activedIndex` _(required)_ | `actived-index`         |                               | `number`              | `undefined` |
-| `defaultActivedIndex`       | `default-actived-index` |                               | `number \| undefined` | `undefined` |
-| `forSlider`                 | `for-slider`            | the `<ccc-slider>` element id | `string \| undefined` | `undefined` |
-| `forTabs`                   | `for-tabs`              |                               | `string \| undefined` | `undefined` |
+| Property              | Attribute               | Description                   | Type                  | Default     |
+| --------------------- | ----------------------- | ----------------------------- | --------------------- | ----------- |
+| `activedIndex`        | `actived-index`         |                               | `number \| undefined` | `undefined` |
+| `defaultActivedIndex` | `default-actived-index` |                               | `number \| undefined` | `undefined` |
+| `forSlider`           | `for-slider`            | the `<ccc-slider>` element id | `string \| undefined` | `undefined` |
+| `forTabs`             | `for-tabs`              |                               | `string \| undefined` | `undefined` |
 
 
 ## Events
@@ -94,6 +94,19 @@ Type: `Promise<void>`
 | -------- | ----------- |
 | `"tabs"` |             |
 
+
+## Dependencies
+
+### Used by
+
+ - [ccc-top-tabs-menu](../menu)
+
+### Graph
+```mermaid
+graph TD;
+  ccc-top-tabs-menu --> ccc-slider-tabs
+  style ccc-slider-tabs fill:#f9f,stroke:#333,stroke-width:4px
+```
 
 ----------------------------------------------
 

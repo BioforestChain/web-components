@@ -259,7 +259,6 @@ export const config: Config = {
       if (withAngular === false) {
         return [];
       }
-      debugger
       return [
         angularOutputTarget({
           componentCorePackage: packageJson.name,

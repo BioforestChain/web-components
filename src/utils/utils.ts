@@ -325,9 +325,32 @@ type DomQueryer = Document | Element | DocumentFragment;
 export const querySelectorAll = <T = HTMLElement>(root: DomQueryer | null | undefined, selector: string) => {
   return Array.prototype.slice.call(root?.querySelectorAll(selector) ?? { length: 0 }) as T[];
 };
+export function* manyQuerySelectorAll<T = HTMLElement>(roots: Iterable<DomQueryer>, selector: string) {
+  for (const root of roots) {
+    yield* querySelectorAll<T>(root, selector);
+  }
+}
 
 export const querySelector = <T = HTMLElement>(root: DomQueryer | null | undefined, selector: string) => {
   return (root?.querySelector(selector) || undefined) as T | undefined;
+};
+
+export const querySlotAssignedElements = <T = HTMLElement>(host: HTMLElement, slot: string) => {
+  const res: T[] = [];
+  const pushToRes = (ele: Element) => {
+    if (ele.tagName === "SLOT") {
+      /// 套娃了
+      for (const subele of (ele as HTMLSlotElement).assignedElements()) {
+        pushToRes(subele);
+      }
+    } else {
+      res.push(ele as unknown as T);
+    }
+  };
+  for (const ele of querySelectorAll(host, `:scope > [slot="${slot}"]`)) {
+    pushToRes(ele);
+  }
+  return res;
 };
 
 export const at = <T>(arr: T[], index: number, floor?: boolean) => {
