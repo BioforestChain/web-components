@@ -23,6 +23,7 @@ export class CccTopTabsMenu implements ComponentInterface {
             part="scrollbar"
             for-slider={this.forSlider || this._tabs_id}
             for-layout={this._tabs_id}
+            exportparts="cursor, spirit"
           ></ccc-slider-scrollbar>
         </ccc-slider-tabs>
       </Host>
