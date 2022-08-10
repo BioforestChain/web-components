@@ -63,7 +63,7 @@ export const isCccLayoutEqual = (layout1: $CccLayout.LayoutChangeDetail, layout2
   if (layout1 === layout2) {
     return true;
   }
-  if (layout1.box.viewSize !== layout2.box.viewSize || layout1.box.scrollSize !== layout2.box.scrollSize) {
+  if (layout1.box.viewSize !== layout2.box.viewSize || layout1.box.scrolledSize !== layout2.box.scrolledSize) {
     return false;
   }
   if (layout1.blockList.length !== layout2.blockList.length) {
@@ -79,7 +79,7 @@ export namespace $CccLayout {
     getLayoutInfo(): Promise<LayoutChangeDetail>;
   }
   export type LayoutChangeDetail = {
-    box: { viewSize: number; scrollSize: number };
+    box: { viewSize: number; contentSize: number; scrolledSize: number };
     blockList: { size: number }[];
   };
   export type HTMLCccLayoutElementEventMap = HTMLElementEventMap & {

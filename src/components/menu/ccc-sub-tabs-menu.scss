@@ -1,0 +1,62 @@
+:host {
+  // white-space: nowrap;
+  overflow-x: auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  // scroll-padding-left: r(42);
+  --mask-color: rgb(255 255 255 / 60%);
+}
+
+.tabs {
+  scroll-snap-type: x proximity;
+
+  /// 确保布局超出后，滚动的是tab-list，而不是host
+  width: 100%;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.mask {
+  all: unset;
+  display: block;
+  z-index: 1;
+
+  flex-shrink: 0;
+  align-self: stretch;
+
+  opacity: 0;
+  pointer-events: none;
+  transition-duration: 500ms;
+  &.start {
+    left: 0;
+    background: linear-gradient(to right, var(--mask-color) 0%, var(--mask-color) 20%, transparent 100%);
+    width: var(--mask-start-width, 1em);
+
+    --margin-end: calc(var(--mask-start-width, 1em) * -1);
+    margin-right: var(--margin-end);
+    margin-inline-end: var(--margin-end);
+  }
+  &.end {
+    right: 0;
+    background: linear-gradient(to left, var(--mask-color) 0%, var(--mask-color) 50%, transparent 100%);
+    width: var(--mask-end-width, 1em);
+
+    --margin-start: calc(var(--mask-end-width, 1em) * -1);
+    margin-left: var(--margin-start);
+    margin-inline-start: var(--margin-start);
+  }
+  &.show {
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: all;
+  }
+}
+
+::slotted(*) {
+  scroll-snap-align: center;
+}

@@ -17,11 +17,11 @@
 
 ## Events
 
-| Event                | Description                    | Type                                                                                               |
-| -------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `activedIndexChange` |                                | `CustomEvent<number>`                                                                              |
-| `activedTabChange`   |                                | `CustomEvent<[tabEle: HTMLElement \| undefined, index: number]>`                                   |
-| `layoutChange`       | 提供基础的布局信息，虽然自己不用，但是方便外部开发相关的组件 | `CustomEvent<{ box: { viewSize: number; scrollSize: number; }; blockList: { size: number; }[]; }>` |
+| Event                | Description                    | Type                                                                                                                      |
+| -------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `activedIndexChange` |                                | `CustomEvent<number>`                                                                                                     |
+| `activedTabChange`   |                                | `CustomEvent<[tabEle: HTMLElement \| undefined, index: number]>`                                                          |
+| `layoutChange`       | 提供基础的布局信息，虽然自己不用，但是方便外部开发相关的组件 | `CustomEvent<{ box: { viewSize: number; contentSize: number; scrolledSize: number; }; blockList: { size: number; }[]; }>` |
 
 
 ## Methods
@@ -47,13 +47,13 @@ Type: `Promise<number>`
 
 
 
-### `getLayoutInfo() => Promise<{ box: { viewOffsetLeft: number; viewOffsetWidth: number; viewSize: number; scrollSize: number; }; blockList: $Tab[]; activedIndex: number; activedTab: $Tab | undefined; }>`
+### `getLayoutInfo() => Promise<{ box: { viewOffsetLeft: number; viewOffsetWidth: number; viewSize: number; scrolledSize: number; contentSize: number; }; blockList: $Tab[]; activedIndex: number; activedTab: $Tab | undefined; }>`
 
 
 
 #### Returns
 
-Type: `Promise<{ box: { viewOffsetLeft: number; viewOffsetWidth: number; viewSize: number; scrollSize: number; }; blockList: $Tab[]; activedIndex: number; activedTab: $Tab | undefined; }>`
+Type: `Promise<{ box: { viewOffsetLeft: number; viewOffsetWidth: number; viewSize: number; scrolledSize: number; contentSize: number; }; blockList: $Tab[]; activedIndex: number; activedTab: $Tab | undefined; }>`
 
 
 

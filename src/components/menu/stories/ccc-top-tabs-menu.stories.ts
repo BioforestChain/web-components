@@ -6,36 +6,37 @@ export default {
   argTypes: cccTopTabsMenuKit.argsFactory.toArgTypes(),
 };
 
-const BASE_HTML = html`
+export const TABS_HTML = html`
   <span slot="tab"> 关 </span>
   <span slot="tab"> 最新 </span>
   <span slot="tab"> 热榜注 </span>
   <span slot="tab"> 你好 </span>
   <span slot="tab"> 世 </span>
 `;
-const BASE_STYLE = `
-ccc-slider-tabs {
-  outline: 1px solid red;
-}
-
+export const TABS_STYLE = `
 [slot="tab"]{
   padding: 0.5em 1em;
   transition-duration: 300ms;
+  background: #90caf9;
+  color: #FFF;
 }
 [slot="tab"][data-ccc-slider-tabs="prev"]{
   background: #c8e6c9;
+  color: #000;
 }
 [slot="tab"][data-ccc-slider-tabs="actived"]{
   background: #009688;
-  color: #FFF;
+  color: #000;
+  font-weight: bold;
 }
 [slot="tab"][data-ccc-slider-tabs="next"]{
   background: #b3e5fc;
+  color: #000;
 }
 `;
-export const Base_Usage = cccTopTabsMenuKit.storyFactory(() => BASE_HTML, {}).addStyle(BASE_STYLE);
+export const Base_Usage = cccTopTabsMenuKit.storyFactory(() => TABS_HTML, {}).addStyle(TABS_STYLE);
 
-const SLIDER_HTML = html`<ccc-slider id="qaq">
+export const SLIDER_HTML = html`<ccc-slider id="qaq">
   <div slot="slider" class="slider item-1">
     <h2>slider 1</h2>
   </div>
@@ -52,7 +53,7 @@ const SLIDER_HTML = html`<ccc-slider id="qaq">
     <h2>slider 5</h2>
   </div>
 </ccc-slider>`;
-const SLIDER_STYLE = `
+export const SLIDER_STYLE = `
 ccc-slider{
   width: 300px;
   height: 500px;
@@ -79,7 +80,7 @@ ccc-slider{
 `;
 
 export const With_Slider = cccTopTabsMenuKit
-  .storyFactory(() => BASE_HTML, { forSlider: "qaq" })
-  .addStyle(BASE_STYLE)
+  .storyFactory(() => TABS_HTML, { forSlider: "qaq" })
+  .addStyle(TABS_STYLE)
   .addHtmlTpl(SLIDER_HTML)
   .addStyle(SLIDER_STYLE);

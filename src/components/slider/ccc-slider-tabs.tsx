@@ -298,7 +298,8 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     const {
       offsetLeft: viewboxOffsetLeft,
       offsetWidth: viewboxOffsetWidth,
-      scrollLeft: viewboxScrollLeft,
+      scrollLeft: scrolledSize,
+      scrollWidth: contentSize,
     } = this.hostEle;
 
     for (const tabLayoutInfo of this._tabList) {
@@ -315,7 +316,8 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
         viewOffsetLeft: viewboxOffsetLeft,
         viewOffsetWidth: viewboxOffsetWidth,
         viewSize: viewboxOffsetWidth,
-        scrollSize: viewboxScrollLeft,
+        scrolledSize,
+        contentSize,
       },
       blockList: this._tabList,
       activedIndex: activedTab?.index ?? -1,
