@@ -41,11 +41,9 @@ export const WithDefaultIndex = cccSliderTabsKit
   .addStyle(BASE_STYLE);
 
 export const WithScrollBar = cccSliderTabsKit
-  .storyFactory(
-    () => html`${BASE_HTML}
-      <ccc-slider-scrollbar for-layout="qaq" for-slider="qaq"></ccc-slider-scrollbar> `,
-  )
+  .storyFactory(() => html`${BASE_HTML}`)
   .addStyle(BASE_STYLE)
+  .addHtmlTpl(html` <ccc-slider-scrollbar for-layout="qaq" for-slider="qaq"></ccc-slider-scrollbar> `)
   .onMount((_, ele) => {
     ele.id = "qaq";
   });

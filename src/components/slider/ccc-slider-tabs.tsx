@@ -214,8 +214,6 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     }
   });
 
-  private _tabListEle?: HTMLElement;
-
   connectedCallback() {
     this._layoutFollower.connectedCallback();
     this._sliderFollower.connectedCallback();
@@ -223,8 +221,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   async componentDidLoad() {
     this.console.log("componentDidLoad");
     this._mutationOb.observe(this.hostEle, { childList: true });
-    this._tabListEle = querySelector(this.hostEle.shadowRoot, ".tab-list");
-    this._resizeOb.observe(this._tabListEle!);
+    this._resizeOb.observe(this.hostEle);
 
     // 初始化tabs
     this._queryTabs();
@@ -235,9 +232,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     }
   }
   disconnectedCallback() {
-    if (this._tabListEle) {
-      this._resizeOb.unobserve(this._tabListEle);
-    }
+    this._resizeOb.unobserve(this.hostEle);
     this._mutationOb.disconnect();
     this._layoutFollower.disconnectedCallback();
     this._sliderFollower.disconnectedCallback();
@@ -382,10 +377,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   render() {
     return (
       <Host onClick={this.onClick}>
-        <div class="tab-list" part="tabs">
-          <slot name="tab"></slot>
-        </div>
-        <slot></slot>
+        <slot name="tab"></slot>
       </Host>
     );
   }

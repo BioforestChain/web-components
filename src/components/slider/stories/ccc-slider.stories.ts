@@ -47,12 +47,14 @@ const DEMO_STYLE = `
 export const Base_Usage = cccSliderKit.storyFactory(() => DEMO_HTML, {}).addStyle(DEMO_STYLE);
 
 const TABS_HTML = (slot?: () => TemplateResult) => html`
-  <ccc-slider-tabs id="tabs" for-slider="qaq">
-    <span class="tab" slot="tab">s1</span>
-    <span class="tab" slot="tab">s2</span>
-    <span class="tab" slot="tab">s3</span>
+  <div class="tabs-wrapper">
+    <ccc-slider-tabs id="tabs" for-slider="qaq">
+      <span class="tab" slot="tab">s1</span>
+      <span class="tab" slot="tab">s2</span>
+      <span class="tab" slot="tab">s3</span>
+    </ccc-slider-tabs>
     ${slot?.()}
-  </ccc-slider-tabs>
+  </div>
 `;
 
 const TABS_STYLE = `
@@ -136,13 +138,18 @@ export const With_Tabs_And_Scrollbar = cccSliderKit
   .onMount((_, ele) => {
     ele.id = "qaq";
   })
+  .addStyle(TABS_STYLE)
   .addHtmlTpl(
     TABS_HTML(
       () => html` <ccc-slider-scrollbar id="scrollbar" for-slider="qaq" for-layout="tabs"> </ccc-slider-scrollbar> `,
     ),
     "before",
-  )
-  .addStyle(TABS_STYLE);
+  ).addStyle(`
+  .tabs-wrapper{
+    display:flex;
+    flex-direction: column;
+  }
+  `);
 
 export const Nested_Slider = cccSliderKit
   .storyFactory(

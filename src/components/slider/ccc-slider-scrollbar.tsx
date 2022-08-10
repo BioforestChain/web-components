@@ -1,5 +1,5 @@
 import { Component, ComponentInterface, Element, h, Host, Method, Prop, Watch } from "@stencil/core";
-import { asSafeInteger, cssAnimationDurationToMs, Logger, querySelector } from "../../utils/utils";
+import { asSafeInteger, at, cssAnimationDurationToMs, Logger, querySelector } from "../../utils/utils";
 import { $CccLayout, $CccSlider, isCccLayout, isCccSlider } from "./ccc-slider.const";
 
 export type $Cursor = {
@@ -282,11 +282,14 @@ export class CccSliderScrollbar implements ComponentInterface {
     const index = progress * (this._cursorList.length - 1);
     const float = index % 1;
     const int = index - float;
-    const base = this._cursorList[int];
+    const base = at(this._cursorList, int);
+    if (!base) {
+      return { left: 0, width: 0 };
+    }
     if (float === 0) {
       return base;
     }
-    const next = this._cursorList[int + 1];
+    const next = at(this._cursorList, int + 1)!;
     const mix = {
       left: base.left + (next.left - base.left) * float,
       width: base.width + (next.width - base.width) * float,

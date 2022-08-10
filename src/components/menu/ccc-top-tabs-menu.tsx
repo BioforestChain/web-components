@@ -19,13 +19,13 @@ export class CccTopTabsMenu implements ComponentInterface {
       <Host>
         <ccc-slider-tabs id={this._tabs_id} class="sub-tab" for-slider={this.forSlider}>
           <slot name="tab" slot="tab"></slot>
-          <ccc-slider-scrollbar
-            part="scrollbar"
-            for-slider={this.forSlider || this._tabs_id}
-            for-layout={this._tabs_id}
-            exportparts="cursor, spirit"
-          ></ccc-slider-scrollbar>
         </ccc-slider-tabs>
+        <ccc-slider-scrollbar
+          part="scrollbar"
+          for-slider={this.forSlider || this._tabs_id}
+          for-layout={this._tabs_id}
+          exportparts="cursor, spirit"
+        ></ccc-slider-scrollbar>
       </Host>
     );
   }

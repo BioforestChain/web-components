@@ -320,10 +320,13 @@ export const throttle =
     return descriptor;
   };
 
-type DomQueryer = Document | Element | DocumentFragment;
+type DomQueryer = Document | Element | DocumentFragment | Node;
 
 export const querySelectorAll = <T = HTMLElement>(root: DomQueryer | null | undefined, selector: string) => {
-  return Array.prototype.slice.call(root?.querySelectorAll(selector) ?? { length: 0 }) as T[];
+  if (root && typeof (root as any).querySelectorAll === "function") {
+    return Array.prototype.slice.call((root as Element).querySelectorAll(selector) ?? { length: 0 }) as T[];
+  }
+  return [];
 };
 export function* manyQuerySelectorAll<T = HTMLElement>(roots: Iterable<DomQueryer>, selector: string) {
   for (const root of roots) {
@@ -332,7 +335,9 @@ export function* manyQuerySelectorAll<T = HTMLElement>(roots: Iterable<DomQuerye
 }
 
 export const querySelector = <T = HTMLElement>(root: DomQueryer | null | undefined, selector: string) => {
-  return (root?.querySelector(selector) || undefined) as T | undefined;
+  if (root && typeof (root as any).querySelector === "function") {
+    return ((root as Element).querySelector(selector) || undefined) as T | undefined;
+  }
 };
 
 export const querySlotAssignedElements = <T = HTMLElement>(host: HTMLElement, slot: string) => {

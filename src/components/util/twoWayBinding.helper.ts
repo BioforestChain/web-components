@@ -18,7 +18,7 @@ export class BindFollowerHelper<T> implements ComponentInterface {
   private _bindingEles = new Set<T>();
   binding() {
     if (this.hostEle.id) {
-      for (const ele of manyQuerySelectorAll<T>([document, this.hostEle], `[${this.bindProp}=${this.hostEle.id}]`)) {
+      for (const ele of manyQuerySelectorAll<T>([document, this.hostEle.getRootNode()], `[${this.bindProp}=${this.hostEle.id}]`)) {
         if (this._bindingEles.has(ele) === false) {
           this.onBind(ele);
         }

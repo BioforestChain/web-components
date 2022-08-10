@@ -1,5 +1,9 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
 }
 .count {
   color: cyan;

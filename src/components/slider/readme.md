@@ -88,22 +88,17 @@ Type: `Promise<void>`
 
 
 
-## Shadow Parts
-
-| Part     | Description |
-| -------- | ----------- |
-| `"tabs"` |             |
-
-
 ## Dependencies
 
 ### Used by
 
+ - [ccc-sub-tabs-menu](../menu)
  - [ccc-top-tabs-menu](../menu)
 
 ### Graph
 ```mermaid
 graph TD;
+  ccc-sub-tabs-menu --> ccc-slider-tabs
   ccc-top-tabs-menu --> ccc-slider-tabs
   style ccc-slider-tabs fill:#f9f,stroke:#333,stroke-width:4px
 ```
