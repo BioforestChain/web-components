@@ -220,7 +220,6 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     this._resizeOb.observe(this.hostEle);
 
     // 初始化tabs
-    debugger
     this._tabSlotChangeHelper.componentDidLoad();
 
     /// 如果没有找到需要跟随的slider，那么就将自己当成slider来使用
