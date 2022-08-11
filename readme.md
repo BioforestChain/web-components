@@ -45,10 +45,10 @@
 
 1. 安装依赖
    ```shell
-   # 你可能需要以下这些指令帮助你完成依赖的安装
-   # $env:PUPPETEER_DOWNLOAD_HOST="https://npm.taobao.org/mirrors/"
-   # $env:PUPPETEER_SKIP_DOWNLOAD=1
-   # $env:PUPPETEER_DOWNLOAD_HOST="http://192.168.110.154:8080/puppeteer/"
+   # 在内网环境中，我们在 .npmrc 配置了一些环境变量来确保在能正常通过依赖的安装。所以你可能需要了解以下这些指令帮助你完成依赖的安装
+   # PUPPETEER_DOWNLOAD_HOST="https://npm.taobao.org/mirrors/" # 外网
+   # PUPPETEER_DOWNLOAD_HOST="http://192.168.110.154:8080/puppeteer/" # 内网
+   # PUPPETEER_SKIP_DOWNLOAD=1 # 内网如果没有及时更新 puppeteer 所需版本的 chromium-browser-snapshots
    yarn install # 确保依赖安装完毕
    ```
 2. 启动开发编译，并启动 storybook 预览组件，并进行实时预览

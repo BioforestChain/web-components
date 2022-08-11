@@ -19,7 +19,7 @@
     "loader/"
   ],
   "scripts": {
-    "postinstall": "node ./scripts/fix-package.mjs",
+    "postinstall": "patch-package && node ./scripts/fix-package.mjs",
     "dev": "concurrently -p \"[{name}]\" --names \"build,storybook\" -c \"bgBlue.bold,bgMagenta.bold\" \"yarn start\" \"yarn storybook\"",
     "build": "stencil build --docs & node ./scripts/fix-index.cjs",
     "start": "stencil build --docs --dev --watch",
@@ -55,6 +55,7 @@
     "jest": "^27.4.5",
     "jest-cli": "^27.4.5",
     "lit-html": "^2.2.7",
+    "patch-package": "^6.4.7",
     "puppeteer": "^10.0.0",
     "stencil-inline-svg": "^1.1.0",
     "treeify": "^1.1.0",
