@@ -11,6 +11,7 @@ import {
   Watch,
 } from "@stencil/core";
 import { at, Logger, querySlotAssignedElements } from "../../utils/utils";
+import { SlotChangeHelper } from "../util/slotChange.helper";
 import { BindFollowerHelper } from "../util/twoWayBinding.helper";
 import { $CccSlider, $CccSliderFollower } from "./ccc-slider.const";
 
@@ -80,18 +81,12 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     }
     this.console.log("resize end");
   });
-  /**
-   * watch id changed
-   */
-  private _mutationOb = new MutationObserver(entries => {
-    for (const entry of entries) {
-      if (entry.type === "childList") {
-        this.console.log("MutationObserver childList changed");
-        this._querySliders();
-        // 进行布局计算，并更新状态
-        this._updateSliderStates();
-      }
-    }
+
+  private _sliderSlotChangeHelper = new SlotChangeHelper(this.hostEle, "slider").onChange(elements => {
+    this.console.log("slot=slider assignedElement changed");
+    this._querySliders([...elements]);
+    // 进行布局计算，并更新状态
+    this._updateSliderStates();
   });
 
   connectedCallback() {
@@ -101,11 +96,9 @@ export class CccSlider implements ComponentInterface, $CccSlider {
   componentDidLoad() {
     this.console.log("componentDidLoad");
     this._resizeOb.observe(this.hostEle);
-    this._mutationOb.observe(this.hostEle, {
-      childList: true,
-    });
+
     // 加载节点
-    this._querySliders();
+    this._sliderSlotChangeHelper.componentDidLoad();
     // 进行布局计算
     this.calcLayoutInfo();
     /// 需要进行初始化
@@ -125,13 +118,12 @@ export class CccSlider implements ComponentInterface, $CccSlider {
   disconnectedCallback() {
     this._followerHelper.disconnectedCallback();
     this._resizeOb.unobserve(this.hostEle);
-    this._mutationOb.disconnect();
+    this._sliderSlotChangeHelper.disconnectedCallback();
   }
 
   private _sliderList: $Slider[] = [];
 
-  private _querySliders() {
-    const sliderEles = querySlotAssignedElements(this.hostEle, "slider");
+  private _querySliders(sliderEles = querySlotAssignedElements(this.hostEle, "slider")) {
     /// 没有发生任何改变
     if (
       this._sliderList.length === sliderEles.length &&

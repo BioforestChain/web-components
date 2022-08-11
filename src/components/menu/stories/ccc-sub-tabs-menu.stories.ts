@@ -1,5 +1,5 @@
 import { cccSubTabsMenuKit } from "./autogen";
-import { SLIDER_HTML, SLIDER_STYLE, TABS_HTML, TABS_STYLE } from "./ccc-top-tabs-menu.stories";
+import { SLIDER_HTML, SLIDER_STYLE, TABS_HTML, TABS_STYLE } from "./const";
 
 export default {
   title: "Component/Menu/Sub Tabs",

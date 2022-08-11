@@ -35,14 +35,17 @@ export const config: Config = {
                   clearInterval(checkTi);
                 },
                 generateBundle() {
-                  // console.log("generateBundle");
-                  doCopy("dev-copy");
-                  // console.log("fixed index.js");
+                  const execCopy = async () => {
+                    try {
+                      await doCopy("dev-copy");
+                    } catch (err) {}
+                  };
+                  execCopy();
 
                   /// 因为 ts 的编译可能会慢一点，所以这里 0.5s 检查一次，看有没有被覆盖写回去了
                   checkTimes = CHECK_MAX_TIMES;
                   checkTi = setInterval(() => {
-                    doCopy();
+                    execCopy();
                     if (--checkTimes <= 0) {
                       clearInterval(checkTi);
                     }

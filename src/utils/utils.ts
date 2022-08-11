@@ -281,7 +281,7 @@ export class PromiseOut<T = unknown> {
 // const asyncFunctionProto = Function(`return Object.getPrototypeOf(async()=>{})`)();
 /**一个简单的节流修饰器 */
 export const throttle =
-  (wait: number = 0) =>
+  (wait?: number) =>
   <T extends Function>(
     _target: object,
     propertyKey: string,
@@ -294,31 +294,75 @@ export const throttle =
     ) {
       throw new TypeError(`Only async methods can be decorated with @throttle. <${propertyKey}> is not a method!`);
     }
-    const sourceFun = descriptor.value;
-    let runned: { po: PromiseOut<unknown>; startTime: number } | undefined;
-    const newFun = function (this: any, ...args: unknown[]) {
-      if (runned === undefined) {
-        const po = new PromiseOut();
-        const startTime = Date.now();
-        runned = { po, startTime };
-        const run = () => {
-          try {
-            po.resolve(sourceFun.apply(this, args));
-          } catch (err) {
-            po.reject(err);
-          }
-          if (runned?.po === po) {
-            runned = undefined;
-          }
-        };
-        wait <= 0 || Number.isSafeInteger(wait) === false ? queueMicrotask(run) : setTimeout(run, wait);
-      }
-      return runned.po.promise;
-    };
-    descriptor.value = newFun as unknown as T;
+
+    descriptor.value = throttleWrapper(descriptor.value as any, wait) as unknown as T;
 
     return descriptor;
   };
+
+export const throttleWrapper = <ARGS extends unknown[], T, R>(
+  sourceFun: (this: T, ...args: ARGS) => R,
+  wait: number = 0,
+  immediately = false,
+) => {
+  let runned: { po: PromiseOut<R>; startTime: number } | undefined;
+
+  let doRun: (fun: () => void) => void;
+  if (wait <= 0 || Number.isSafeInteger(wait) === false) {
+    if (immediately) {
+      let running = false;
+      doRun = fun => {
+        if (running) {
+          queueMicrotask(fun);
+        } else {
+          running = true;
+          fun();
+          queueMicrotask(() => (running = false));
+        }
+      };
+    } else {
+      doRun = fun => queueMicrotask(fun);
+    }
+  } else {
+    if (immediately) {
+      let running = false;
+      doRun = fun => {
+        if (running) {
+          setTimeout(fun, wait);
+        } else {
+          running = true;
+          fun();
+          setTimeout(() => (running = false), wait);
+        }
+      };
+    } else {
+      doRun = fun => setTimeout(fun, wait);
+    }
+  }
+
+  const newFun = function (this: T, ...args: ARGS) {
+    if (runned === undefined) {
+      const po = new PromiseOut<R>();
+      const startTime = Date.now();
+      runned = { po, startTime };
+      doRun(() => {
+        try {
+          po.resolve(sourceFun.apply(this, args));
+        } catch (err) {
+          po.reject(err);
+        }
+        if (runned?.po === po) {
+          runned = undefined;
+        }
+      });
+      return po.promise; // 这里需要使用po来返回，因为 immediately 可能会清理掉 runned
+    }
+    return runned.po.promise;
+  };
+
+  (newFun as any).__source_fun__ = sourceFun;
+  return newFun;
+};
 
 type DomQueryer = Document | Element | DocumentFragment | Node;
 

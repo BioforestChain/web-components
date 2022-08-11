@@ -11,6 +11,7 @@ import {
   Watch,
 } from "@stencil/core";
 import { at, Logger, querySelector, querySlotAssignedElements } from "../../utils/utils";
+import { SlotChangeHelper } from "../util/slotChange.helper";
 import { BindFollowerHelper } from "../util/twoWayBinding.helper";
 import {
   $CccLayout,
@@ -182,8 +183,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   }
 
   private _tabList: Array<$Tab> = [];
-  private _queryTabs() {
-    const tabEles = querySlotAssignedElements(this.hostEle, "tab");
+  private _queryTabs(tabEles = querySlotAssignedElements(this.hostEle, "tab")) {
     if (this._tabList.length === tabEles.length && this._tabList.every((tab, index) => tabEles[index] === tab.ele)) {
       return;
     }
@@ -204,14 +204,11 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
     // 这里只是触发resize相关的计算，不用 updateTabLayoutInfo
     this.calcLayoutInfo(undefined, true);
   });
-  private _mutationOb = new MutationObserver(entries => {
-    for (const entry of entries) {
-      if (entry.type === "childList") {
-        this.console.log("MutationObserver childList changed");
-        this._queryTabs();
-        this._updateTabLayoutInfo(this.calcLayoutInfo(undefined, true));
-      }
-    }
+
+  private _tabSlotChangeHelper = new SlotChangeHelper(this.hostEle, "tab").onChange(elements => {
+    this.console.log("slot=tab assignedElement changed");
+    this._queryTabs([...elements]);
+    this._updateTabLayoutInfo(this.calcLayoutInfo(undefined, true));
   });
 
   connectedCallback() {
@@ -220,11 +217,11 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   }
   async componentDidLoad() {
     this.console.log("componentDidLoad");
-    this._mutationOb.observe(this.hostEle, { childList: true });
     this._resizeOb.observe(this.hostEle);
 
     // 初始化tabs
-    this._queryTabs();
+    debugger
+    this._tabSlotChangeHelper.componentDidLoad();
 
     /// 如果没有找到需要跟随的slider，那么就将自己当成slider来使用
     if (!(await this.watchForSlider(this.forSlider))) {
@@ -233,7 +230,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   }
   disconnectedCallback() {
     this._resizeOb.unobserve(this.hostEle);
-    this._mutationOb.disconnect();
+    this._tabSlotChangeHelper.disconnectedCallback();
     this._layoutFollower.disconnectedCallback();
     this._sliderFollower.disconnectedCallback();
   }
