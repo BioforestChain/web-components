@@ -28,9 +28,10 @@
 
 ## Shadow Parts
 
-| Part           | Description |
-| -------------- | ----------- |
-| `"actionsbar"` |             |
+| Part             | Description |
+| ---------------- | ----------- |
+| `"actionsbar"`   |             |
+| `"rightactions"` |             |
 
 
 ----------------------------------------------

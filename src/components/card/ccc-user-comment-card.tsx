@@ -113,7 +113,7 @@ export class CccUserCommentCard implements ComponentInterface {
               <div class="left-actions">
                 <slot name="reply" />
               </div>
-              <div class="right-actions">
+              <div class="right-actions"  part="rightActions">
                 <slot name="actions" />
               </div>
             </div>
