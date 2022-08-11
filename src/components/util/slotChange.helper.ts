@@ -11,10 +11,8 @@ export class SlotChangeHelper implements ComponentInterface {
     return this;
   }
   private _cbs = new Set<$SlotChangeCallback>();
-  private _emitCallback() {
+  private _emitCallback(elements: Set<HTMLElement>, nodes: Set<Node>) {
     const runs: PromiseLike<unknown>[] = [];
-    const nodes = this._nodes;
-    const elements = this._elements;
     for (const cb of this._cbs) {
       try {
         const res = cb(elements, nodes);
@@ -28,8 +26,10 @@ export class SlotChangeHelper implements ComponentInterface {
     return Promise.all(runs);
   }
 
-  private _nodes = new Set<Node>();
-  private _elements = new Set<HTMLElement>();
+  /**
+   * 所有的元素，包括slot本身
+   */
+  private _allNodes = new Set<Node>();
   private _slots = new Set<HTMLSlotElement>();
 
   private _onSlotChange = throttleWrapper(
@@ -47,17 +47,19 @@ export class SlotChangeHelper implements ComponentInterface {
     for (const slotEle of this._slots) {
       slotEle.removeEventListener("slotchange", this._onSlotChange);
     }
-    this._nodes.clear();
-    this._elements.clear();
+    this._allNodes.clear();
     this._slots.clear();
   }
   private _bind() {
+    const allNodes = new Set<Node>();
     const nodes = new Set<Node>();
     const elements = new Set<HTMLElement>();
     const slots = new Set<HTMLSlotElement>();
 
+    /**收集各类DOM元素 */
     const collectNodes = (slotEle: HTMLSlotElement): void => {
       slots.add(slotEle);
+      allNodes.add(slotEle);
       for (const node of slotEle.assignedNodes()) {
         if (node instanceof HTMLSlotElement) {
           return collectNodes(node);
@@ -66,6 +68,7 @@ export class SlotChangeHelper implements ComponentInterface {
           elements.add(node);
         }
         nodes.add(node);
+        allNodes.add(node);
       }
     };
     const rootSlotEle = querySelector<HTMLSlotElement>(this.hostEle.shadowRoot, `slot[name="${this.slot}"]`);
@@ -73,7 +76,7 @@ export class SlotChangeHelper implements ComponentInterface {
       collectNodes(rootSlotEle);
     }
     /// 如果没有变动，那么不需要触发
-    if (isSetEqual(nodes, this._nodes)) {
+    if (isSetEqual(allNodes, this._allNodes)) {
       return;
     }
 
@@ -91,10 +94,8 @@ export class SlotChangeHelper implements ComponentInterface {
     for (const slotEle of this._slots) {
       slotEle.removeEventListener("slotchange", this._onSlotChange);
     }
-    this._nodes = nodes;
-    this._elements = elements;
     this._slots = slots;
-    this._emitCallback();
+    this._emitCallback(elements, nodes);
   }
 }
 const isSetEqual = <T>(a: Set<T>, b: Set<T>) => {
