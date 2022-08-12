@@ -94,10 +94,17 @@
   &.gray {
     background: #f4f6f7;
     border-radius: 1px;
-    font-size: 0.95em;
+    font-size: 1.083em;
     color: #737880;
-    padding: 0.3em 0.3em;
+    padding: 0.2em 0.3em;
     margin-bottom: 0.3em;
+    line-height: 1.5em;
+    .text {
+      line-height: 1.5em;
+      &.fold {
+        max-height: 1.5em;
+      }
+    }
   }
 }
 .fold-btn {
