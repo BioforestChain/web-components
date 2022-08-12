@@ -446,12 +446,11 @@ export class CccSliderScrollbar implements ComponentInterface {
     this._prepareAnimations(eles);
 
     await this.watchForLayout(this.forLayout);
-
     await this.watchForSlider(this.forSlider);
   }
-  async connectedCallback() {
+  async disconnectedCallback() {
     await this._bindLayoutElement(null);
-    await this._bindLayoutElement(null);
+    await this._bindSliderElement(null);
   }
   @Method()
   async update() {
