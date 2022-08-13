@@ -22,12 +22,11 @@ import {
   isCccSlider,
 } from "./ccc-slider.const";
 
-export type $Tab = {
+export type $Tab = $CccLayout.LayoutChangeDetail['blockList'][0] & {
   index: number;
   ele: HTMLElement;
   offsetWidthCache: number;
   offsetLeftCache: number;
-  size: number;
 };
 export type $NullableTab = Omit<$Tab, "ele"> & { ele?: $Tab["ele"] };
 // const DEFAULT_CURSOR_LAYOUT: $Tab = { width: 0, left: 0 };
@@ -194,6 +193,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
         offsetLeftCache: 0,
         offsetWidthCache: 0,
         size: 0,
+        start: 0
       };
       return slider;
     });
@@ -304,6 +304,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
       tabLayoutInfo.offsetLeftCache = offsetLeft;
       tabLayoutInfo.offsetWidthCache = offsetWidth;
       tabLayoutInfo.size = offsetWidth;
+      tabLayoutInfo.start = offsetLeft - viewboxOffsetLeft
     }
     const activedTab = at(this._tabList, activedIndex);
 
