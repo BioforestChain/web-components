@@ -17,7 +17,7 @@ export class CccTopTabsMenu implements ComponentInterface {
   render() {
     return (
       <Host>
-        <ccc-slider-tabs id={this._tabs_id} class="sub-tab" for-slider={this.forSlider}>
+        <ccc-slider-tabs id={this._tabs_id} part="tabs" class="sub-tab" for-slider={this.forSlider}>
           <slot name="tab" slot="tab"></slot>
         </ccc-slider-tabs>
         <ccc-slider-scrollbar
