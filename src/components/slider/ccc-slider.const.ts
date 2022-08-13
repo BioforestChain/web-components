@@ -80,7 +80,7 @@ export namespace $CccLayout {
   }
   export type LayoutChangeDetail = {
     box: { viewSize: number; contentSize: number; scrolledSize: number };
-    blockList: { size: number }[];
+    blockList: { size: number, start: number }[];
   };
   export type HTMLCccLayoutElementEventMap = HTMLElementEventMap & {
     layoutChange: CustomEvent<LayoutChangeDetail>;

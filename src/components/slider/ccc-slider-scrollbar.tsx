@@ -177,8 +177,8 @@ export class CccSliderScrollbar implements ComponentInterface {
     /// 计算光标的基本布局的布局
     let accLeft = 0;
     this._cursorList = layoutInfo.blockList.map((block, i) => {
-      const cursor = { index: i, width: block.size, left: accLeft };
-      accLeft += block.size;
+      const cursor = { index: i, width: block.size, left: block.start };
+      accLeft = block.start + block.size;
       return cursor;
     });
     this._cursorTotalWidth = accLeft;
