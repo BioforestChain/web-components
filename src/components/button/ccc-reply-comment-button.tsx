@@ -19,7 +19,7 @@ export class CccReplyCommentButton implements ComponentInterface {
   }
   render() {
     return (
-      <button class="reply-button" onClick={_ => this.userClickHandle(this.commentInfo)}>
+      <button class="reply-button" part="replyButton" onClick={_ => this.userClickHandle(this.commentInfo)}>
         <span class="reply"> {this.commentInfo?.replies && this.commentInfo?.replies !== 0 ? this.commentInfo?.replies : ""} 回复</span>
         <ion-icon src="./assets/icon/comments_list_right.svg"></ion-icon>
       </button>
