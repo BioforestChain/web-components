@@ -8,9 +8,9 @@ import {
   Host,
   Method,
   Prop,
-  Watch,
+  Watch
 } from "@stencil/core";
-import { at, Logger, querySelector, querySlotAssignedElements } from "../../utils/utils";
+import { at, Logger, queryScopeSelector, querySlotAssignedElements } from "../../utils/utils";
 import { SlotChangeHelper } from "../util/slotChange.helper";
 import { BindFollowerHelper } from "../util/twoWayBinding.helper";
 import {
@@ -19,10 +19,10 @@ import {
   $CccSlider,
   $CccSliderFollower,
   isCccLayoutEqual,
-  isCccSlider,
+  isCccSlider
 } from "./ccc-slider.const";
 
-export type $Tab = $CccLayout.LayoutChangeDetail['blockList'][0] & {
+export type $Tab = $CccLayout.LayoutChangeDetail["blockList"][0] & {
   index: number;
   ele: HTMLElement;
   offsetWidthCache: number;
@@ -82,7 +82,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
   @Watch("forSlider")
   watchForSlider(forSlider: string | undefined) {
     return this._bindSliderElement(
-      forSlider ? querySelector<$CccSlider.HTMLCccSliderElement>(document, `#${this.forSlider}`) : null,
+      forSlider ? queryScopeSelector<$CccSlider.HTMLCccSliderElement>(this.hostEle, `#${this.forSlider}`) : null,
     );
   }
   private _sliderEle: $CccSlider.HTMLCccSliderElement | null = null;
@@ -193,7 +193,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
         offsetLeftCache: 0,
         offsetWidthCache: 0,
         size: 0,
-        start: 0
+        start: 0,
       };
       return slider;
     });
@@ -304,7 +304,7 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
       tabLayoutInfo.offsetLeftCache = offsetLeft;
       tabLayoutInfo.offsetWidthCache = offsetWidth;
       tabLayoutInfo.size = offsetWidth;
-      tabLayoutInfo.start = offsetLeft - viewboxOffsetLeft
+      tabLayoutInfo.start = offsetLeft - viewboxOffsetLeft;
     }
     const activedTab = at(this._tabList, activedIndex);
 

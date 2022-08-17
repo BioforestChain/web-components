@@ -85,6 +85,11 @@ export class CccSlider implements ComponentInterface, $CccSlider {
   private _sliderSlotChangeHelper = new SlotChangeHelper(this.hostEle, "slider").onChange(elements => {
     this.console.log("slot=slider assignedElement changed");
     this._querySliders([...elements]);
+
+    /// 如果在初始化阶段，那么不负责状态更新，以确保 defaultActivedIndex 正常工作
+    if (this._reasons.has("init")) {
+      return;
+    }
     // 进行布局计算，并更新状态
     this._updateSliderStates();
   });
@@ -97,12 +102,12 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     this.console.log("componentDidLoad");
     this._resizeOb.observe(this.hostEle);
 
+    this._reasons.add("init");
     // 加载节点
     this._sliderSlotChangeHelper.componentDidLoad();
     // 进行布局计算
     this.calcLayoutInfo();
     /// 需要进行初始化
-    this._reasons.add("init");
     if (this.defaultActivedIndex) {
       this.console.log("componentDidLoad", "!! scroll into defaultIndex", this.defaultActivedIndex);
       this._scrollToIndex(this.defaultActivedIndex, "set" /* 初始化的时候减少动画 */);

@@ -384,6 +384,23 @@ export const querySelector = <T = HTMLElement>(root: DomQueryer | null | undefin
   }
 };
 
+export const queryScopeSelectorAll = <T = HTMLElement>(host: HTMLElement, selector: string) => {
+  const rootNode = host.getRootNode();
+  if (rootNode === document) {
+    return querySelectorAll<T>(document, selector);
+  }
+  return manyQuerySelectorAll<T>([document, rootNode], selector);
+};
+export const queryScopeSelector = <T = HTMLElement>(host: HTMLElement, selector: string) => {
+  const rootNode = host.getRootNode();
+  if (rootNode === document) {
+    return querySelector<T>(document, selector);
+  }
+  for (const ele of manyQuerySelectorAll<T>([rootNode, document], selector)) {
+    return ele;
+  }
+};
+
 export const querySlotAssignedElements = <T = HTMLElement>(host: HTMLElement, slot: string) => {
   const res: T[] = [];
   const pushToRes = (ele: Element) => {

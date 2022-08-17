@@ -1,5 +1,5 @@
 import { ComponentInterface } from "@stencil/core";
-import { manyQuerySelectorAll } from "../../utils/utils";
+import { queryScopeSelectorAll } from "../../utils/utils";
 
 /**绑定跟随者的工具类 */
 export class BindFollowerHelper<T> implements ComponentInterface {
@@ -18,7 +18,7 @@ export class BindFollowerHelper<T> implements ComponentInterface {
   private _bindingEles = new Set<T>();
   binding() {
     if (this.hostEle.id) {
-      for (const ele of manyQuerySelectorAll<T>([document, this.hostEle.getRootNode()], `[${this.bindProp}=${this.hostEle.id}]`)) {
+      for (const ele of queryScopeSelectorAll<T>(this.hostEle, `[${this.bindProp}=${this.hostEle.id}]`)) {
         if (this._bindingEles.has(ele) === false) {
           this.onBind(ele);
         }
@@ -43,3 +43,7 @@ export class BindFollowerHelper<T> implements ComponentInterface {
     this.unbind();
   }
 }
+
+// export class FollowerHelper<T> implements ComponentInterface {
+//   constructor(readonly hostEle: HTMLElement, readonly bindProp: string = "for") {}
+// }

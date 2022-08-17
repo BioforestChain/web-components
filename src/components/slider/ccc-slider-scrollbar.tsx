@@ -1,5 +1,12 @@
 import { Component, ComponentInterface, Element, h, Host, Method, Prop, Watch } from "@stencil/core";
-import { asSafeInteger, at, cssAnimationDurationToMs, Logger, querySelector } from "../../utils/utils";
+import {
+  asSafeInteger,
+  at,
+  cssAnimationDurationToMs,
+  Logger,
+  queryScopeSelector,
+  querySelector,
+} from "../../utils/utils";
 import { $CccLayout, $CccSlider, isCccLayout, isCccSlider } from "./ccc-slider.const";
 
 export type $Cursor = {
@@ -23,7 +30,7 @@ export class CccSliderScrollbar implements ComponentInterface {
   @Prop({}) forSlider?: string;
   @Watch("forSlider")
   watchForSlider(forSlider: string | undefined) {
-    return this._bindSliderElement(forSlider ? querySelector(document, `#${forSlider}`) : null);
+    return this._bindSliderElement(forSlider ? queryScopeSelector(this.hostEle, `#${forSlider}`) : null);
   }
   private _sliderEle: $CccSlider.HTMLCccSliderElement | null = null;
 
@@ -101,7 +108,7 @@ export class CccSliderScrollbar implements ComponentInterface {
   @Prop({}) forLayout?: string;
   @Watch("forLayout")
   watchForLayout(forLayout: string | undefined) {
-    return this._bindLayoutElement(forLayout ? querySelector(document, `#${forLayout}`) : null);
+    return this._bindLayoutElement(forLayout ? queryScopeSelector(this.hostEle, `#${forLayout}`) : null);
   }
   private _layoutEle: $CccLayout.HTMLCccLayoutElement | null = null;
 
