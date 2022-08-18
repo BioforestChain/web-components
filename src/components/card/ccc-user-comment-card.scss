@@ -54,12 +54,13 @@
       align-items: center;
       flex-direction: row;
       .flag-badge {
-        border: 0.55px solid #acb5bf;
-        border-radius: 1em;
-        padding: 0.2em 0.6em;
-        font-size: 0.6em;
-        line-height: 1em;
-        color: #acb5bf;
+        border: 0.5px solid rgba(172, 181, 191, 1);
+        border-radius: 3px;
+        color: rgba(172, 181, 191, 1);
+        font-size: 1em;
+        padding: 0 0.5em;
+        line-height: 1.4em;
+        text-align: center;
         &:empty {
           display: none;
         }
