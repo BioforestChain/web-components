@@ -80,10 +80,8 @@ export class CccUserCommentCard implements ComponentInterface {
                     <slot name="author">楼主</slot>
                   </span>
                 ) : undefined}
-                <span class="flag">
-                  <slot name="userflag">
-                    <span class="flag-badge">{this.userFlag}</span>
-                  </slot>
+                <span class="author">
+                  <slot name="userflag">{this.userFlag}</slot>
                 </span>
               </div>
               <span class="time">
@@ -113,7 +111,7 @@ export class CccUserCommentCard implements ComponentInterface {
               <div class="left-actions">
                 <slot name="reply" />
               </div>
-              <div class="right-actions"  part="rightActions">
+              <div class="right-actions" part="rightActions">
                 <slot name="actions" />
               </div>
             </div>
