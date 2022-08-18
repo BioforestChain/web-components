@@ -1,5 +1,6 @@
-import { Component, ComponentInterface, Element, h, Host, Prop } from "@stencil/core";
-import { Logger } from "../../utils/utils";
+import { Component, ComponentInterface, Element, h, Host, Method, Prop } from "@stencil/core";
+import { Logger, querySelector } from "../../utils/utils";
+import { $CccLayout, $CccSliderFollower } from "../slider/ccc-slider.const";
 
 let tabsIdAcc = 0;
 
@@ -8,9 +9,20 @@ let tabsIdAcc = 0;
   styleUrl: "ccc-top-tabs-menu.scss",
   shadow: true,
 })
-export class CccTopTabsMenu implements ComponentInterface {
+export class CccTopTabsMenu implements ComponentInterface, $CccSliderFollower {
   private readonly _tabs_id = `top-tabs-menu-${tabsIdAcc++}`;
   @Prop() forSlider?: string;
+
+  @Method()
+  async bindSliderElement(ele?: HTMLElement | null) {
+    this._tabsEle.bindSliderElement(ele);
+  }
+
+  private _tabsEle!: $CccLayout.HTMLCccLayoutElement & $CccSliderFollower;
+  async componentDidLoad() {
+    this._tabsEle = querySelector(this.hostEle.shadowRoot, ":scope > .tabs")!;
+  }
+
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
 

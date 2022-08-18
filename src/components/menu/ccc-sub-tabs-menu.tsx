@@ -1,25 +1,29 @@
-import { Component, ComponentInterface, Element, h, Host, Prop, State } from "@stencil/core";
+import { Component, ComponentInterface, Element, h, Host, Method, Prop, State } from "@stencil/core";
 import { Logger, querySelector, throttle } from "../../utils/utils";
-import { $CccLayout } from "../slider/ccc-slider.const";
+import { $CccLayout, $CccSliderFollower } from "../slider/ccc-slider.const";
 
 @Component({
   tag: "ccc-sub-tabs-menu",
   styleUrl: "ccc-sub-tabs-menu.scss",
   shadow: true,
 })
-export class CccSubTabsMenu implements ComponentInterface {
+export class CccSubTabsMenu implements ComponentInterface, $CccSliderFollower {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
 
   @Prop({}) forSlider?: string;
+  @Method()
+  async bindSliderElement(ele?: HTMLElement | null) {
+    this._tabsEle.bindSliderElement(ele);
+  }
 
   @State() enableMask = false;
   @State() enableStartMask = false;
   @State() enableEndMask = false;
 
-  private _tabsEle!: $CccLayout.HTMLCccLayoutElement;
+  private _tabsEle!: $CccLayout.HTMLCccLayoutElement & $CccSliderFollower;
   async componentDidLoad() {
-    this._tabsEle = querySelector<$CccLayout.HTMLCccLayoutElement>(this.hostEle.shadowRoot, ":scope > .tabs")!;
+    this._tabsEle = querySelector(this.hostEle.shadowRoot, ":scope > .tabs")!;
     this._updateMaskState();
   }
 
