@@ -1,5 +1,5 @@
 import { Component, ComponentInterface, Event, EventEmitter, h, Host, Element, Prop, State } from "@stencil/core";
-import { querySelector } from "../../utils/utils";
+import { Logger, querySelector } from "../../utils/utils";
 
 @Component({
   tag: "ccc-user-comment-card",
@@ -7,6 +7,9 @@ import { querySelector } from "../../utils/utils";
   shadow: true,
 })
 export class CccUserCommentCard implements ComponentInterface {
+  @Element() hostEle!: HTMLElement;
+  readonly console = new Logger(this.hostEle);
+
   @Prop() replyContent = "";
   @Prop() userAvator = "";
   @Prop() userName = "some one";
@@ -28,18 +31,17 @@ export class CccUserCommentCard implements ComponentInterface {
     this.clickUser.emit();
   };
 
-  @Element() _hostEle!: HTMLElement;
-
   private textContainerEle: HTMLDivElement | null = null;
   private resizeObserver: ResizeObserver | undefined;
   componentDidLoad() {
     const textContainerEle = (this.textContainerEle ??= querySelector<HTMLDivElement>(
-      this._hostEle.shadowRoot,
+      this.hostEle.shadowRoot,
       ".text",
     )!);
 
     if (this.resizeObserver === undefined) {
       this.resizeObserver = new ResizeObserver(() => {
+        this.console.debugger(textContainerEle.scrollHeight, textContainerEle.clientHeight);
         /// 在折叠模式下。可以简单使用 scrollHeight 与 clientHeight 进行配合判断
         if (this.isFlod) {
           this.canFlod = textContainerEle.scrollHeight > textContainerEle.clientHeight;
@@ -113,7 +115,7 @@ export class CccUserCommentCard implements ComponentInterface {
               <div class="left-actions">
                 <slot name="reply" />
               </div>
-              <div class="right-actions"  part="rightActions">
+              <div class="right-actions" part="rightActions">
                 <slot name="actions" />
               </div>
             </div>

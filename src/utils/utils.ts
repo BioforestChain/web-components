@@ -511,6 +511,10 @@ export class Logger {
   private _log(args: unknown[]) {
     console.debug("%c" + this._tagInfo, "color:#9e9e9e", ...args);
   }
+  private _debugger(args: unknown[]) {
+    debugger;
+    console.trace("%c" + this._tagInfo, "color:#9e9e9e", ...args);
+  }
   private _info(args: unknown[]) {
     console.info("%c" + this._tagInfo, "color:#00bcd4", ...args);
   }
@@ -531,6 +535,11 @@ export class Logger {
   log(...args: unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.log)) {
       this._log(args);
+    }
+  }
+  debugger(...args: unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.log)) {
+      this._debugger(args);
     }
   }
   info(...args: unknown[]) {
@@ -562,6 +571,11 @@ export class Logger {
   lazyLog(fun: () => unknown[]) {
     if (this.isEnable(LOGGER_LEVEL.log)) {
       this._log(fun());
+    }
+  }
+  lazyDebugger(fun: () => unknown[]) {
+    if (this.isEnable(LOGGER_LEVEL.log)) {
+      this._debugger(fun());
     }
   }
   lazyInfo(fun: () => unknown[]) {
