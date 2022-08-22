@@ -19,6 +19,13 @@
 | `userClick` |             | `CustomEvent<any>` |
 
 
+## Shadow Parts
+
+| Part            | Description |
+| --------------- | ----------- |
+| `"replybutton"` |             |
+
+
 ----------------------------------------------
 
 Copyright (c) BFChain

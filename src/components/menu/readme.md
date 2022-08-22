@@ -7,9 +7,22 @@
 
 ## Properties
 
-| Property    | Attribute    | Description | Type                  | Default     |
-| ----------- | ------------ | ----------- | --------------------- | ----------- |
-| `forSlider` | `for-slider` |             | `string \| undefined` | `undefined` |
+| Property    | Attribute    | Description      | Type                  | Default     |
+| ----------- | ------------ | ---------------- | --------------------- | ----------- |
+| `forSlider` | `for-slider` | 通过 `@Prop` 修饰器绑定 | `string \| undefined` | `undefined` |
+
+
+## Methods
+
+### `bindSliderElement(ele?: HTMLElement | null | undefined) => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
 
 
 ## Shadow Parts
@@ -17,6 +30,7 @@
 | Part          | Description |
 | ------------- | ----------- |
 | `"scrollbar"` |             |
+| `"tabs"`      |             |
 
 
 ## Dependencies
