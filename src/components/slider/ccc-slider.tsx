@@ -30,6 +30,13 @@ export type $Slider = {
   offsetCenterCache: number;
 };
 export type $NullableSlider = Omit<$Slider, "ele"> & { ele?: $Slider["ele"] };
+const NULLABLE_SLIDER: Readonly<$NullableSlider> = Object.freeze({
+  index: -1,
+  ele: undefined,
+  offsetLeftCache: 0,
+  offsetWidthCache: 0,
+  offsetCenterCache: 0,
+});
 
 type $InternalReason = "touch" | "mousewheel" | "into" | "init";
 
@@ -158,13 +165,8 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     const { offsetLeft: viewboxOffsetLeft, offsetWidth: viewboxOffsetWidth } = this.hostEle;
     const viewboxOffsetCenter = viewboxOffsetLeft + viewboxScrollLeft + viewboxOffsetWidth / 2;
 
-    let closestSlider: $NullableSlider = {
-      index: -1,
-      ele: undefined,
-      offsetLeftCache: 0,
-      offsetWidthCache: 0,
-      offsetCenterCache: 0,
-    };
+    const closestSliderList: $Slider[] = [];
+    let closestSlider = NULLABLE_SLIDER;
     /// 更新slider的布局信息；并寻找"中线"现在进入到哪一个视图中
     for (const sliderLayoutInfo of this._sliderList) {
       const { offsetLeft, offsetWidth } = sliderLayoutInfo.ele;
@@ -175,8 +177,16 @@ export class CccSlider implements ComponentInterface, $CccSlider {
       sliderLayoutInfo.offsetCenterCache = offsetLeft + offsetWidth / 2;
 
       if (offsetLeft <= viewboxOffsetCenter && viewboxOffsetCenter <= offsetRight) {
-        closestSlider = sliderLayoutInfo;
+        closestSliderList.push(sliderLayoutInfo);
       }
+    }
+
+    /// 如果选中了多个，那么基于 defaultActivedIndex 来进行选择，否则选择第一个去
+    if (closestSliderList.length > 1) {
+      closestSlider =
+        closestSliderList.find(slider => slider.index === this.defaultActivedIndex) || closestSliderList[0];
+    } else {
+      closestSlider = closestSliderList[0] || NULLABLE_SLIDER;
     }
 
     /// 计算出 scrollProgress
@@ -222,7 +232,7 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     return this.calcLayoutInfo();
   }
 
-  @Prop({}) defaultActivedIndex?: number;
+  @Prop({}) readonly defaultActivedIndex: number = -1;
   @Prop({}) readonly activedIndex?: number;
   private _activedIndex = 0;
   @Watch("activedIndex")
@@ -270,6 +280,7 @@ export class CccSlider implements ComponentInterface, $CccSlider {
      */
     if (slider && layoutInfo.closestSlider.index !== slider.index) {
       layoutInfo.closestSlider = slider;
+      layoutInfo.scrollProgress = slider.index;
       behavior = "set";
     }
 
@@ -331,7 +342,10 @@ export class CccSlider implements ComponentInterface, $CccSlider {
     this.activedIndexChange.emit(index);
   }
 
-  private _preSliderStates: { list: $Slider[]; activedIndex: number } = { list: [], activedIndex: -1 };
+  private _preSliderStates: { list: $Slider[]; activedIndex: number } = {
+    list: [],
+    activedIndex: this.defaultActivedIndex,
+  };
   /**
    * 通知slider-ele的状态变更
    * 更新activedIndex的值变更

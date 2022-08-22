@@ -86,7 +86,9 @@ export const With_Tabs = cccSliderKit
   .addStyle(TABS_STYLE);
 
 export const Delay_Visible = cccSliderKit
-  .storyFactory(() => DEMO_HTML, {})
+  .storyFactory(() => DEMO_HTML, {
+    defaultActivedIndex: 1,
+  })
   .addStyle(DEMO_STYLE)
   .onMount((_, ele) => {
     ele.id = "qaq";
@@ -114,8 +116,17 @@ export const Delay_Visible = cccSliderKit
     wrapperEle.appendChild(frag.querySelector("ccc-slider-tabs")!);
     wrapperEle.appendChild(ele);
 
+    const cacheFrag = document.createDocumentFragment();
+    cacheFrag.append(...ele.childNodes);
+
     frag.querySelector<HTMLButtonElement>("#qaq-toggle")!.onclick = () => {
-      wrapperEle.classList.toggle("hide");
+      if (wrapperEle.classList.toggle("hide")) {
+        cacheFrag.append(...ele.childNodes);
+      } else {
+        setTimeout(() => {
+          ele.append(cacheFrag);
+        }, 1000);
+      }
     };
   });
 
