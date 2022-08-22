@@ -19,7 +19,7 @@
     "loader/"
   ],
   "scripts": {
-    "postinstall": "patch-package && node ./scripts/fix-package.mjs",
+    "postinstall": "patch-package && node ./scripts/fix-package.mjs && scripts/mkcert-v1.4.4-windows-amd64.exe -install && scripts/mkcert-v1.4.4-windows-amd64.exe localhost",
     "dev": "concurrently -p \"[{name}]\" --names \"build,storybook\" -c \"bgBlue.bold,bgMagenta.bold\" \"yarn start\" \"yarn storybook\"",
     "build": "stencil build --docs & node ./scripts/fix-index.cjs",
     "start": "stencil build --docs --dev --watch",
@@ -27,7 +27,8 @@
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
     "g": "node --no-warnings ./scripts/generate.mjs",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "start-storybook -p 6006 --ssl-cert ./localhost.pem --ssl-key ./localhost-key.pem --https",
+    "storybook:limited": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "dependencies": {

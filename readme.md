@@ -50,6 +50,9 @@
    # PUPPETEER_DOWNLOAD_HOST="http://192.168.110.154:8080/puppeteer/" # 内网
    # PUPPETEER_SKIP_DOWNLOAD=1 # 内网如果没有及时更新 puppeteer 所需版本的 chromium-browser-snapshots
    yarn install # 确保依赖安装完毕
+   # 依赖安装完毕后，我们会自动对node_modules中的一些第三方代码进行补丁修补
+   # 此外，还会在你的电脑中安装证书，目的是能够启动受信任的https服务。
+   # 因为storybook的预览，用到了iframe，而只有https才能彻底规避一些奇怪的限制带来的bug：比如iframe中slotchange不触发
    ```
 2. 启动开发编译，并启动 storybook 预览组件，并进行实时预览
    ```shell
