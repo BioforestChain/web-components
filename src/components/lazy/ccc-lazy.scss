@@ -10,11 +10,9 @@
 :host([lazy-state="sleep"]) {
   .weakup {
     z-index: 0;
-    visibility: hidden;
   }
   .sleep {
     z-index: 1;
-    visibility: visible;
   }
 }
 
@@ -25,11 +23,6 @@
 }
 
 :host([lazy-state="weakup"]) {
-  .weakup {
-    z-index: 1;
-    visibility: visible;
-  }
-
   .sleep {
     opacity: 0;
     pointer-events: none;
