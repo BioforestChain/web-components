@@ -33,13 +33,13 @@ Type: `Promise<boolean>`
 
 
 
-### `weakup() => Promise<void>`
+### `weakup() => Promise<boolean>`
 
 
 
 #### Returns
 
-Type: `Promise<void>`
+Type: `Promise<boolean>`
 
 
 

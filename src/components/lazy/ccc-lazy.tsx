@@ -44,7 +44,7 @@ export class CccLazy implements ComponentInterface {
 
   private _emitWeakUp() {
     if (this.state === "weakup") {
-      return;
+      return false;
     }
     this.state = "weakup";
     this.onWeakUp.emit();
@@ -53,6 +53,7 @@ export class CccLazy implements ComponentInterface {
     if (this.autoSleep === false) {
       this._destroyIo();
     }
+    return true;
   }
   private _emitSleep() {
     if (this.state === "sleep") {
