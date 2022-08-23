@@ -1,0 +1,37 @@
+:host {
+  display: grid;
+  grid: 1fr/1fr;
+  grid-template-areas: "view";
+  > * {
+    grid-area: 1/1;
+  }
+}
+
+:host([state="sleep"]) {
+  .weakup {
+    z-index: 0;
+    visibility: hidden;
+  }
+  .sleep {
+    z-index: 1;
+    visibility: visible;
+  }
+}
+
+.weakup,
+.sleep {
+  transition-duration: 500ms;
+  transition-timing-function: ease-out;
+}
+
+:host([state="weakup"]) {
+  .weakup {
+    z-index: 1;
+    visibility: visible;
+  }
+
+  .sleep {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

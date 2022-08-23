@@ -49,6 +49,19 @@ export const defineStory = <T, E extends HTMLElement = HTMLElement>(
         htmlTpls.push({ tpl, pos });
         return Tpl;
       },
+      clone(args?: Partial<T>) {
+        const Tpl = defineStory<T, E>(tpl, { ...defaultArgs, ...args });
+        for (const css of cssTexts) {
+          Tpl.addStyle(css);
+        }
+        for (const htmlTpl of htmlTpls) {
+          Tpl.addHtmlTpl(htmlTpl.tpl, htmlTpl.pos);
+        }
+        for (const cb of onMountCbs) {
+          Tpl.onMount(cb);
+        }
+        return Tpl;
+      },
     },
   );
   return Tpl;
