@@ -15,6 +15,10 @@ import { Logger } from "../../utils/utils";
 // const THRESHOLD_STEPS = 10;
 const THRESHOLD = [0, 1]; // Array.from({ length: THRESHOLD_STEPS + 1 }, (_, i) => i / THRESHOLD_STEPS);
 
+/**
+ * @slot weakup - 放置唤醒时要渲染的内容
+ * @slot sleep - 放置睡眠是要渲染的内容
+ */
 @Component({
   tag: "ccc-lazy",
   styleUrl: "ccc-lazy.scss",
@@ -25,16 +29,23 @@ export class CccLazy implements ComponentInterface {
   readonly console = new Logger(this.hostEle);
 
   /**
-   * into view
+   * 视图进入视野中的时候，唤醒视图
    */
   @Event({ eventName: "weakup" }) onWeakUp!: EventEmitter<void>;
   /**
-   * destroy view
+   * 视图离开视野中的时候，进入睡眠（需要配置 auto-sleep 属性）
    */
   @Event({ eventName: "sleep" }) onSleep!: EventEmitter<void>;
 
+  /**
+   * 视图当前的状态
+   */
   @Prop({ mutable: true, reflect: true })
   state: "sleep" | "weakup" = "sleep";
+
+  /**
+   * 是否自动进入睡眠状态
+   */
   @Prop()
   readonly autoSleep: boolean = false;
   @Watch("autoSleep")
