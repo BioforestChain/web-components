@@ -100,7 +100,7 @@ export class CccUserCommentCard implements ComponentInterface {
               </div>
             </div>
           ) : undefined}
-          <div class="text-wrapper" style={{ "--line-clamp": `${this.lineClamp}` }}>
+          {/* <div class="text-wrapper" style={{ "--line-clamp": `${this.lineClamp}` }}>
             <div class={{ text: true, fold: this.isFlod }}>
               <slot name="text">{this.text}</slot>
             </div>
@@ -109,7 +109,10 @@ export class CccUserCommentCard implements ComponentInterface {
             <button class={{ "fold-btn": true, "fold": this.isFlod }} onClick={this.toggleFold}>
               {this.isFlod ? <slot name="unfold">展开</slot> : <slot name="fold">收起</slot>}
             </button>
-          ) : undefined}
+          ) : undefined} */}
+          <div class="text-wrapper">
+              <slot name="text"/>
+          </div>
           <div class="actions-bar" part="actionsBar">
             <div class="actions">
               <div class="left-actions">
