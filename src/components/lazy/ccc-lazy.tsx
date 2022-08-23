@@ -100,6 +100,16 @@ export class CccLazy implements ComponentInterface {
   //   }
   //   return root || null;
   // }
+
+  /**防抖，至少要显隐一定时间以上才能触发相应的状态变更 */
+  @Prop()
+  readonly debounce: number = 120;
+
+  private _debounceCache?: {
+    isIntersecting: boolean;
+    ti: any;
+  };
+
   private _initIo() {
     if (this._io) {
       return;
@@ -111,11 +121,31 @@ export class CccLazy implements ComponentInterface {
       entries => {
         this.console.log(...entries);
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            this._emitWeakUp();
-          } else if (this.autoSleep) {
-            this._emitSleep();
+          if (entry.target !== this.hostEle) {
+            continue;
           }
+          if (this._debounceCache && this._debounceCache.isIntersecting !== entry.isIntersecting) {
+            clearTimeout(this._debounceCache.ti);
+            this._debounceCache = undefined;
+          }
+          if (this._debounceCache === undefined) {
+            this._debounceCache = {
+              isIntersecting: entry.isIntersecting,
+              ti: setTimeout(() => {
+                if (entry.isIntersecting) {
+                  this._emitWeakUp();
+                } else if (this.autoSleep) {
+                  this._emitSleep();
+                }
+              }, this.debounce),
+            };
+          }
+
+          // if (entry.isIntersecting) {
+          //   this._emitWeakUp();
+          // } else if (this.autoSleep) {
+          //   this._emitSleep();
+          // }
         }
       },
       {

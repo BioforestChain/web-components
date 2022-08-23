@@ -7,10 +7,11 @@
 
 ## Properties
 
-| Property    | Attribute    | Description | Type                  | Default   |
-| ----------- | ------------ | ----------- | --------------------- | --------- |
-| `autoSleep` | `auto-sleep` | 是否自动进入睡眠状态  | `boolean`             | `false`   |
-| `lazyState` | `lazy-state` | 视图当前的状态     | `"sleep" \| "weakup"` | `"sleep"` |
+| Property    | Attribute    | Description               | Type                  | Default   |
+| ----------- | ------------ | ------------------------- | --------------------- | --------- |
+| `autoSleep` | `auto-sleep` | 是否自动进入睡眠状态                | `boolean`             | `false`   |
+| `debounce`  | `debounce`   | 防抖，至少要显隐一定时间以上才能触发相应的状态变更 | `number`              | `120`     |
+| `lazyState` | `lazy-state` | 视图当前的状态                   | `"sleep" \| "weakup"` | `"sleep"` |
 
 
 ## Events

@@ -7,7 +7,7 @@
   }
 }
 
-:host([state="sleep"]) {
+:host([lazy-state="sleep"]) {
   .weakup {
     z-index: 0;
     visibility: hidden;
@@ -24,7 +24,7 @@
   transition-timing-function: ease-out;
 }
 
-:host([state="weakup"]) {
+:host([lazy-state="weakup"]) {
   .weakup {
     z-index: 1;
     visibility: visible;
