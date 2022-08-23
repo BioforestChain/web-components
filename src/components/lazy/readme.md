@@ -10,15 +10,14 @@
 | Property    | Attribute    | Description | Type                  | Default   |
 | ----------- | ------------ | ----------- | --------------------- | --------- |
 | `autoSleep` | `auto-sleep` | 是否自动进入睡眠状态  | `boolean`             | `false`   |
-| `state`     | `state`      | 视图当前的状态     | `"sleep" \| "weakup"` | `"sleep"` |
+| `lazyState` | `lazy-state` | 视图当前的状态     | `"sleep" \| "weakup"` | `"sleep"` |
 
 
 ## Events
 
-| Event    | Description                         | Type                |
-| -------- | ----------------------------------- | ------------------- |
-| `sleep`  | 视图离开视野中的时候，进入睡眠（需要配置 auto-sleep 属性） | `CustomEvent<void>` |
-| `weakup` | 视图进入视野中的时候，唤醒视图                     | `CustomEvent<void>` |
+| Event             | Description                                         | Type                               |
+| ----------------- | --------------------------------------------------- | ---------------------------------- |
+| `lazyStateChange` | 元素进入视野中的时候，唤醒视图 元素离开视野中的时候，进入睡眠（需要配置 auto-sleep 属性） | `CustomEvent<"sleep" \| "weakup">` |
 
 
 ## Methods

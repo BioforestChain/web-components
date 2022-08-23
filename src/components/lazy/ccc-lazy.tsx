@@ -11,6 +11,7 @@ import {
   Watch,
 } from "@stencil/core";
 import { Logger } from "../../utils/utils";
+import { $LazyState } from "./ccc-lazy.const";
 
 // const THRESHOLD_STEPS = 10;
 const THRESHOLD = [0, 1]; // Array.from({ length: THRESHOLD_STEPS + 1 }, (_, i) => i / THRESHOLD_STEPS);
@@ -29,19 +30,16 @@ export class CccLazy implements ComponentInterface {
   readonly console = new Logger(this.hostEle);
 
   /**
-   * 视图进入视野中的时候，唤醒视图
+   * 元素进入视野中的时候，唤醒视图
+   * 元素离开视野中的时候，进入睡眠（需要配置 auto-sleep 属性）
    */
-  @Event({ eventName: "weakup" }) onWeakUp!: EventEmitter<void>;
-  /**
-   * 视图离开视野中的时候，进入睡眠（需要配置 auto-sleep 属性）
-   */
-  @Event({ eventName: "sleep" }) onSleep!: EventEmitter<void>;
+  @Event() lazyStateChange!: EventEmitter<$LazyState>;
 
   /**
    * 视图当前的状态
    */
   @Prop({ mutable: true, reflect: true })
-  state: "sleep" | "weakup" = "sleep";
+  lazyState: $LazyState = "sleep";
 
   /**
    * 是否自动进入睡眠状态
@@ -54,11 +52,10 @@ export class CccLazy implements ComponentInterface {
   }
 
   private _emitWeakUp() {
-    if (this.state === "weakup") {
+    if (this.lazyState === "weakup") {
       return false;
     }
-    this.state = "weakup";
-    this.onWeakUp.emit();
+    this.lazyStateChange.emit((this.lazyState = "weakup"));
 
     /// 如果不是autoSleep，那么可以销毁io对象
     if (this.autoSleep === false) {
@@ -67,12 +64,11 @@ export class CccLazy implements ComponentInterface {
     return true;
   }
   private _emitSleep() {
-    if (this.state === "sleep") {
+    if (this.lazyState === "sleep") {
       return false;
     }
-    this.state = "sleep";
     this._initIo();
-    this.onSleep.emit();
+    this.lazyStateChange.emit((this.lazyState = "sleep"));
     return true;
   }
 
