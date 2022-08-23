@@ -9,6 +9,7 @@
   line-height: 1.5;
   max-height: calc(var(--line-height) * var(--clamp-line));
   overflow: hidden;
+  text-align: justify;
 
   &::before {
     content: " ";
