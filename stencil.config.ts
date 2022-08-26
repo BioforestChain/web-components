@@ -69,7 +69,9 @@ export const config: Config = {
                 name: "copy-component-assets-to-angular-project",
                 generateBundle() {
                   for (const filepath of walkFiles(srcDir)) {
-                    fs.copyFileSync(filepath, path.join(destDir, path.relative(srcDir, filepath)));
+                    const destFilepath = path.join(destDir, path.relative(srcDir, filepath));
+                    fs.mkdirSync(path.dirname(destFilepath), { recursive: true });
+                    fs.copyFileSync(filepath, destFilepath);
                   }
                 },
               },
