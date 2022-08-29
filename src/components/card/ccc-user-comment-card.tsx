@@ -31,36 +31,6 @@ export class CccUserCommentCard implements ComponentInterface {
     this.clickUser.emit();
   };
 
-  private textContainerEle: HTMLDivElement | null = null;
-  private resizeObserver: ResizeObserver | undefined;
-  componentDidLoad() {
-    const textContainerEle = (this.textContainerEle ??= querySelector<HTMLDivElement>(
-      this.hostEle.shadowRoot,
-      ".text",
-    )!);
-
-    if (this.resizeObserver === undefined) {
-      this.resizeObserver = new ResizeObserver(() => {
-        this.console.debugger(textContainerEle.scrollHeight, textContainerEle.clientHeight);
-        /// 在折叠模式下。可以简单使用 scrollHeight 与 clientHeight 进行配合判断
-        if (this.isFlod) {
-          this.canFlod = textContainerEle.scrollHeight > textContainerEle.clientHeight;
-        }
-        /// 在非折叠模式下，需要手动判定函数
-        else {
-          const style = getComputedStyle(textContainerEle);
-          const lh = parseInt(style.lineHeight, 10);
-          const h = parseInt(style.height, 10);
-          const lineCount = Math.round(h / lh);
-          this.canFlod = lineCount > this.lineClamp;
-        }
-      });
-    }
-    this.resizeObserver.observe(textContainerEle);
-  }
-  disconnectedCallback() {
-    this.resizeObserver?.disconnect();
-  }
 
   render() {
     return (
