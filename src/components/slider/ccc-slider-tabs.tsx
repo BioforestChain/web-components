@@ -8,7 +8,7 @@ import {
   Host,
   Method,
   Prop,
-  Watch
+  Watch,
 } from "@stencil/core";
 import { at, Logger, queryScopeSelector, querySlotAssignedElements } from "../../utils/utils";
 import { SlotChangeHelper } from "../util/slotChange.helper";
@@ -19,7 +19,7 @@ import {
   $CccSlider,
   $CccSliderFollower,
   isCccLayoutEqual,
-  isCccSlider
+  isCccSlider,
 } from "./ccc-slider.const";
 
 export type $Tab = $CccLayout.LayoutChangeDetail["blockList"][0] & {
@@ -250,6 +250,10 @@ export class CccSliderTabs implements ComponentInterface, $CccSliderFollower, $C
       }
     }
     this.console.info("clicked", tabEle);
+    /// 无法在结构上找到，也无法根据X坐标来寻找（几个tabEle并不相连，这时候点击两个的中间空白处，tabEle=null）
+    if (tabEle === null) {
+      return;
+    }
 
     this._setActivedIndex(this._tabList.findIndex(tab => tab.ele === tabEle));
   };
