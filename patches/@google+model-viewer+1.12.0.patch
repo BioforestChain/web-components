@@ -1,0 +1,12 @@
+diff --git a/node_modules/@google/model-viewer/package.json b/node_modules/@google/model-viewer/package.json
+index 4763e46..b178a4b 100644
+--- a/node_modules/@google/model-viewer/package.json
++++ b/node_modules/@google/model-viewer/package.json
+@@ -21,6 +21,7 @@
+   ],
+   "main": "dist/model-viewer-umd.js",
+   "module": "dist/model-viewer.min.js",
++  "types": "lib/model-viewer.d.ts",
+   "files": [
+     "src",
+     "lib",

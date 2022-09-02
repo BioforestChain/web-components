@@ -49,6 +49,7 @@
     "@storybook/html": "^6.5.9",
     "@storybook/manager-webpack4": "^6.5.9",
     "@storybook/testing-library": "^0.0.13",
+    "@types/three": "^0.139.0",
     "@types/jest": "^27.0.3",
     "babel-loader": "^8.2.5",
     "concurrently": "^7.3.0",

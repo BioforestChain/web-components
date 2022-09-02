@@ -11,12 +11,12 @@ export const Base_Usage = cccPictureModelViewerKit.storyFactory(
     // push some child element
     html`<span>picture-model-viewer demo</span>`,
   {
-    src: "https://localhost:6006/assets/logo.png",
+    src: "https://localhost:6006/assets/logo.webp",
     skyboxImage: "https://localhost:6006/assets/skybox.jpg",
   },
 ).addStyle(`
 ccc-picture-model-viewer {
-  width: 200px;
-  height: 200px;
+  width: 80vmin;
+  height: 80vmin;
 }
 `);

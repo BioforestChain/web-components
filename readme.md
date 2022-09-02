@@ -17,7 +17,7 @@
    yarn install @ccchain/web-component
    ```
 
-1. 安装
+1. 使用 Usage
 
    1. 纯 Web 技术下，下载依赖包，使用 `dist/umd/index.js` 导入到你的网页中
 
@@ -44,16 +44,20 @@
 ## 🚀 贡献者·快速开始
 
 1. 安装依赖
-   ```shell
-   # 在内网环境中，我们在 .npmrc 配置了一些环境变量来确保在能正常通过依赖的安装。所以你可能需要了解以下这些指令帮助你完成依赖的安装
-   # PUPPETEER_DOWNLOAD_HOST="https://npm.taobao.org/mirrors/" # 外网
-   # PUPPETEER_DOWNLOAD_HOST="http://192.168.110.154:8080/puppeteer/" # 内网
-   # PUPPETEER_SKIP_DOWNLOAD=1 # 内网如果没有及时更新 puppeteer 所需版本的 chromium-browser-snapshots
-   yarn install # 确保依赖安装完毕
-   # 依赖安装完毕后，我们会自动对node_modules中的一些第三方代码进行补丁修补
-   # 此外，还会在你的电脑中安装证书，目的是能够启动受信任的https服务。
-   # 因为storybook的预览，用到了iframe，而只有https才能彻底规避一些奇怪的限制带来的bug：比如iframe中slotchange不触发
-   ```
+   1. 在内网环境中，我们在 .npmrc 配置了一些环境变量来确保在能正常通过依赖的安装。所以你可能需要了解以下这些指令帮助你完成依赖的安装
+      ```ini
+      PUPPETEER_DOWNLOAD_HOST="https://npm.taobao.org/mirrors/" # 外网
+      PUPPETEER_DOWNLOAD_HOST="http://192.168.110.154:8080/puppeteer/" # 内网
+      PUPPETEER_SKIP_DOWNLOAD=1 # 内网如果没有及时更新 puppeteer 所需版本的 chromium-browser-snapshots
+      ```
+   1. 然后执行安装
+      ```shell
+      yarn install # 确保依赖安装完毕
+      # 依赖安装完毕后，我们会自动对node_modules中的一些第三方代码进行补丁修补
+      # 此外，还会在你的电脑中安装证书，目的是能够启动受信任的https服务。
+      # 因为storybook的预览，用到了iframe，而只有https才能彻底规避一些奇怪的限制带来的bug：比如iframe中slotchange不触发
+      ```
+   1. 安装后执行的 npm 的 postintall 命令里，我们会自动对 node_modules 中的一些第三方代码进行补丁修补。此外，还会在你的电脑中安装证书服务[mkcert](https://github.com/FiloSottile/mkcert)，目的是能够启动受信任的 https 服务。如果你看到错误，那么可能是权限问题导致，使用管理员系统权限重新`scripts/mkcert-v1.4.4-windows-amd64.exe -install && scripts/mkcert-v1.4.4-windows-amd64.exe localhost`即可。
 2. 启动开发编译，并启动 storybook 预览组件，并进行实时预览
    ```shell
    yarn dev
