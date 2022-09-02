@@ -1,5 +1,5 @@
-import { Component, ComponentInterface, Event, EventEmitter, h, Host, Element, Prop, State } from "@stencil/core";
-import { Logger, querySelector } from "../../utils/utils";
+import { Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Prop, State } from "@stencil/core";
+import { Logger } from "../../utils/utils";
 
 @Component({
   tag: "ccc-user-comment-card",
@@ -30,7 +30,6 @@ export class CccUserCommentCard implements ComponentInterface {
   onClickUser = () => {
     this.clickUser.emit();
   };
-
 
   render() {
     return (
@@ -81,7 +80,7 @@ export class CccUserCommentCard implements ComponentInterface {
             </button>
           ) : undefined} */}
           <div class="text-wrapper">
-              <slot name="text"/>
+            <slot name="text" />
           </div>
           <div class="actions-bar" part="actionsBar">
             <div class="actions">
