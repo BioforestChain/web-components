@@ -1,26 +1,14 @@
+import { NgModule } from "@angular/core";
+import { DIRECTIVES } from "./directives/index";
+export * from "./directives/proxies";
+import { defineCustomElements } from "@ccchain/web-component";
 
-import * as d from './directives/proxies';
-
-export const DIRECTIVES = [
-  d.CccAnimationIcon,
-  d.CccCollectButton,
-  d.CccConfigUtil,
-  d.CccDislikeButton,
-  d.CccHasMoreText,
-  d.CccIcon,
-  d.CccImageToggleButton,
-  d.CccLazy,
-  d.CccLikeButton,
-  d.CccLottieWeb,
-  d.CccLottieWebToggleButton,
-  d.CccPictureModelViewer,
-  d.CccReplyCommentButton,
-  d.CccSlider,
-  d.CccSliderScrollbar,
-  d.CccSliderTabs,
-  d.CccStackingUtil,
-  d.CccSubTabsMenu,
-  d.CccTemplate,
-  d.CccTopTabsMenu,
-  d.CccUserCommentCard
-];
+@NgModule({
+  declarations: DIRECTIVES,
+  exports: DIRECTIVES,
+})
+export class CccWebComponentModule {
+  constructor() {
+    defineCustomElements();
+  }
+}

@@ -1,7 +1,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 
 export default {
-  input: 'build/es2020/core.js',
+  input: 'dist/out-tsc/index.js',
   output: {
     file: 'dist/fesm2020.js',
     format: 'es',

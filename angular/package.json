@@ -19,12 +19,12 @@
   },
   "module": "dist/fesm2020.js",
   "type": "module",
-  "types": "dist/core.d.ts",
+  "types": "dist/out-tsc/index.d.ts",
   "files": [
     "dist/"
   ],
   "dependencies": {
-    "@ccchain/web-component": "workspace:^1.0.0",
+    "@ccchain/web-component": "workspace:../core",
     "tslib": "^1.14.1"
   },
   "devDependencies": {

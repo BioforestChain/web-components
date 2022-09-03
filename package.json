@@ -2,6 +2,7 @@
     "name": "@ccchain/web-component-workspaces",
     "private": true,
     "workspaces": [
+        "./.test",
         "./core",
         "./angular"
     ],

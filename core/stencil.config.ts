@@ -16,7 +16,7 @@ const resolveTo = (to: string, ...args: string[]) => path.resolve(__dirname, to,
 const withAngular = true as boolean;
 const ANGULAR_DEST_PATH = resolveTo("../angular");
 const CORE_DEST_PATH = resolveTo("./dist/ccchain-web-component");
-debugger
+debugger;
 export const config: Config = {
   namespace: packageJson.name.replace("@", "").replace("/", "-"),
   hashFileNames: true,
@@ -83,6 +83,10 @@ export const config: Config = {
     ],
   },
   outputTargets: [
+    {
+      type: "dist",
+      esmLoaderPath: "../loader",
+    },
     {
       type: "docs-readme",
       footer: "Copyright (c) BFChain",
@@ -253,7 +257,7 @@ export const config: Config = {
           componentCorePackage: packageJson.name,
           // customElementsDir: path.relative(__dirname, CORE_DEST_PATH).replaceAll(path.sep, path.posix.sep),
           directivesProxyFile: resolveTo(ANGULAR_DEST_PATH, "src/directives/proxies.ts"),
-          directivesArrayFile: resolveTo(ANGULAR_DEST_PATH, "src/index.ts"),
+          directivesArrayFile: resolveTo(ANGULAR_DEST_PATH, "src/directives/index.ts"),
           // includeImportCustomElements: true,
         }),
       ];
