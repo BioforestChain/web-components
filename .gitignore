@@ -27,3 +27,4 @@ core/src/components/*/stories/autogen.ts
 Thumbs.db
 UserInterfaceState.xcuserstate
 .env
+/.*
