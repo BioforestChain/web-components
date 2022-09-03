@@ -25,23 +25,43 @@ export class CccPictureModelViewer implements ComponentInterface {
   @Prop({ reflect: true }) readonly src!: string;
   @Watch("src")
   async watchSrc() {
-    const gltf2d_text = await CccPictureModelViewer.gltf2d;
-    const mime =
-      (this.src.startsWith("data:")
-        ? this.src.match(/^data:([^\:]+);/)?.[1]
-        : Reflect.get(MIME_MAP, (new URL(this.src).pathname.split(".").pop() ?? "jpg").toLowerCase())) ||
-      // unknown
-      MIME_MAP.jpg;
+    const src = this.src;
+    let mime: string | undefined | null;
+    try {
+      mime = this.src.startsWith("data:")
+        ? // 如果是base64格式，直接从链接中获取mime
+          this.src.match(/^data:([^\:]+);/)?.[1]
+        : // 如果是链接的格式，尝试以文件后缀来获取mime
+          Reflect.get(MIME_MAP, (new URL(src).pathname.split(".").pop() ?? "jpg").toLowerCase());
+
+      if (mime === undefined) {
+        /// 从response的头部中获取
+        mime = await fetch(src).then(res => res.headers.get("content-type"));
+      }
+    } catch {}
+    if (mime == undefined) {
+      return;
+    }
+
+    const gltf2d_text = this.gltfSrc
+      ? await fetch(this.gltfSrc).then(res => res.text())
+      : await CccPictureModelViewer.gltf2d;
 
     this._model_src = URL.createObjectURL(
-      new Blob([
-        gltf2d_text
-          //
-          .replace("{IMAGE_URL}", this.src)
-          //
-          .replace("{IMAGE_MIME}", mime),
-      ]),
+      new Blob(
+        [
+          gltf2d_text
+            //
+            .replace(/\{IMAGE_URL\}/g, this.src)
+            //
+            .replace(/\{IMAGE_MIME\}/, mime),
+        ],
+        {
+          type: "application/json; charset=utf-8",
+        },
+      ),
     );
+    this.console.log(src, "=>", this._model_src);
   }
   connectedCallback() {
     this.watchSrc();
@@ -51,6 +71,11 @@ export class CccPictureModelViewer implements ComponentInterface {
    * image alt
    */
   @Prop({ reflect: true }) readonly alt!: string;
+
+  /**
+   * .gltf 文件的链接，里头可以通过 {IMAGE_URL} 与 {IMAGE_MIME} 来匹配当前 src 所指向的图片
+   */
+  @Prop({}) readonly gltfSrc?: string;
 
   /**
    * model 3d view skybox image

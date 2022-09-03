@@ -5,7 +5,8 @@ const resolveTo = createResolveTo(__dirname);
 
 exports.inject = () => {
   let inject = "";
-  for (const filepath of walkFiles(resolveTo("../src/components"))) {
+  debugger
+  for (const filepath of walkFiles(resolveTo("../dist/types/components"))) {
     if (filepath.endsWith(".const.ts") || filepath.endsWith(".const.tsx")) {
       inject += `\nexport * from ${JSON.stringify(
         path

@@ -1,0 +1,50 @@
+{
+  "name": "@ccchain/web-component-angular",
+  "version": "0.0.4",
+  "private": true,
+  "description": "Angular specific wrapper for @ccchain/web-component",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ionic-team/stencil-ds-output-targets.git"
+  },
+  "scripts": {
+    "build": "npm run build.ng",
+    "build.fesm": "rollup --config ./scripts/rollup.config.js",
+    "build.ng": "npm run build.es2020",
+    "build.es2020": "ngc -p tsconfig.json && rollup --config ./scripts/rollup.config.js",
+    "prerelease": "npm run validate && np prerelease --yolo --any-branch --tag next",
+    "dev": "tsc -p .",
+    "validate": "npm i npm run build"
+  },
+  "module": "dist/fesm2020.js",
+  "type": "module",
+  "types": "dist/core.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {
+    "@ccchain/web-component": "workspace:^1.0.0",
+    "tslib": "^1.14.1"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "^14.2.1",
+    "@angular-devkit/schematics": "^14.2.1",
+    "@angular/common": "^14.2.0",
+    "@angular/compiler": "^14.2.0",
+    "@angular/compiler-cli": "^14.2.0",
+    "@angular/core": "^14.2.0",
+    "@angular/forms": "^14.2.0",
+    "@angular/platform-browser": "^14.2.0",
+    "@angular/platform-browser-dynamic": "^14.2.0",
+    "@angular/router": "^14.2.0",
+    "@types/node": "~10.12.30",
+    "fs-extra": "^7.0.1",
+    "glob": "^7.2.3",
+    "rollup": "^1.32.1",
+    "rollup-plugin-node-resolve": "^4.2.4",
+    "rxjs": "^7.5.6",
+    "typescript": "^4.8.2",
+    "zone.js": "^0.11.8"
+  }
+}

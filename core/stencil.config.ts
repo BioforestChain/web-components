@@ -1,7 +1,6 @@
 import { angularOutputTarget } from "@stencil/angular-output-target";
 import { Config } from "@stencil/core";
 import { sass } from "@stencil/sass";
-import { execFile } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import prettier from "prettier";
@@ -11,18 +10,20 @@ import packageJson from "./package.json";
 import { doCopy } from "./scripts/fix-index.cjs";
 import { walkFiles } from "./scripts/util/walkFiles.cjs";
 
-const resolveTo = (to: string) => path.join(__dirname, to);
+const isDev = process.argv.includes("--dev");
+const resolveTo = (to: string, ...args: string[]) => path.resolve(__dirname, to, ...args);
 
-const angularJsonPath = resolveTo("../app/angular.json");
-const withAngular = fs.existsSync(angularJsonPath);
-
+const withAngular = true as boolean;
+const ANGULAR_DEST_PATH = resolveTo("../angular");
+const CORE_DEST_PATH = resolveTo("./dist/ccchain-web-component");
+debugger
 export const config: Config = {
   namespace: packageJson.name.replace("@", "").replace("/", "-"),
   hashFileNames: true,
   plugins: [sass(), inlineSvg()],
   rollupPlugins: {
     after: [
-      ...(process.argv.includes("--dev")
+      ...(isDev
         ? [
             (() => {
               let checkTi: any;
@@ -37,6 +38,7 @@ export const config: Config = {
                 generateBundle() {
                   const execCopy = async () => {
                     try {
+                      debugger;
                       await doCopy("dev-copy");
                     } catch (err) {}
                   };
@@ -59,9 +61,9 @@ export const config: Config = {
 
       ...(withAngular
         ? (() => {
-            const srcDir = resolveTo("dist/ccchain-web-component/assets");
+            const srcDir = resolveTo(CORE_DEST_PATH, "assets");
             fs.mkdirSync(srcDir, { recursive: true });
-            const destDir = resolveTo("../app/src/assets/ccchain-web-component/assets");
+            const destDir = resolveTo(ANGULAR_DEST_PATH, "assets");
             fs.mkdirSync(destDir, { recursive: true });
             console.log("copy assets to", destDir);
             return [
@@ -81,24 +83,6 @@ export const config: Config = {
     ],
   },
   outputTargets: [
-    {
-      type: "dist",
-      esmLoaderPath: "../loader", // for old browser
-      // copy: (() => {
-      //   if (withAngular === false) {
-      //     return [];
-      //   }
-      //   const srcDir = resolveTo("dist/ccchain-web-component/assets");
-      //   fs.mkdirSync(srcDir, { recursive: true });
-      //   const destDir = resolveTo("../app/src/assets/ccchain-web-component/assets");
-      //   fs.mkdirSync(destDir, { recursive: true });
-      //   console.log("copy assets to", destDir);
-      //   return [{ src: resolveTo("dist/ccchain-web-component/assets"), dest: destDir }];
-      // })(),
-    },
-    // {
-    //   type: "dist-custom-elements",
-    // },
     {
       type: "docs-readme",
       footer: "Copyright (c) BFChain",
@@ -220,7 +204,7 @@ export const config: Config = {
               ]
                 .filter(Boolean)
                 .join("\n")}
-  
+
               const storyFactory = (slot: (args: Partial<Partial<JSX.${className}>>) => HTMLTemplateResult, args?: Partial<JSX.${className}>) => {
                 return defineStory<JSX.${className}, ${htmlClassName}>(args => {
                   return html\`<${component.tag} ${bindNames
@@ -267,8 +251,10 @@ export const config: Config = {
       return [
         angularOutputTarget({
           componentCorePackage: packageJson.name,
-          directivesProxyFile: "../app/src/directives/web-component/components.ts",
-          directivesArrayFile: "../app/src/directives/web-component/index.ts",
+          // customElementsDir: path.relative(__dirname, CORE_DEST_PATH).replaceAll(path.sep, path.posix.sep),
+          directivesProxyFile: resolveTo(ANGULAR_DEST_PATH, "src/directives/proxies.ts"),
+          directivesArrayFile: resolveTo(ANGULAR_DEST_PATH, "src/index.ts"),
+          // includeImportCustomElements: true,
         }),
       ];
     })(),
