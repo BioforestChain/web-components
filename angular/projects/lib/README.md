@@ -11,6 +11,7 @@
    ```shell
    # run npm install / yarn add / pnpm install in your angular project
    cd $YOUR_PROJECT
+   # install both
    npm install @bnqkl/web-component-angular @bnqkl/web-component
    ```
 
@@ -21,7 +22,7 @@
    ```json
    {
      "glob": "*",
-     "input": "node_modules/@bnqkl/web-component-angular/assets",
+     "input": "node_modules/@bnqkl/web-component/assets",
      "output": "assets/bnqkl-web-component"
    }
    ```

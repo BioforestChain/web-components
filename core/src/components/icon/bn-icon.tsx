@@ -10,7 +10,7 @@ import {
   State,
   Watch,
 } from "@stencil/core";
-import bnIconMetadata from "./assets/bnicon.json";
+import bnIconMetadata from "./assets/bnqkl-icon.json";
 import type { $Direction } from "./bn-icon.const";
 import type { $BnIconName } from "./bn-icon.name";
 
@@ -30,7 +30,7 @@ export class BnIcon implements ComponentInterface {
       gloablStyle.innerHTML = `
       @font-face {
         font-family: "bnqkl-icon";
-        src: url("${getAssetPath("./bnqkl.woff")}") format("woff");
+        src: url("${getAssetPath("./bnqkl-icon.woff")}") format("woff");
         font-weight: normal;
         font-style: normal;
         font-display: block;

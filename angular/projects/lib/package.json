@@ -3,10 +3,10 @@
   "version": "1.0.2",
   "peerDependencies": {
     "@angular/common": "^14.0.0",
-    "@angular/core": "^14.0.0"
+    "@angular/core": "^14.0.0",
+    "@bnqkl/web-component": "workspace:*"
   },
   "dependencies": {
-    "@bnqkl/web-component": "workspace:*",
     "tslib": "^2.3.0"
   }
 }
