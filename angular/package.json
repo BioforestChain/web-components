@@ -1,7 +1,6 @@
 {
   "name": "@ccchain/web-component-angular",
   "version": "1.0.0",
-  "private": true,
   "description": "Angular specific wrapper for @ccchain/web-component",
   "license": "MIT",
   "repository": {
