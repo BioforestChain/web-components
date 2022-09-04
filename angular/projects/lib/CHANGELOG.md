@@ -1,13 +1,9 @@
-# @bnqkl/web-component
+# @bnqkl/web-component-angular
 
 ## 1.0.1
 
 ### Patch Changes
 
 - <bn-config-util/> now has default assetPath: "./assets/"
-
-## 1.0.0
-
-### Major Changes
-
-- first publish
+- Updated dependencies
+  - @bnqkl/web-component@1.0.1
