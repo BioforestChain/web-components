@@ -1,7 +1,7 @@
 {
-  "name": "@ccchain/web-component",
+  "name": "@bnqkl/web-component",
   "version": "1.0.0",
-  "description": "CCChain Web Component",
+  "description": "Bnqkl Web Component",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "es2015": "dist/index.js",
@@ -9,11 +9,12 @@
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/ccchain-web-component/ccchain-web-component.esm.js",
+  "unpkg": "dist/bnqkl-web-component/bnqkl-web-component.esm.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ionic-team/stencil-component-starter.git"
+    "url": "https://github.com/BioforestChain/web-components.git"
   },
+  "homepage": "https://github.com/BioforestChain/web-components/tree/main/core",
   "files": [
     "dist/",
     "loader/"

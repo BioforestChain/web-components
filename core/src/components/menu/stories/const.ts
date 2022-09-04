@@ -14,22 +14,22 @@ export const TABS_STYLE = `
   background: #90caf9;
   color: #FFF;
 }
-[slot="tab"][data-ccc-slider-tabs="prev"]{
+[slot="tab"][data-bn-slider-tabs="prev"]{
   background: #c8e6c9;
   color: #000;
 }
-[slot="tab"][data-ccc-slider-tabs="actived"]{
+[slot="tab"][data-bn-slider-tabs="actived"]{
   background: #009688;
   color: #000;
   font-weight: bold;
 }
-[slot="tab"][data-ccc-slider-tabs="next"]{
+[slot="tab"][data-bn-slider-tabs="next"]{
   background: #b3e5fc;
   color: #000;
 }
 `;
 
-export const SLIDER_HTML = html`<ccc-slider id="qaq">
+export const SLIDER_HTML = html`<bn-slider id="qaq">
   <div slot="slider" class="slider item-1">
     <h2>slider 1</h2>
   </div>
@@ -45,9 +45,9 @@ export const SLIDER_HTML = html`<ccc-slider id="qaq">
   <div slot="slider" class="slider item-1">
     <h2>slider 5</h2>
   </div>
-</ccc-slider>`;
+</bn-slider>`;
 export const SLIDER_STYLE = `
-ccc-slider{
+bn-slider{
   width: 300px;
   height: 500px;
 }

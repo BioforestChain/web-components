@@ -14,8 +14,8 @@ const isDev = process.argv.includes("--dev");
 const resolveTo = (to: string, ...args: string[]) => path.resolve(__dirname, to, ...args);
 
 const withAngular = true as boolean;
-const ANGULAR_DEST_PATH = resolveTo("../angular");
-const CORE_DEST_PATH = resolveTo("./dist/ccchain-web-component");
+const ANGULAR_DEST_PATH = resolveTo("../angular/projects/lib");
+const CORE_DEST_PATH = resolveTo("./dist/bnqkl-web-component");
 debugger;
 export const config: Config = {
   namespace: packageJson.name.replace("@", "").replace("/", "-"),

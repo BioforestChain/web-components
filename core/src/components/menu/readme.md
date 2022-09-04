@@ -1,4 +1,4 @@
-# ccc-sub-tabs-menu
+# bn-sub-tabs-menu
 
 
 
@@ -37,15 +37,15 @@ Type: `Promise<void>`
 
 ### Depends on
 
-- [ccc-slider-tabs](../slider)
-- [ccc-slider-scrollbar](../slider)
+- [bn-slider-tabs](../slider)
+- [bn-slider-scrollbar](../slider)
 
 ### Graph
 ```mermaid
 graph TD;
-  ccc-top-tabs-menu --> ccc-slider-tabs
-  ccc-top-tabs-menu --> ccc-slider-scrollbar
-  style ccc-top-tabs-menu fill:#f9f,stroke:#333,stroke-width:4px
+  bn-top-tabs-menu --> bn-slider-tabs
+  bn-top-tabs-menu --> bn-slider-scrollbar
+  style bn-top-tabs-menu fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

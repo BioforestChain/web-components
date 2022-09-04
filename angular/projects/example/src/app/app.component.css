@@ -1,0 +1,73 @@
+main {
+  max-width: 90vw;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: minmax(8em, auto);
+  grid-gap: 1em;
+  flex-direction: column;
+
+  /* background-color: #aaa; */
+  border-radius: 1em;
+  padding: 1em;
+  background-image: linear-gradient(
+    -45deg,
+    rgba(59, 173, 227, 1) 0%,
+    rgba(87, 111, 230, 1) 25%,
+    rgba(152, 68, 183, 1) 51%,
+    rgba(255, 53, 127, 1) 100%
+  );
+  animation: AnimateBG 20s ease infinite;
+}
+
+@keyframes AnimateBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+@media (max-width: 60em) {
+  main {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 30em) {
+  main {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+section {
+  grid-column: span 1;
+  border-radius: 1em;
+  padding: 1em;
+
+  background-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0.2em 0.2em 0.4em rgba(0, 0, 0, 0.3),
+    -0.2em -0.2em 0.4em rgba(255, 255, 255, 0.6),
+    inset 0.1em 0.1em 0.2em rgba(255, 255, 255, 0.7),
+    inset -0.1em -0.1em 0.2em rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2em);
+}
+#parchment {
+  display: none;
+}
+#parchment-1 {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  z-index: -1;
+  /* center page with absolute position */
+  top: 0%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  box-shadow: 2px 3px 20px black, 0 0 60px #8a4d0f inset;
+  background: #fffef0;
+  filter: url(#wavy2);
+}

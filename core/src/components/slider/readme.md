@@ -1,4 +1,4 @@
-# ccc-slider-scrollbar
+# bn-slider-scrollbar
 
 
 
@@ -7,12 +7,12 @@
 
 ## Properties
 
-| Property              | Attribute               | Description                   | Type                  | Default     |
-| --------------------- | ----------------------- | ----------------------------- | --------------------- | ----------- |
-| `activedIndex`        | `actived-index`         |                               | `number \| undefined` | `undefined` |
-| `defaultActivedIndex` | `default-actived-index` |                               | `number \| undefined` | `undefined` |
-| `forSlider`           | `for-slider`            | the `<ccc-slider>` element id | `string \| undefined` | `undefined` |
-| `forTabs`             | `for-tabs`              |                               | `string \| undefined` | `undefined` |
+| Property              | Attribute               | Description                  | Type                  | Default     |
+| --------------------- | ----------------------- | ---------------------------- | --------------------- | ----------- |
+| `activedIndex`        | `actived-index`         |                              | `number \| undefined` | `undefined` |
+| `defaultActivedIndex` | `default-actived-index` |                              | `number \| undefined` | `undefined` |
+| `forSlider`           | `for-slider`            | the `<bn-slider>` element id | `string \| undefined` | `undefined` |
+| `forTabs`             | `for-tabs`              |                              | `string \| undefined` | `undefined` |
 
 
 ## Events
@@ -29,7 +29,7 @@
 ### `bindSliderElement(_sliderEle?: HTMLElement | null | undefined) => Promise<void>`
 
 手动绑定或者解绑 for 元素
-从而让 `<ccc-slider>` 元素能主动 根据自己的生命周期来与 tabs 进行绑定联动
+从而让 `<bn-slider>` 元素能主动 根据自己的生命周期来与 tabs 进行绑定联动
 
 #### Returns
 
@@ -92,15 +92,15 @@ Type: `Promise<void>`
 
 ### Used by
 
- - [ccc-sub-tabs-menu](../menu)
- - [ccc-top-tabs-menu](../menu)
+ - [bn-sub-tabs-menu](../menu)
+ - [bn-top-tabs-menu](../menu)
 
 ### Graph
 ```mermaid
 graph TD;
-  ccc-sub-tabs-menu --> ccc-slider-tabs
-  ccc-top-tabs-menu --> ccc-slider-tabs
-  style ccc-slider-tabs fill:#f9f,stroke:#333,stroke-width:4px
+  bn-sub-tabs-menu --> bn-slider-tabs
+  bn-top-tabs-menu --> bn-slider-tabs
+  style bn-slider-tabs fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

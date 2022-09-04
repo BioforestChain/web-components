@@ -1,4 +1,4 @@
-# @ccchain/web-component
+# @bnqkl/web-component
 
 ## 1.0.0
 

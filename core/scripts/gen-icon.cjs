@@ -8,13 +8,13 @@ const resolveTo = createResolveTo(__dirname);
 
 /**
  *
- * @param {string} ccchain_icomoon_path
+ * @param {string} bnqkl_icomoon_path
  */
-const doGenIcon = ccchain_icomoon_path => {
-  const src_resolveTo = createResolveTo(ccchain_icomoon_path);
+const doGenIcon = bnqkl_icomoon_path => {
+  const src_resolveTo = createResolveTo(bnqkl_icomoon_path);
   const des_resolveTo = createResolveTo(resolveTo("../src/components/icon/assets"));
 
-  const cccIconMetadata = {};
+  const bnIconMetadata = {};
 
   /// 处理json
   const selection_json_src_filepath = src_resolveTo("selection.json");
@@ -34,15 +34,15 @@ const doGenIcon = ccchain_icomoon_path => {
         style,
       };
     });
-    cccIconMetadata[icon.properties.name] = iconMetadata;
+    bnIconMetadata[icon.properties.name] = iconMetadata;
   }
-  exportJson(des_resolveTo("./cccicon.json"), cccIconMetadata);
+  exportJson(des_resolveTo("./bnicon.json"), bnIconMetadata);
 
-  const name_ts_des_filepath = des_resolveTo("../ccc-icon.name.ts");
+  const name_ts_des_filepath = des_resolveTo("../bn-icon.name.ts");
   exportTs(
     name_ts_des_filepath,
-    `export type $CccIconName =` +
-      Object.keys(cccIconMetadata)
+    `export type $BnIconName =` +
+      Object.keys(bnIconMetadata)
         .map(n => `"${n}"`)
         .join("|"),
   );

@@ -3,4 +3,4 @@ packages:
   - "core"
   # proxy for angular
   - "angular"
-  - "angular-demo"
+  - "angular/projects/lib"

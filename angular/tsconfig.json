@@ -11,7 +11,15 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
-    "declaration": true,
+    "paths": {
+      "lib": [
+        "dist/lib"
+      ],
+      "wc": [
+        "dist/wc"
+      ]
+    },
+    "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",

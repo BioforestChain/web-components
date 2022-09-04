@@ -455,15 +455,15 @@ export class Logger {
     }
   }
   private _getLogLevel() {
-    let cccDebug = this.hostEle.dataset.cccDebug;
-    if (cccDebug === undefined) {
-      const globalCccDebug = localStorage.getItem("ccc-debug");
-      if (globalCccDebug) {
-        const configs = globalCccDebug.split(/[,\s]+/);
+    let bnDebug = this.hostEle.dataset.bnDebug;
+    if (bnDebug === undefined) {
+      const globalBnDebug = localStorage.getItem("bn-debug");
+      if (globalBnDebug) {
+        const configs = globalBnDebug.split(/[,\s]+/);
         if (
           configs.find(v => {
             if (v.startsWith(this._tagName + ":")) {
-              cccDebug = v.slice(this._tagName.length + 1).trim();
+              bnDebug = v.slice(this._tagName.length + 1).trim();
               return true;
             }
           })
@@ -471,17 +471,17 @@ export class Logger {
         } else if (
           configs.find(v => {
             if (v.startsWith("*:")) {
-              cccDebug = v.slice(2).trim();
+              bnDebug = v.slice(2).trim();
               return true;
             }
           })
         ) {
         } else if (configs.includes("*")) {
-          cccDebug = "*";
+          bnDebug = "*";
         }
       }
     }
-    switch (cccDebug) {
+    switch (bnDebug) {
       case "*":
       case "enable":
         return LOGGER_LEVEL.enable;
@@ -503,7 +503,7 @@ export class Logger {
     return LOGGER_LEVEL.disable;
   }
   isEnable(level: LOGGER_LEVEL) {
-    return !!(self as any).__ccc_dev__ && this._getLogLevel() <= level;
+    return !!(self as any).__bn_dev__ && this._getLogLevel() <= level;
   }
   private _verbose(args: (string | number)[]) {
     console.debug(`%c ${this._tagInfo} ${args.join(" ")}`, "color:#9e9e9e;font-size:0.8em;");

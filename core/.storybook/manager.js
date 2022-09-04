@@ -1,5 +1,5 @@
 import { addons } from "@storybook/addons";
-import cccTheme from "./ccc.theme";
+import bnTheme from "./bn.theme";
 addons.setConfig({
-  theme: cccTheme,
+  theme: bnTheme,
 });

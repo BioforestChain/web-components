@@ -1,4 +1,4 @@
-# @ccchain/web-component-angular
+# @bnqkl/web-component-angular
 
 ## 1.0.0
 
@@ -9,4 +9,4 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @ccchain/web-component@1.0.0
+  - @bnqkl/web-component@1.0.0

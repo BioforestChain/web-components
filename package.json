@@ -1,13 +1,19 @@
 {
-    "name": "@ccchain/web-component-workspaces",
+    "name": "@bnqkl/web-component-workspaces",
     "private": true,
-    "workspaces": [
-        "./.test",
-        "./core",
-        "./angular"
-    ],
     "packageManager": "pnpm@7.9.5",
     "version": "0.0.0",
+    "workspaces": [
+        "./core",
+        "./angular",
+        "./angular/projects/*"
+    ],
+    "scripts": {
+        "dev": "npm run dev --workspace=core",
+        "start": "npm run start --workspace=core",
+        "storybook": "npm run storybook --workspace=core",
+        "build": "npm run build --workspace=core && npm run build:lib --workspace=angular"
+    },
     "devDependencies": {
         "@changesets/cli": "^2.24.4"
     }

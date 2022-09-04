@@ -61,14 +61,14 @@ const generateComponent = async () => {
   const PACKAGE_TARGET_DIR = resolveTo(`../src/components/${dirname}`);
   const tagBaseName = [...new Set([...basename.split(/[\_\-]/), ...dirname.split(/[\_\-]/)])].join("-");
 
-  const tagName = `ccc-${tagBaseName}`;
+  const tagName = `bn-${tagBaseName}`;
   const classBaseName = tagBaseName
     // 首字母大写
     .replace(/^\w/, s => s.toUpperCase())
     // 转驼峰
     .replace(/-\w/g, s => s[1].toUpperCase());
-  const className = `Ccc${classBaseName}`;
-  const classInstanceName = `ccc${classBaseName}`;
+  const className = `Bn${classBaseName}`;
+  const classInstanceName = `bn${classBaseName}`;
 
   const storyBaseTitle = inputName
     // 首字母大写
@@ -92,9 +92,9 @@ const generateComponent = async () => {
     str
       // .replace(/PACKAGE-NAME/g, packageName)
       .replace(/template/g, tagBaseName)
-      .replace(/ccc-template/g, tagName)
-      .replace(/CccTemplate/g, className)
-      .replace(/cccTemplate/g, classInstanceName)
+      .replace(/bn-template/g, tagName)
+      .replace(/BnTemplate/g, className)
+      .replace(/bnTemplate/g, classInstanceName)
       .replace(/Template\/ComponentTitle/g, storyComponentTitle)
       .replace(/Template\/DocumentTitle/g, storyDocumentTitle)
       .replace(/Template/g, classBaseName);

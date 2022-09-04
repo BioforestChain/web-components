@@ -1,49 +1,42 @@
 {
-  "name": "@ccchain/web-component-angular",
+  "name": "@bnqkl/web-component-angular-workspace",
   "version": "1.0.0",
-  "description": "Angular specific wrapper for @ccchain/web-component",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ionic-team/stencil-ds-output-targets.git"
-  },
   "scripts": {
-    "build": "npm run build.ng",
-    "build.fesm": "rollup --config ./scripts/rollup.config.js",
-    "build.ng": "npm run build.es2020",
-    "build.es2020": "ngc -p tsconfig.json && rollup --config ./scripts/rollup.config.js",
-    "prerelease": "npm run validate && np prerelease --yolo --any-branch --tag next",
-    "dev": "tsc -p .",
-    "validate": "npm i npm run build"
+    "ng": "ng",
+    "start": "ng serve",
+    "dev:lib": "ng build lib --watch",
+    "build:lib": "ng build lib",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
   },
-  "module": "dist/fesm2020.js",
-  "type": "module",
-  "types": "dist/out-tsc/index.d.ts",
-  "files": [
-    "dist/"
-  ],
+  "private": true,
   "dependencies": {
-    "@ccchain/web-component": "workspace:*",
-    "tslib": "^1.14.1"
+    "@angular/animations": "^14.0.0",
+    "@angular/common": "^14.0.0",
+    "@angular/compiler": "^14.0.0",
+    "@angular/core": "^14.0.0",
+    "@angular/forms": "^14.0.0",
+    "@angular/platform-browser": "^14.0.0",
+    "@angular/platform-browser-dynamic": "^14.0.0",
+    "@angular/router": "^14.0.0",
+    "@bnqkl/web-component": "workspace:*",
+    "rxjs": "~7.5.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
-    "@angular-devkit/core": "^14.2.1",
-    "@angular-devkit/schematics": "^14.2.1",
-    "@angular/common": "^14.2.0",
-    "@angular/compiler": "^14.2.0",
-    "@angular/compiler-cli": "^14.2.0",
-    "@angular/core": "^14.2.0",
-    "@angular/forms": "^14.2.0",
-    "@angular/platform-browser": "^14.2.0",
-    "@angular/platform-browser-dynamic": "^14.2.0",
-    "@angular/router": "^14.2.0",
-    "@types/node": "~10.12.30",
-    "fs-extra": "^7.0.1",
-    "glob": "^7.2.3",
-    "rollup": "^1.32.1",
-    "rollup-plugin-node-resolve": "^4.2.4",
-    "rxjs": "^7.5.6",
-    "typescript": "^4.8.2",
-    "zone.js": "^0.11.8"
+    "@angular-devkit/build-angular": "^14.2.1",
+    "@angular/cli": "~14.2.1",
+    "@angular/compiler-cli": "^14.0.0",
+    "@types/jasmine": "~4.0.0",
+    "jasmine-core": "~4.3.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.0.0",
+    "ng-packagr": "^14.2.0",
+    "typescript": "~4.7.2"
   }
 }

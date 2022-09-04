@@ -1,4 +1,4 @@
-import "../dist/ccchain-web-component/ccchain-web-component.esm";
+import "../dist/bnqkl-web-component/bnqkl-web-component.esm";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
