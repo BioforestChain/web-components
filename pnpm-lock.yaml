@@ -99,6 +99,7 @@ importers:
       patch-package: ^6.4.7
       puppeteer: ^10.0.0
       stencil-inline-svg: ^1.1.0
+      sudo-prompt: ^9.2.1
       treeify: ^1.1.0
       vite: ^3.0.2
     dependencies:
@@ -131,6 +132,7 @@ importers:
       patch-package: 6.4.7
       puppeteer: 10.4.0
       stencil-inline-svg: 1.1.0
+      sudo-prompt: 9.2.1
       treeify: 1.1.0
       vite: 3.0.9
 
@@ -16358,6 +16360,10 @@ packages:
       source-map: 0.7.4
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /sudo-prompt/9.2.1:
+    resolution: {integrity: sha512-Mu7R0g4ig9TUuGSxJavny5Rv0egCEtpZRNMrZaYS1vxkiIxGiGUwoezU3LazIQ+KE04hTrTfNPgxU5gzi7F5Pw==}
     dev: true
 
   /supports-color/5.5.0:

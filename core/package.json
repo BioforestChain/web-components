@@ -20,7 +20,7 @@
     "loader/"
   ],
   "scripts": {
-    "postinstall": "patch-package && node ./scripts/fix-package.mjs && scripts/mkcert-v1.4.4-windows-amd64.exe -install && scripts/mkcert-v1.4.4-windows-amd64.exe localhost",
+    "prepare": "patch-package && node ./scripts/fix-package.mjs && node ./scripts/mkcert.cjs -install",
     "dev": "concurrently -p \"[{name}]\" --names \"build,storybook\" -c \"bgBlue.bold,bgMagenta.bold\" \"yarn start\" \"yarn storybook\"",
     "build": "stencil build --docs & node ./scripts/fix-index.cjs",
     "start": "stencil build --docs --dev --watch",
@@ -63,6 +63,7 @@
     "patch-package": "^6.4.7",
     "puppeteer": "^10.0.0",
     "stencil-inline-svg": "^1.1.0",
+    "sudo-prompt": "^9.2.1",
     "treeify": "^1.1.0",
     "vite": "^3.0.2"
   },
