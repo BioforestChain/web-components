@@ -1,6 +1,6 @@
 {
   "name": "@ccchain/web-component-angular",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "private": true,
   "description": "Angular specific wrapper for @ccchain/web-component",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@ccchain/web-component": "workspace:../core",
+    "@ccchain/web-component": "workspace:*",
     "tslib": "^1.14.1"
   },
   "devDependencies": {
