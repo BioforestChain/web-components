@@ -9,12 +9,17 @@ import { DIRECTIVES } from './directives/index';
 export * from './directives/proxies';
 import { defineCustomElements } from '@bnqkl/web-component';
 
+let defined = false
+
 @NgModule({
   declarations: DIRECTIVES,
   exports: DIRECTIVES,
 })
 export class BnWebComponentModule {
   constructor() {
-    defineCustomElements();
+    if(defined ===false){
+      defined  = true
+      defineCustomElements();
+    }
   }
 }

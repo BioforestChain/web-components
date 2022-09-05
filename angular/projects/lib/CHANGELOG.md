@@ -1,5 +1,11 @@
 # @bnqkl/web-component-angular
 
+## 2.0.1
+
+### Patch Changes
+
+- 修复 defineCustomElements 重复执行的问题
+
 ## 2.0.0
 
 ### Patch Changes
