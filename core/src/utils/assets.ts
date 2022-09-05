@@ -14,8 +14,8 @@ class Assets {
   }
 
   private _base = import.meta.url || location.href;
-  parseRoot(path?: string | null) {
-    return new URL(path || "", this._base).href;
+  parseRoot(path?: string | null, base = this._base) {
+    return new URL(path || "", base).href;
   }
 }
 

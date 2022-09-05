@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.1.2
+
+### Patch Changes
+
+- bn-config-util use document.baseURI as baseurl
+
 ## 1.1.1
 
 ### Patch Changes

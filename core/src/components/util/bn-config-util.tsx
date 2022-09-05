@@ -12,7 +12,7 @@ export class BnConfigUtil implements ComponentInterface {
   readonly console = new Logger(this.hostEle);
 
   connectedCallback() {
-    if (assets.root !== assets.parseRoot(this.assetPath)) {
+    if (assets.root !== assets.parseRoot(this.assetPath, document.baseURI)) {
       this.watchAssetPath();
     }
     this.console.log("assetPath:", assets.root);
@@ -24,7 +24,7 @@ export class BnConfigUtil implements ComponentInterface {
   @Watch("assetPath")
   watchAssetPath() {
     if (this.assetPath) {
-      assets.setRoot(assets.parseRoot(this.assetPath));
+      assets.setRoot(assets.parseRoot(this.assetPath, document.baseURI));
     }
   }
 
