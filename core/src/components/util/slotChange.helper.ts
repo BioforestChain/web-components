@@ -2,25 +2,56 @@ import { ComponentInterface } from "@stencil/core";
 import { querySelector, throttleWrapper } from "../../utils/utils";
 
 export type $SlotChangeCallback = (elements: Set<HTMLElement>, nodes: Set<Node>) => unknown;
+export type $SlotToggleCallback = (hasEle: boolean, rootSlotEle: HTMLSlotElement | undefined) => unknown;
 
 export class SlotChangeHelper implements ComponentInterface {
   constructor(private hostEle: HTMLElement, readonly slot: string) {}
 
+  /**获取Host元素下的slot元素 */
+  getHostSlotElement() {
+    for (const slotEle of this._slots) {
+      return slotEle;
+    }
+  }
+
   onChange(cb: $SlotChangeCallback) {
-    this._cbs.add(cb);
+    this._change_cbs.add(cb);
     return this;
   }
-  private _cbs = new Set<$SlotChangeCallback>();
+
+  private _isToggle?: boolean;
+  onToggle(cb: $SlotToggleCallback) {
+    this._toggle_cbs.add(cb);
+    return this;
+  }
+
+  private _change_cbs = new Set<$SlotChangeCallback>();
+  private _toggle_cbs = new Set<$SlotToggleCallback>();
   private _emitCallback(elements: Set<HTMLElement>, nodes: Set<Node>) {
     const runs: PromiseLike<unknown>[] = [];
-    for (const cb of this._cbs) {
+    const doApply = (doCb: Function) => {
       try {
-        const res = cb(elements, nodes);
+        const res = doCb();
         if (res && typeof (res as any).then === "function") {
           runs.push(res as PromiseLike<unknown>);
         }
       } catch (err) {
         runs.push(Promise.reject(err));
+      }
+    };
+    /// change
+    {
+      for (const cb of this._change_cbs.values()) {
+        doApply(() => cb(elements, nodes));
+      }
+    }
+    /// toggle
+    const hasEle = elements.size > 0;
+    if (this._isToggle !== hasEle) {
+      this._isToggle = hasEle;
+      const rootSlotEle = this.getHostSlotElement();
+      for (const cb of this._toggle_cbs.values()) {
+        doApply(() => cb(hasEle, rootSlotEle));
       }
     }
     return Promise.all(runs);

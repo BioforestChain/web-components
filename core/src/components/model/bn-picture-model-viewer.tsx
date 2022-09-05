@@ -3,6 +3,7 @@ import { ModelViewerElement } from "@google/model-viewer";
 import { Component, ComponentInterface, Element, h, Host, Prop, State, Watch } from "@stencil/core";
 import { assets } from "../../utils/assets";
 import { Logger } from "../../utils/utils";
+import { SlotChangeHelper } from "../util/slotChange.helper";
 const MIME_MAP = {
   png: "image/png",
   webp: "image/webp",
@@ -67,6 +68,13 @@ export class BnPictureModelViewer implements ComponentInterface {
   connectedCallback() {
     this.watchSrc();
   }
+  componentDidLoad() {
+    debugger;
+    this._posterSlotChangeHelper.componentDidLoad();
+  }
+  disconnectedCallback() {
+    this._posterSlotChangeHelper.disconnectedCallback();
+  }
 
   /**
    * image alt
@@ -121,6 +129,15 @@ export class BnPictureModelViewer implements ComponentInterface {
     }, 200);
   };
 
+  private _posterSlotChangeHelper = new SlotChangeHelper(this.hostEle, "poster").onToggle((hasEle, slotEle) => {
+    this.console.log("has custom poster", hasEle);
+    if (hasEle) {
+      slotEle?.setAttribute("slot", "poster");
+    } else {
+      slotEle?.removeAttribute("slot");
+    }
+  });
+
   render() {
     return (
       <Host>
@@ -140,7 +157,9 @@ export class BnPictureModelViewer implements ComponentInterface {
           max-field-of-view="50deg"
           interpolation-decay="20"
           oncamera-change={this.onCameraChange}
-        ></model-viewer>
+        >
+          <slot name="poster"></slot>
+        </model-viewer>
       </Host>
     );
   }

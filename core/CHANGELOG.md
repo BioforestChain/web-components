@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.2.0
+
+### Minor Changes
+
+- picture-model-viewer support custom poster
+
 ## 1.1.2
 
 ### Patch Changes
