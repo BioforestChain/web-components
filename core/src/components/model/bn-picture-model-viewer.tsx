@@ -1,6 +1,7 @@
 import "@google/model-viewer";
 import { ModelViewerElement } from "@google/model-viewer";
-import { Component, ComponentInterface, Element, getAssetPath, h, Host, Prop, State, Watch } from "@stencil/core";
+import { Component, ComponentInterface, Element, h, Host, Prop, State, Watch } from "@stencil/core";
+import { assets } from "../../utils/assets";
 import { Logger } from "../../utils/utils";
 const MIME_MAP = {
   png: "image/png",
@@ -84,8 +85,8 @@ export class BnPictureModelViewer implements ComponentInterface {
 
   private static _gltf2d_text?: string | Promise<string>;
   static get gltf2d() {
-    return (this._gltf2d_text ??= fetch(getAssetPath("./2d.gltf")).then(async res => {
-      const binBlob = await fetch(getAssetPath("./2d.bin")).then(res => res.blob());
+    return (this._gltf2d_text ??= fetch(assets.get("./2d.gltf")).then(async res => {
+      const binBlob = await fetch(assets.get("./2d.bin")).then(res => res.blob());
       const binBlobUrl = URL.createObjectURL(binBlob);
       return (this._gltf2d_text = (await res.text()).replace("{BIN_URL}", binBlobUrl));
     }));

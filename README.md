@@ -100,6 +100,22 @@ lottie 动画图标会占用大量的资源，所以我们新的方案是将之�
 
 我们使用 iconmoon 来管理图标
 
+## 📦 贡献者·发布流程
+
+在做完一些修改后，请**务必**根据以下的流程来进行发布：
+
+1. `pnpm changeset`
+   > 一般来说只选中 1 个要发布的包，并描述发布内容
+1. `pnpm changeset version`
+   > 变更版本号并将刚才些的内容存放到 CHANGELOG.md 中去
+1. `pnpm changeset`+`pnpm changeset version`
+   > 继续以上的流程，直到所有包的版本号都变更完毕
+1. `pnpm build`
+   > 会依此编译 core 和 angular，并执行一些脚本工作
+1. 提交 Git
+1. `pnpm pub`
+   > 会依此发布 core 和 angular（编译好的）
+
 ## TODO
 
 - [ ] 一个文件夹中放置多个组件的支持不够好，readme 只会有一个。

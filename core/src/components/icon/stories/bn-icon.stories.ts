@@ -1,5 +1,5 @@
 import { html } from "lit-html";
-import allIcons from "../assets/bnicon.json";
+import allIcons from "../assets/bnqkl-icon.json";
 import type { $BnIconName } from "../bn-icon.name";
 import { bnIconKit } from "./autogen";
 

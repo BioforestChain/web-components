@@ -1,16 +1,6 @@
-import {
-  Component,
-  ComponentInterface,
-  Element,
-  getAssetPath,
-  h,
-  Host,
-  Method,
-  Prop,
-  setAssetPath,
-  Watch,
-} from "@stencil/core";
+import { Component, ComponentInterface, Element, h, Host, Method, Prop, Watch } from "@stencil/core";
 import { Logger } from "../../utils/utils";
+import { assets } from "../../utils/assets";
 
 @Component({
   tag: "bn-config-util",
@@ -21,13 +11,11 @@ export class BnConfigUtil implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
 
-  /// 设置默认路径
-  static DEFAULT_ASSET_PATH = setAssetPath(new URL("./assets/", location.href).href);
   connectedCallback() {
-    if (BnConfigUtil.DEFAULT_ASSET_PATH !== this.assetPath) {
+    if (assets.root !== assets.parseRoot(this.assetPath)) {
       this.watchAssetPath();
     }
-    this.console.log("assetPath:", getAssetPath("./"));
+    this.console.log("assetPath:", assets.root);
   }
   /**
    * 用于 new URL(REL_PATH, assetPath)，所以如果是文件夹，务必要以 '/' 结尾
@@ -36,7 +24,7 @@ export class BnConfigUtil implements ComponentInterface {
   @Watch("assetPath")
   watchAssetPath() {
     if (this.assetPath) {
-      setAssetPath(new URL(this.assetPath, location.href).href);
+      assets.setRoot(assets.parseRoot(this.assetPath));
     }
   }
 
@@ -46,7 +34,7 @@ export class BnConfigUtil implements ComponentInterface {
   }
   @Method()
   async getAssetPath(path = "") {
-    return getAssetPath(path);
+    return assets.get(path);
   }
 
   render() {

@@ -1,5 +1,24 @@
 # @bnqkl/web-component-angular
 
+## 1.1.2
+
+### Patch Changes
+
+- update core version
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @bnqkl/web-component@1.1.1
+
+## 1.1.0
+
+### Minor Changes
+
+- remove assets, now power by core-pack, peer install pls.
+
 ## 1.0.2
 
 ### Patch Changes

@@ -1,11 +1,11 @@
 {
   "name": "@bnqkl/web-component-angular-workspace",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "dev:lib": "ng build lib --watch",
-    "build:lib": "ng build lib",
+    "build:lib": "ng build lib && node ./scripts/fix-dist-lib-deps.cjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

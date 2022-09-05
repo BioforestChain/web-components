@@ -5,14 +5,19 @@
     "version": "0.0.0",
     "workspaces": [
         "./core",
-        "./angular",
-        "./angular/projects/*"
+        "./angular/",
+        "./angular/projects/lib"
     ],
     "scripts": {
         "dev": "npm run dev --workspace=core",
         "start": "npm run start --workspace=core",
         "storybook": "npm run storybook --workspace=core",
-        "build": "npm run build --workspace=core && npm run build:lib --workspace=angular"
+        "build": "npm run build:core && npm run build:angular",
+        "build:core": "npm run build --workspace=core",
+        "build:angular": "npm run build:lib --workspace=angular",
+        "pub": "npm run pub:core && npm run angular",
+        "pub:core": "cd core && pnpm publish --access public",
+        "pub:angular": "cd angular/dist/lib && npm publish --access public"
     },
     "devDependencies": {
         "@changesets/cli": "^2.24.4"

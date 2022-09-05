@@ -1,4 +1,5 @@
-import { Component, ComponentInterface, getAssetPath, h, Prop, State, Watch } from "@stencil/core";
+import { Component, ComponentInterface, h, Prop, State, Watch } from "@stencil/core";
+import { assets } from "../../utils/assets";
 import { bindThis } from "../../utils/utils";
 import { $ImageToggleButton, imageToggleButtonRender } from "../util/bn-image-toggle-button.const";
 
@@ -45,7 +46,7 @@ export class BnButtonLike implements ComponentInterface {
   render() {
     return imageToggleButtonRender(
       {
-        src: getAssetPath("./assets/like.webp"),
+        src: assets.get("./like.webp"),
         frames: 48,
         duration: "1.6s",
         checkedColor: `#549deb`,

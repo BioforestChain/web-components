@@ -66,8 +66,9 @@ importers:
       '@bnqkl/web-component': workspace:*
       tslib: ^2.3.0
     dependencies:
-      '@bnqkl/web-component': link:../../../core
       tslib: 2.4.0
+    devDependencies:
+      '@bnqkl/web-component': link:../../../core
 
   core:
     specifiers:
