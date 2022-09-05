@@ -15,7 +15,7 @@
         "build": "npm run build:core && npm run build:angular",
         "build:core": "npm run build --workspace=core",
         "build:angular": "npm run build:lib --workspace=angular",
-        "pub": "npm run pub:core && npm run angular",
+        "pub": "npm run pub:core && npm run pub:angular",
         "pub:core": "cd core && pnpm publish --access public",
         "pub:angular": "cd angular/dist/lib && npm publish --access public"
     },
