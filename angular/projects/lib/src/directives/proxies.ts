@@ -152,6 +152,47 @@ export class BnIcon {
 }
 
 
+export declare interface BnImage extends Components.BnImage {}
+
+@ProxyCmp({
+  defineCustomElementFn: undefined,
+  inputs: ['alt', 'errorSrc', 'src']
+})
+@Component({
+  selector: 'bn-image',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>',
+  inputs: ['alt', 'errorSrc', 'src']
+})
+export class BnImage {
+  protected el: HTMLElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+  }
+}
+
+
+export declare interface BnImageProvider extends Components.BnImageProvider {}
+
+@ProxyCmp({
+  defineCustomElementFn: undefined,
+  methods: ['setTransform']
+})
+@Component({
+  selector: 'bn-image-provider',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>'
+})
+export class BnImageProvider {
+  protected el: HTMLElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+  }
+}
+
+
 export declare interface BnImageToggleButton extends Components.BnImageToggleButton {
   /**
    *  
@@ -304,13 +345,13 @@ export declare interface BnPictureModelViewer extends Components.BnPictureModelV
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  inputs: ['alt', 'gltfSrc', 'skyboxImage', 'src']
+  inputs: ['alt', 'gltfSrc', 'skyboxImage', 'src', 'withCredentials']
 })
 @Component({
   selector: 'bn-picture-model-viewer',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
-  inputs: ['alt', 'gltfSrc', 'skyboxImage', 'src']
+  inputs: ['alt', 'gltfSrc', 'skyboxImage', 'src', 'withCredentials']
 })
 export class BnPictureModelViewer {
   protected el: HTMLElement;

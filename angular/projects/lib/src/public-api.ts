@@ -9,7 +9,7 @@ import { DIRECTIVES } from './directives/index';
 export * from './directives/proxies';
 import { defineCustomElements } from '@bnqkl/web-component';
 
-let defined = false
+let defined = false;
 
 @NgModule({
   declarations: DIRECTIVES,
@@ -17,8 +17,8 @@ let defined = false
 })
 export class BnWebComponentModule {
   constructor() {
-    if(defined ===false){
-      defined  = true
+    if (defined === false) {
+      defined = true;
       defineCustomElements();
     }
   }

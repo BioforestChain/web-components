@@ -89,6 +89,10 @@ export class BnPictureModelViewer implements ComponentInterface {
    * model 3d view skybox image
    */
   @Prop({ reflect: true }) readonly skyboxImage!: string;
+  /**
+   * for cors
+   */
+  @Prop({ reflect: true }) readonly withCredentials!: boolean;
 
   private static _gltf2d_text?: string | Promise<string>;
   static get gltf2d() {
@@ -156,6 +160,7 @@ export class BnPictureModelViewer implements ComponentInterface {
           max-field-of-view="50deg"
           interpolation-decay="20"
           oncamera-change={this.onCameraChange}
+          with-credentials={this.withCredentials}
         >
           <slot name="poster"></slot>
         </model-viewer>

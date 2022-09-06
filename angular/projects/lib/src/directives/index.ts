@@ -8,6 +8,8 @@ export const DIRECTIVES = [
   d.BnDislikeButton,
   d.BnHasMoreText,
   d.BnIcon,
+  d.BnImage,
+  d.BnImageProvider,
   d.BnImageToggleButton,
   d.BnLazy,
   d.BnLikeButton,

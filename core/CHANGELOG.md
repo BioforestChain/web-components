@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.2.1
+
+### Patch Changes
+
+- picture-model-viewer add attr: with-credentials
+
 ## 1.2.0
 
 ### Minor Changes
