@@ -1,5 +1,16 @@
 # @bnqkl/web-component-angular
 
+## 2.0.3
+
+### Minor Changes
+
+- toggle button add onCheckedChange event
+
+### Patch Changes
+
+- Updated dependencies
+  - @bnqkl/web-component@1.3.0
+
 ## 2.0.2
 
 ### Patch Changes

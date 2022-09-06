@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.3.0
+
+### Minor Changes
+
+- toggle button add onCheckedChange event
+
 ## 1.2.1
 
 ### Patch Changes

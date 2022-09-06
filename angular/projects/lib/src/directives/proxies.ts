@@ -30,7 +30,13 @@ export class BnAnimationIcon {
 }
 
 
-export declare interface BnCollectButton extends Components.BnCollectButton {}
+export declare interface BnCollectButton extends Components.BnCollectButton {
+  /**
+   *  
+   */
+  checkedChange: EventEmitter<CustomEvent<boolean>>;
+
+}
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
@@ -47,6 +53,7 @@ export class BnCollectButton {
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
+    proxyOutputs(this, this.el, ['checkedChange']);
   }
 }
 
@@ -73,7 +80,13 @@ export class BnConfigUtil {
 }
 
 
-export declare interface BnDislikeButton extends Components.BnDislikeButton {}
+export declare interface BnDislikeButton extends Components.BnDislikeButton {
+  /**
+   *  
+   */
+  checkedChange: EventEmitter<CustomEvent<boolean>>;
+
+}
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
@@ -90,6 +103,7 @@ export class BnDislikeButton {
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
+    proxyOutputs(this, this.el, ['checkedChange']);
   }
 }
 
@@ -251,7 +265,13 @@ export class BnLazy {
 }
 
 
-export declare interface BnLikeButton extends Components.BnLikeButton {}
+export declare interface BnLikeButton extends Components.BnLikeButton {
+  /**
+   *  
+   */
+  checkedChange: EventEmitter<CustomEvent<boolean>>;
+
+}
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
@@ -268,6 +288,7 @@ export class BnLikeButton {
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
+    proxyOutputs(this, this.el, ['checkedChange']);
   }
 }
 

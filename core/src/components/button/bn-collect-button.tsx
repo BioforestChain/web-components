@@ -1,4 +1,4 @@
-import { Component, ComponentInterface, h, Prop } from "@stencil/core";
+import { Component, ComponentInterface, Event, EventEmitter, h, Prop } from "@stencil/core";
 import { assets } from "../../utils/assets";
 import { bindThis } from "../../utils/utils";
 import { $ImageToggleButton, imageToggleButtonRender } from "../util/bn-image-toggle-button.const";
@@ -17,12 +17,13 @@ export class BnButtonCollect implements ComponentInterface {
   @Prop() unCheckLabel: string = "";
 
   @Prop({ mutable: true, reflect: true }) checked = false;
+  @Event() checkedChange!: EventEmitter<boolean>;
   @Prop() direction: $ImageToggleButton.Direction = "lr";
 
   @bindThis
   onChange(event: CustomEvent<boolean>) {
     this.checked = event.detail;
-    // this.updateCount();
+    this.checkedChange.emit(event.detail);
   }
 
   render() {
