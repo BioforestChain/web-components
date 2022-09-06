@@ -1,0 +1,36 @@
+:host {
+  display: inline-grid;
+  grid: 1fr/1fr;
+  grid-template-areas: "img";
+  line-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+img {
+  grid-area: img;
+  width: var(--width);
+  height: var(--height);
+  &.error {
+    display: inline-block;
+    position: relative;
+    color: transparent; // 隐藏原本的alt
+    pointer-events: none;
+  }
+}
+.alt {
+  grid-area: img;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  visibility: hidden;
+
+  line-height: 1;
+  text-align: center;
+  align-self: end;
+  justify-self: center;
+
+  z-index: 1;
+  &.show {
+    visibility: visible;
+  }
+}

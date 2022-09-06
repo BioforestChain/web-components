@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.5.0
+
+### Minor Changes
+
+- base implements of `<bn-image>` and `<bn-image-imaginary-provider>` element
+
 ## 1.4.0
 
 ### Minor Changes

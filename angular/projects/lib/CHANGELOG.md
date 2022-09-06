@@ -1,5 +1,11 @@
 # @bnqkl/web-component-angular
 
+## 2.0.5
+
+### Patch Changes
+
+- base implements of `<bn-image>` and `<bn-image-imaginary-provider>` element
+
 ## 2.0.4
 
 ### Minor Changes

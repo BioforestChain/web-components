@@ -9,7 +9,7 @@ export const DIRECTIVES = [
   d.BnHasMoreText,
   d.BnIcon,
   d.BnImage,
-  d.BnImageProvider,
+  d.BnImageImaginaryProvider,
   d.BnImageToggleButton,
   d.BnLazy,
   d.BnLikeButton,
