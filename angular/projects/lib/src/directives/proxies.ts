@@ -191,7 +191,8 @@ export declare interface BnImageImaginaryProvider extends Components.BnImageImag
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  inputs: ['origin']
+  inputs: ['origin'],
+  methods: ['transform', 'transformFromElement']
 })
 @Component({
   selector: 'bn-image-imaginary-provider',

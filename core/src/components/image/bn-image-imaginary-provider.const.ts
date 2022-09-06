@@ -541,11 +541,9 @@ export class ImaginaryTransform extends ImageTransform {
   constructor(readonly config: ImaginaryTransform.Config) {
     super();
   }
-  transform(source_url: string, ele: HTMLElement) {
-    debugger;
-    const { dataset } = ele;
-    const mode = dataset.mode;
-    if (mode === undefined || mode in MODE_AND_PARAMS === false) {
+  transform(source_url: string, dataset: { [key: string]: unknown }) {
+    const mode = String(dataset.mode);
+    if (mode in MODE_AND_PARAMS === false) {
       return source_url;
     }
     const params = MODE_AND_PARAMS[mode as keyof typeof MODE_AND_PARAMS];
@@ -555,7 +553,11 @@ export class ImaginaryTransform extends ImageTransform {
         continue;
       }
       if (key in params) {
-        url.searchParams.set(key, dataset[key]!);
+        let val = dataset[key];
+        if (typeof val !== "string") {
+          val = JSON.stringify(val);
+        }
+        url.searchParams.set(key, val as string);
       }
     }
     url.searchParams.set("url", source_url);

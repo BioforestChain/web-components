@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.6.0
+
+### Minor Changes
+
+- `<bn-image-imaginary-provider>` exports transform methods
+
 ## 1.5.0
 
 ### Minor Changes

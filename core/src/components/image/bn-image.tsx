@@ -28,13 +28,13 @@ export class BnImage implements ComponentInterface {
   @State() private _errorSrc?: string;
   @Watch("errorSrc")
   private async _watchErrorSrc(errorSrc?: string) {
-    this._errorSrc = errorSrc && (await imageProvider.transform(toHref(errorSrc), this.hostEle));
+    this._errorSrc = errorSrc && (await imageProvider.transformFromElement(toHref(errorSrc), this.hostEle));
   }
   @Prop({ reflect: true }) src?: string;
   @State() private _src?: string;
   @Watch("src")
   private async _watchSrc(src?: string) {
-    this._src = src && (await imageProvider.transform(toHref(src), this.hostEle));
+    this._src = src && (await imageProvider.transformFromElement(toHref(src), this.hostEle));
   }
 
   @Prop({ reflect: true }) alt?: string;

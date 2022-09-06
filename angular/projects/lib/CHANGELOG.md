@@ -1,5 +1,11 @@
 # @bnqkl/web-component-angular
 
+## 2.0.6
+
+### Patch Changes
+
+- `<bn-image-imaginary-provider>` exports transform methods
+
 ## 2.0.5
 
 ### Patch Changes
