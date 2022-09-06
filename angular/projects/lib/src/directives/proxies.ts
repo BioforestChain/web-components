@@ -366,13 +366,13 @@ export declare interface BnPictureModelViewer extends Components.BnPictureModelV
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  inputs: ['alt', 'gltfSrc', 'skyboxImage', 'src', 'withCredentials']
+  inputs: ['alt', 'autoRotate', 'environmentImage', 'gltfSrc', 'skyboxImage', 'src', 'withCredentials']
 })
 @Component({
   selector: 'bn-picture-model-viewer',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
-  inputs: ['alt', 'gltfSrc', 'skyboxImage', 'src', 'withCredentials']
+  inputs: ['alt', 'autoRotate', 'environmentImage', 'gltfSrc', 'skyboxImage', 'src', 'withCredentials']
 })
 export class BnPictureModelViewer {
   protected el: HTMLElement;

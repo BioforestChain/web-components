@@ -1,5 +1,16 @@
 # @bnqkl/web-component-angular
 
+## 2.0.4
+
+### Minor Changes
+
+- picture-model-viewer exports attribute: 'auto-rotate' and 'environment-image'
+
+### Patch Changes
+
+- Updated dependencies
+  - @bnqkl/web-component@1.4.0
+
 ## 2.0.3
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.4.0
+
+### Minor Changes
+
+- picture-model-viewer exports attribute: 'auto-rotate' and 'environment-image'
+
 ## 1.3.0
 
 ### Minor Changes

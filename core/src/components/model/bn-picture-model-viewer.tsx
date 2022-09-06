@@ -78,7 +78,7 @@ export class BnPictureModelViewer implements ComponentInterface {
   /**
    * image alt
    */
-  @Prop({ reflect: true }) readonly alt!: string;
+  @Prop({ reflect: true }) readonly alt?: string;
 
   /**
    * .gltf 文件的链接，里头可以通过 {IMAGE_URL} 与 {IMAGE_MIME} 来匹配当前 src 所指向的图片
@@ -88,7 +88,11 @@ export class BnPictureModelViewer implements ComponentInterface {
   /**
    * model 3d view skybox image
    */
-  @Prop({ reflect: true }) readonly skyboxImage!: string;
+  @Prop({ reflect: true }) readonly skyboxImage?: string;
+  /**
+   * model 3d view environment image
+   */
+  @Prop({ reflect: true }) readonly environmentImage: string = "neutral";
   /**
    * for cors
    */
@@ -107,6 +111,8 @@ export class BnPictureModelViewer implements ComponentInterface {
   private _model_src?: string;
 
   private _rotateTi?: any;
+
+  @Prop({ reflect: true }) readonly autoRotate: boolean = true;
 
   onCameraChange = (e: CustomEvent<{ source: string }>) => {
     if (e.detail.source !== "user-interaction") {
@@ -148,10 +154,11 @@ export class BnPictureModelViewer implements ComponentInterface {
           alt={this.alt}
           src={this._model_src}
           skybox-image={this.skyboxImage}
+          environment-image={this.environmentImage}
           poster={this.src}
           shadow-intensity="1"
           camera-controls
-          auto-rotate
+          auto-rotate={this.autoRotate}
           touch-actions="pan-y"
           camera-orbit="0deg 95deg 50m"
           max-camera-orbit="Infinity 110deg 55m"
