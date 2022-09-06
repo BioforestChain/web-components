@@ -69,7 +69,6 @@ export class BnPictureModelViewer implements ComponentInterface {
     this.watchSrc();
   }
   componentDidLoad() {
-    debugger;
     this._posterSlotChangeHelper.componentDidLoad();
   }
   disconnectedCallback() {
