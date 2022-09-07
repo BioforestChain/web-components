@@ -2,7 +2,7 @@ import "@google/model-viewer";
 import { ModelViewerElement } from "@google/model-viewer";
 import { Component, ComponentInterface, Element, h, Host, Prop, State, Watch } from "@stencil/core";
 import { assets } from "../../utils/assets";
-import { Logger } from "../../utils/utils";
+import { Logger, querySelector } from "../../utils/utils";
 import { SlotChangeHelper } from "../util/slotChange.helper";
 const MIME_MAP = {
   png: "image/png",
@@ -106,9 +106,23 @@ export class BnPictureModelViewer implements ComponentInterface {
   }
   componentDidLoad() {
     this._posterSlotChangeHelper.componentDidLoad();
+    this._fixOutline();
   }
   disconnectedCallback() {
     this._posterSlotChangeHelper.disconnectedCallback();
+  }
+
+  private _fixed_outline = false;
+
+  private _fixOutline() {
+    if (this._fixed_outline) {
+      return;
+    }
+
+    this._fixed_outline = true;
+    const styleEle = document.createElement("style");
+    styleEle.innerHTML += ":focus{outline:none}";
+    querySelector(this.hostEle.shadowRoot, "model-viewer")?.shadowRoot?.appendChild(styleEle);
   }
 
   /**
