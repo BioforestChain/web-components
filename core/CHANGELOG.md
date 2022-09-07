@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.7.1
+
+### Patch Changes
+
+- fix `<bn-lazy>` auto-sleep miss reflect config; and IntersectionObserver root should be null
+
 ## 1.7.0
 
 ### Minor Changes

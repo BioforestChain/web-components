@@ -44,7 +44,7 @@ export class BnLazy implements ComponentInterface {
   /**
    * 是否自动进入睡眠状态
    */
-  @Prop()
+  @Prop({ reflect: true })
   readonly autoSleep: boolean = false;
   @Watch("autoSleep")
   watchAutoSleep() {
@@ -150,8 +150,6 @@ export class BnLazy implements ComponentInterface {
       },
       {
         threshold: THRESHOLD,
-        root: this.hostEle.parentElement /*  this._findRoot() */,
-        // rootMargin: "0px",
       },
     );
     this._io.observe(this.hostEle);
