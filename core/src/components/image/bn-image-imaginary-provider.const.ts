@@ -1,15 +1,12 @@
 import { ImageTransform } from "../../utils/imageProvider";
+import { nullProtoObj } from "../../utils/utils";
 
 namespace ImaginaryTransform {
   export type Config = {
     origin: string;
+    redirection: { [from: string]: string };
   };
 }
-
-const nullProtoObj = <T extends {}>(obj: T) => {
-  Object.setPrototypeOf(obj, null);
-  return obj;
-};
 
 const MODE_AND_PARAMS = nullProtoObj({
   crop: nullProtoObj({
@@ -541,7 +538,17 @@ export class ImaginaryTransform extends ImageTransform {
   constructor(readonly config: ImaginaryTransform.Config) {
     super();
   }
+  private _redirect(src: string) {
+    const redirection = this.config.redirection;
+    for (const prefix in redirection) {
+      if (src.startsWith(prefix)) {
+        return src.replace(prefix, redirection[prefix]);
+      }
+    }
+    return src;
+  }
   transform(source_url: string, dataset: { [key: string]: unknown }) {
+    source_url = this._redirect(source_url);
     const mode = String(dataset.mode);
     if (mode in MODE_AND_PARAMS === false) {
       return source_url;

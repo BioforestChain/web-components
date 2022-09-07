@@ -616,3 +616,8 @@ export const cssAnimationDurationToMs = (animationDuration: string) => {
 export const asSafeInteger = (number: unknown) => {
   return Number.isSafeInteger(number) ? (number as number) : undefined;
 };
+
+export const nullProtoObj = <T extends {}>(obj: T) => {
+  Object.setPrototypeOf(obj, null);
+  return obj;
+};

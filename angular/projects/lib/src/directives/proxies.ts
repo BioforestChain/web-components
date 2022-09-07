@@ -170,13 +170,13 @@ export declare interface BnImage extends Components.BnImage {}
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  inputs: ['alt', 'errorSrc', 'height', 'src', 'width']
+  inputs: ['alt', 'errorSrc', 'height', 'loading', 'src', 'width']
 })
 @Component({
   selector: 'bn-image',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
-  inputs: ['alt', 'errorSrc', 'height', 'src', 'width']
+  inputs: ['alt', 'errorSrc', 'height', 'loading', 'src', 'width']
 })
 export class BnImage {
   protected el: HTMLElement;
@@ -191,14 +191,14 @@ export declare interface BnImageImaginaryProvider extends Components.BnImageImag
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  inputs: ['origin'],
+  inputs: ['origin', 'redirection'],
   methods: ['transform', 'transformFromElement']
 })
 @Component({
   selector: 'bn-image-imaginary-provider',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
-  inputs: ['origin']
+  inputs: ['origin', 'redirection']
 })
 export class BnImageImaginaryProvider {
   protected el: HTMLElement;

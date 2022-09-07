@@ -33,7 +33,7 @@ export class BnImage implements ComponentInterface {
   @Prop({ reflect: true }) src?: string;
   @State() private _src?: string;
   @Watch("src")
-  private async _watchSrc(src?: string) {
+  private async _watchSrc(src?: string) {debugger
     this._src = src && (await imageProvider.transformFromElement(toHref(src), this.hostEle));
   }
 
@@ -70,6 +70,7 @@ export class BnImage implements ComponentInterface {
 
   @Prop({ reflect: true }) width?: number;
   @Prop({ reflect: true }) height?: number;
+  @Prop({ reflect: true }) loading?: "lazy" | "auto" | "eager";
 
   @State() private _isErrorError = false;
   private _onErrorError = () => {
@@ -79,6 +80,7 @@ export class BnImage implements ComponentInterface {
   render() {
     const width = parseWH(this.width);
     const height = parseWH(this.height);
+    const { loading } = this;
     this.console.info("image src:", this.src, "=>", this._src);
     return (
       <Host>
@@ -88,6 +90,7 @@ export class BnImage implements ComponentInterface {
               part="error"
               class="error"
               role="error"
+              loading={loading}
               src={this._errorSrc}
               alt={this.alt}
               style={{ width, height }}
@@ -102,6 +105,7 @@ export class BnImage implements ComponentInterface {
             onError={this._onError}
             alt={this.alt}
             style={{ width, height }}
+            loading={loading}
           />
         )}
         <blockquote part="alt" class={{ alt: true, show: this._showError }}>
