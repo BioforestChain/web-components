@@ -1,5 +1,13 @@
 # @bnqkl/web-component
 
+## 1.8.0
+
+### Minor Changes
+
+- 1. `<bn-picture-model-viewer>` hidden outline style
+  2. `<bn-image>` add loading attribute
+  3. `<bn-image-imaginary-provider>` add redirection support
+
 ## 1.7.1
 
 ### Patch Changes
