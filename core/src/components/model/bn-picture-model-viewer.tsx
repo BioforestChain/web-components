@@ -11,6 +11,40 @@ const MIME_MAP = {
   svg: "image/svg+xml",
 };
 
+const numsParser = (value: string, allowUnits: Set<string>, allowValues?: Set<string>) => {
+  return value
+    .split(/[\-\,\s\;]+/)
+    .map(r => r.trim())
+    .filter(r => {
+      if (allowValues && allowValues.has(r)) {
+        return true;
+      }
+      const num_unit = r.match(/(^[\d\.]+)([\w\W]+)/);
+      if (num_unit === null) {
+        return false;
+      }
+      const [_, num, unit] = num_unit;
+      /// 如果不是正常的数字，解析异常
+      if (parseFloat(num).toString() !== num) {
+        return false;
+      }
+      /// 单位不对
+      if (allowUnits.has(unit) === false) {
+        return false;
+      }
+      return true;
+    });
+};
+const CAMERA_ORBIT_RADIUS_UNITS = new Set(["m", "mm", "cm", "%"]);
+const CAMERA_ORBIT_RADIUS_DEAFULT = "100%";
+
+const FIELD_OF_VIEW_UNITS = new Set(["deg", "rad"]);
+const FIELD_OF_VIEW_VALUES = new Set("auto");
+const FIELD_OF_VIEW_DEFAULT = "auto";
+
+/**默认启用交互提示 */
+let defaultInteractionPrompt = true;
+
 @Component({
   tag: "bn-picture-model-viewer",
   styleUrl: "bn-picture-model-viewer.scss",
@@ -26,8 +60,7 @@ export class BnPictureModelViewer implements ComponentInterface {
    */
   @Prop({ reflect: true }) readonly src!: string;
   @Watch("src")
-  async watchSrc() {
-    const src = this.src;
+  async watchSrc(src: string) {
     let mime: string | undefined | null;
     try {
       mime = this.src.startsWith("data:")
@@ -66,7 +99,10 @@ export class BnPictureModelViewer implements ComponentInterface {
     this.console.log(src, "=>", this._model_src);
   }
   connectedCallback() {
-    this.watchSrc();
+    this.watchSrc(this.src);
+    this.watchCameraOrbitRadius(this.cameraOrbitRadius);
+    this.watchFieldOfView(this.fieldOfView);
+    this.interactionPrompt = defaultInteractionPrompt;
   }
   componentDidLoad() {
     this._posterSlotChangeHelper.componentDidLoad();
@@ -96,7 +132,7 @@ export class BnPictureModelViewer implements ComponentInterface {
   /**
    * for cors
    */
-  @Prop({ reflect: true }) readonly withCredentials!: boolean;
+  @Prop({ reflect: true }) readonly withCredentials?: boolean;
 
   private static _gltf2d_text?: string | Promise<string>;
   static get gltf2d() {
@@ -110,14 +146,62 @@ export class BnPictureModelViewer implements ComponentInterface {
   @State()
   private _model_src?: string;
 
-  private _rotateTi?: any;
+  /**
+   * 相机轨道中有$theta $phi $radius三个属性，这个是距离属性
+   * 格式为：$min-$default-$max
+   * 可以为缩写成: $min($default)-$max
+   * 或者：$min($default/$max)
+   */
+  @Prop({ reflect: true }) readonly cameraOrbitRadius?: string;
+  @State() private _cameraOrbitRadius: readonly [string, string, string] = [
+    CAMERA_ORBIT_RADIUS_DEAFULT,
+    CAMERA_ORBIT_RADIUS_DEAFULT,
+    CAMERA_ORBIT_RADIUS_DEAFULT,
+  ] as const;
+  @Watch("cameraOrbitRadius")
+  watchCameraOrbitRadius(cameraOrbitRadius = CAMERA_ORBIT_RADIUS_DEAFULT) {
+    const radius = numsParser(cameraOrbitRadius, CAMERA_ORBIT_RADIUS_UNITS);
+    switch (radius.length) {
+      case 0:
+        radius.push(CAMERA_ORBIT_RADIUS_DEAFULT);
+      case 1:
+        radius.push(radius[0]);
+      case 2:
+        radius.unshift(radius[0]);
+      default:
+        this._cameraOrbitRadius = [radius[0], radius[1], radius[2]];
+    }
+  }
 
-  @Prop({ reflect: true }) readonly autoRotate: boolean = true;
+  /**
+   * 相机的视角，如果 cameraOrbitRadius 设置得很大，可以通过调整 fieldOfView 来拉近它
+   */
+  @Prop({ reflect: true }) readonly fieldOfView?: string;
+  @State() private _fieldOfView: readonly [string, string] = [FIELD_OF_VIEW_DEFAULT, FIELD_OF_VIEW_DEFAULT];
+  @Watch("fieldOfView")
+  watchFieldOfView(fieldOfView = FIELD_OF_VIEW_DEFAULT) {
+    const fields = numsParser(fieldOfView, FIELD_OF_VIEW_UNITS, FIELD_OF_VIEW_VALUES);
+    switch (fields.length) {
+      case 0:
+        fields.push(FIELD_OF_VIEW_DEFAULT);
+      case 1:
+        fields.push(fields[0]);
+      default:
+        this._fieldOfView = [fields[0], fields[1]];
+    }
+    return fields;
+  }
+
+  private _rotateTi?: any;
+  @Prop({ reflect: true }) readonly autoRotate?: boolean;
 
   onCameraChange = (e: CustomEvent<{ source: string }>) => {
     if (e.detail.source !== "user-interaction") {
       return;
     }
+    // 仅用了默认交互提示
+    defaultInteractionPrompt = false;
+
     const modelViewer = e.target as ModelViewerElement;
     modelViewer.interpolationDecay = 50;
     if (this._rotateTi !== undefined) {
@@ -134,7 +218,7 @@ export class BnPictureModelViewer implements ComponentInterface {
 
       this.console.log("auto rotate", "from:", theta, "to:", toTheta);
       modelViewer.interpolationDecay = 200;
-      modelViewer.cameraOrbit = `${toTheta}rad 95deg 50m`;
+      modelViewer.cameraOrbit = `${toTheta}rad 95deg ${this._cameraOrbitRadius[1]}`;
     }, 200);
   };
 
@@ -147,7 +231,19 @@ export class BnPictureModelViewer implements ComponentInterface {
     }
   });
 
+  /**
+   * 是否要显示交互提示
+   * 这里默认的行为是，只要用户有过交互行为，那么在本次访问中，它就默认为false了
+   */
+  @Prop() interactionPrompt?: boolean;
+
   render() {
+    const { autoRotate, _cameraOrbitRadius: radius, _fieldOfView: fields, interactionPrompt } = this;
+
+    this.console.log("autoRotate:", autoRotate);
+    this.console.log("cameraOrbitRadius:", radius);
+    this.console.log("fieldOfView:", fields);
+
     return (
       <Host>
         <model-viewer
@@ -158,13 +254,14 @@ export class BnPictureModelViewer implements ComponentInterface {
           poster={this.src}
           shadow-intensity="1"
           camera-controls
-          auto-rotate={this.autoRotate}
+          auto-rotate={autoRotate}
+          interaction-prompt={interactionPrompt ? "auto" : "non"}
           touch-actions="pan-y"
-          camera-orbit="0deg 95deg 50m"
-          max-camera-orbit="Infinity 110deg 55m"
-          min-camera-orbit="-Infinity 90deg 45m"
-          min-field-of-view="40deg"
-          max-field-of-view="50deg"
+          min-camera-orbit={"-Infinity 90deg " + radius[0]}
+          camera-orbit={"0deg 95deg " + radius[1]}
+          max-camera-orbit={"Infinity 110deg " + radius[2]}
+          min-field-of-view={fields[0]}
+          max-field-of-view={fields[1]}
           interpolation-decay="20"
           oncamera-change={this.onCameraChange}
           with-credentials={this.withCredentials}

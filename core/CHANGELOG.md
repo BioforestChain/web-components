@@ -1,5 +1,15 @@
 # @bnqkl/web-component
 
+## 1.7.0
+
+### Minor Changes
+
+- :sparkles: 对 picture-model-viewer 做了增强性的改进
+
+  1. 改进了模型的 screen 面的材质，使之发光，避免颜色衰减
+  2. 增加了 cameraOrbitRadius 与 fieldOfView 属性，使得开发者可以自定义：相机与模型的距离、以及相机的可视角
+  3. 增加了 interactionPrompt 属性，默认本次会话里，在用户与 3d 模型交互过后，就不再提示用户可以进行交互
+
 ## 1.6.0
 
 ### Minor Changes

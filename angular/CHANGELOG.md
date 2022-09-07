@@ -1,5 +1,12 @@
 # @bnqkl/web-component-angular
 
+## 1.0.11
+
+### Patch Changes
+
+- Updated dependencies
+  - @bnqkl/web-component@1.7.0
+
 ## 1.0.10
 
 ### Patch Changes
