@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.9.1
+
+### Patch Changes
+
+- `<bn-image>` data-width/height now support value: parent
+
 ## 1.9.0
 
 ### Minor Changes
