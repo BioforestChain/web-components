@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.9.0
+
+### Minor Changes
+
+- `<bn-image>` add slot: error/success/loading/img, add attr pixel-ratio, remove attr error-src
+
 ## 1.8.0
 
 ### Minor Changes

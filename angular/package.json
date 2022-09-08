@@ -1,6 +1,6 @@
 {
   "name": "@bnqkl/web-component-angular-workspace",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
