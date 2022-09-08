@@ -9,7 +9,7 @@ img {
   width: 100%;
   height: 100%;
   &.error {
-    opacity: 0;
+    display: none;
   }
 }
 .slotter {
@@ -17,7 +17,7 @@ img {
   z-index: 1;
   display: none;
   &.show {
-    display: block;
+    display: flex;
   }
 }
 // .alt {

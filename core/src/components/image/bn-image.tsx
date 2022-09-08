@@ -125,13 +125,13 @@ export class BnImage implements ComponentInterface {
             loading={loading}
           />
         </slot>
-        <div class={"slotter error" + (this.status === "error" ? " show" : "")}>
+        <div part="error" class={"slotter error" + (this.status === "error" ? " show" : "")}>
           <slot name="error">🖼️{this.alt}</slot>
         </div>
-        <div class={"slotter success" + (this.status === "success" ? " show" : "")}>
+        <div part="success" class={"slotter success" + (this.status === "success" ? " show" : "")}>
           <slot name="success" />
         </div>
-        <div class={"slotter loading" + (this.status === "loading" ? " show" : "")}>
+        <div part="loading" class={"slotter loading" + (this.status === "loading" ? " show" : "")}>
           <slot name="loading" />
         </div>
       </Host>
