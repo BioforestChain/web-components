@@ -170,13 +170,14 @@ export declare interface BnImage extends Components.BnImage {}
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  inputs: ['alt', 'errorSrc', 'height', 'loading', 'src', 'width']
+  inputs: ['alt', 'height', 'loading', 'pixelRatio', 'src', 'width'],
+  methods: ['refresh']
 })
 @Component({
   selector: 'bn-image',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
-  inputs: ['alt', 'errorSrc', 'height', 'loading', 'src', 'width']
+  inputs: ['alt', 'height', 'loading', 'pixelRatio', 'src', 'width']
 })
 export class BnImage {
   protected el: HTMLElement;

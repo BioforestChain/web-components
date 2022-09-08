@@ -1,7 +1,8 @@
-import { Component, ComponentInterface, Element, h, Host, Prop, State, Watch } from "@stencil/core";
+import { Component, ComponentInterface, Element, h, Host, Method, Prop, State, Watch } from "@stencil/core";
 import { imageProvider } from "../../utils/imageProvider";
-import { Logger } from "../../utils/utils";
+import { Logger, manyQuerySelectorAll } from "../../utils/utils";
 import { EventBindingHelper } from "../util/eventBinding.helper";
+import { SlotChangeHelper } from "../util/slotChange.helper";
 
 const toHref = (src: string) => new URL(src, document.baseURI).href;
 const parseWH = (wh?: number) => {
@@ -20,43 +21,70 @@ export class BnImage implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
 
-  /**
-   * 当绑定了 src ，并且 src 加载失败的时候，会转而加载 error-src 来进行替代性渲染
-   * 渲染 error-src 的时候，默认会显示alt
-   */
-  @Prop({ reflect: true }) errorSrc?: string;
-  @State() private _errorSrc?: string;
-  @Watch("errorSrc")
-  private async _watchErrorSrc(errorSrc?: string) {
-    this._errorSrc = errorSrc && (await imageProvider.transformFromElement(toHref(errorSrc), this.hostEle));
-  }
-  @Prop({ reflect: true }) src?: string;
-  @State() private _src?: string;
-  @Watch("src")
-  private async _watchSrc(src?: string) {debugger
-    this._src = src && (await imageProvider.transformFromElement(toHref(src), this.hostEle));
-  }
-
+  @Prop({ reflect: true }) pixelRatio: number = devicePixelRatio;
+  @Prop({ reflect: true }) width?: number;
+  @Prop({ reflect: true }) height?: number;
+  @Prop({ reflect: true }) loading?: "lazy" | "auto" | "eager";
   @Prop({ reflect: true }) alt?: string;
-  @State() private _showError = false;
-  private _onError = () => {
-    this.console.warn("fail to load image:", this._src);
+  @Prop({ reflect: true }) src?: string;
 
-    this._showError = true;
-    this._isErrorError = false;
+  @State() private tf_src: string = "";
+  private _setTfSrc(tf_src: string = "") {
+    this.tf_src = tf_src;
+    for (const ele of manyQuerySelectorAll<HTMLImageElement>(this._slotEles, "img")) {
+      ele.src = tf_src;
+    }
+  }
+  @Watch("src")
+  async watchSrc(src?: string) {
+    return this._setTfSrc(src && (await this._getTfSrc(src)));
+  }
+  private _getTfSrc(src: string) {
+    return imageProvider.transformFromElement(toHref(src), this.hostEle);
+  }
+
+  @State() private status: "loading" | "success" | "error" = "loading";
+  private _onError = () => {
+    this.console.warn("fail to load image:", this.tf_src);
+
+    this.status = "error";
     /// 网络发生变更的时候，触发重新绑定
     this._onOnlineHellper.bind();
   };
+  private _onLoad = () => {
+    this.console.info("success to load image:", this.tf_src);
 
+    this.status = "success";
+    /// 加载成功，结果已经渲染，不需要绑定网络变更
+    this._onOnlineHellper.unbind();
+  };
+
+  /**网络变动的时候，自动进行重载 */
   private _onOnlineHellper = new EventBindingHelper(this.hostEle, window, "online", () => {
-    this._showError = false;
+    if (this.status === "error") {
+      this.refresh();
+    }
   });
 
+  /**刷新加载 */
+  @Method()
+  async refresh(src?: string) {
+    const tf_src = src ? this._getTfSrc(src) : this.tf_src;
+    this._setTfSrc(undefined);
+    await new Promise<void>(resolve =>
+      requestAnimationFrame(async () => {
+        this._setTfSrc(await tf_src);
+        this.status = "loading";
+        resolve();
+      }),
+    );
+  }
+
   private _initSrc = async () => {
-    await this._watchSrc(this.src);
-    await this._watchErrorSrc(this.errorSrc);
-    this._showError = false;
+    await this.watchSrc(this.src);
+    this.status = "loading";
   };
+  /**监听配置属性变更 */
   private _datasetOb = new MutationObserver(this._initSrc);
 
   connectedCallback() {
@@ -66,51 +94,46 @@ export class BnImage implements ComponentInterface {
   disconnectedCallback() {
     this._onOnlineHellper.unbind();
     this._datasetOb.disconnect();
+    this._imgSlotHelper.disconnectedCallback();
+  }
+  componentDidLoad(): void {
+    this._imgSlotHelper.componentDidLoad();
   }
 
-  @Prop({ reflect: true }) width?: number;
-  @Prop({ reflect: true }) height?: number;
-  @Prop({ reflect: true }) loading?: "lazy" | "auto" | "eager";
-
-  @State() private _isErrorError = false;
-  private _onErrorError = () => {
-    this._isErrorError = true;
-  };
+  private _slotEles = new Set<HTMLElement>();
+  private _imgSlotHelper = new SlotChangeHelper(this.hostEle, "img").onChange(eles => {
+    this._slotEles = eles;
+    this._setTfSrc(this.tf_src);
+  });
 
   render() {
     const width = parseWH(this.width);
     const height = parseWH(this.height);
     const { loading } = this;
-    this.console.info("image src:", this.src, "=>", this._src);
+    this.console.info("image src:", this.src, "=>", this.tf_src);
     return (
       <Host>
-        {this._showError ? (
-          this._isErrorError || !this._errorSrc ? null : (
-            <img
-              part="error"
-              class="error"
-              role="error"
-              loading={loading}
-              src={this._errorSrc}
-              alt={this.alt}
-              style={{ width, height }}
-              onError={this._onErrorError}
-            />
-          )
-        ) : (
+        <slot name="img">
           <img
             part="img"
-            class="img"
-            src={this._src}
+            class={"img " + this.status}
+            src={this.tf_src}
             onError={this._onError}
+            onLoad={this._onLoad}
             alt={this.alt}
             style={{ width, height }}
             loading={loading}
           />
-        )}
-        <blockquote part="alt" class={{ alt: true, show: this._showError }}>
-          {this.alt}
-        </blockquote>
+        </slot>
+        <div class={"slotter error" + (this.status === "error" ? " show" : "")}>
+          <slot name="error">🖼️{this.alt}</slot>
+        </div>
+        <div class={"slotter success" + (this.status === "success" ? " show" : "")}>
+          <slot name="success" />
+        </div>
+        <div class={"slotter loading" + (this.status === "loading" ? " show" : "")}>
+          <slot name="loading" />
+        </div>
       </Host>
     );
   }

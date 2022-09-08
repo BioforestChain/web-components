@@ -16,7 +16,7 @@ const resolveTo = (to: string, ...args: string[]) => path.resolve(__dirname, to,
 const withAngular = true as boolean;
 const ANGULAR_DEST_PATH = resolveTo("../angular/projects/lib");
 const CORE_DEST_PATH = resolveTo("./dist/bnqkl-web-component");
-debugger;
+
 export const config: Config = {
   namespace: packageJson.name.replace("@", "").replace("/", "-"),
   hashFileNames: true,
@@ -38,7 +38,6 @@ export const config: Config = {
                 generateBundle() {
                   const execCopy = async () => {
                     try {
-                      debugger;
                       await doCopy("dev-copy");
                     } catch (err) {}
                   };
@@ -57,28 +56,6 @@ export const config: Config = {
               };
             })(),
           ]
-        : []),
-
-      ...(withAngular
-        ? (() => {
-            const srcDir = resolveTo(CORE_DEST_PATH, "assets");
-            fs.mkdirSync(srcDir, { recursive: true });
-            const destDir = resolveTo(ANGULAR_DEST_PATH, "assets");
-            fs.mkdirSync(destDir, { recursive: true });
-            console.log("copy assets to", destDir);
-            return [
-              {
-                name: "copy-component-assets-to-angular-project",
-                generateBundle() {
-                  for (const filepath of walkFiles(srcDir)) {
-                    const destFilepath = path.join(destDir, path.relative(srcDir, filepath));
-                    fs.mkdirSync(path.dirname(destFilepath), { recursive: true });
-                    fs.copyFileSync(filepath, destFilepath);
-                  }
-                },
-              },
-            ];
-          })()
         : []),
     ],
   },

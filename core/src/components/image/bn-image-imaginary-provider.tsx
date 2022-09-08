@@ -51,8 +51,9 @@ export class BnImageImaginaryProvider implements ComponentInterface {
   }
 
   @Method()
-  async transform(src: string, params: { [key: string]: unknown }) {
-    return this._getTransform().transform(src, params);
+  async transform(src: string, params: { [key: string]: unknown }, config?: { pixelRatio?: number }) {
+    const pixelRatio = config?.pixelRatio ?? devicePixelRatio;
+    return this._getTransform().transform(src, params, { pixelRatio });
   }
   @Method()
   async transformFromElement(src: string, ele: HTMLElement) {

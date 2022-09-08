@@ -102,7 +102,9 @@ export class BnPictureModelViewer implements ComponentInterface {
     this.watchSrc(this.src);
     this.watchCameraOrbitRadius(this.cameraOrbitRadius);
     this.watchFieldOfView(this.fieldOfView);
-    this.interactionPrompt = defaultInteractionPrompt;
+    if (this.interactionPrompt === undefined) {
+      this.interactionPrompt = defaultInteractionPrompt;
+    }
   }
   componentDidLoad() {
     this._posterSlotChangeHelper.componentDidLoad();
@@ -249,7 +251,7 @@ export class BnPictureModelViewer implements ComponentInterface {
    * 是否要显示交互提示
    * 这里默认的行为是，只要用户有过交互行为，那么在本次访问中，它就默认为false了
    */
-  @Prop() interactionPrompt?: boolean;
+  @Prop({ reflect: true, mutable: true }) interactionPrompt?: boolean;
 
   render() {
     const { autoRotate, _cameraOrbitRadius: radius, _fieldOfView: fields, interactionPrompt } = this;

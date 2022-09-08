@@ -15,7 +15,7 @@
 
 ## Methods
 
-### `transform(src: string, params: { [key: string]: unknown; }) => Promise<string>`
+### `transform(src: string, params: { [key: string]: unknown; }, config?: { pixelRatio?: number | undefined; } | undefined) => Promise<string>`
 
 
 
