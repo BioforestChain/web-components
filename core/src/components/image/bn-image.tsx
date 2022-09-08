@@ -62,14 +62,14 @@ export class BnImage implements ComponentInterface {
   /**网络变动的时候，自动进行重载 */
   private _onOnlineHellper = new EventBindingHelper(this.hostEle, window, "online", () => {
     if (this.status === "error") {
-      this.refresh();
+      this.refresh(false);
     }
   });
 
   /**刷新加载 */
   @Method()
-  async refresh(src?: string) {
-    const tf_src = src ? this._getTfSrc(src) : this.tf_src;
+  async refresh(force?: boolean) {
+    const tf_src = force && this.src ? this._getTfSrc(this.src) : this.tf_src;
     this._setTfSrc(undefined);
     await new Promise<void>(resolve =>
       requestAnimationFrame(async () => {
