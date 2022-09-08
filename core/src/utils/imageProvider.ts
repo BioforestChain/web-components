@@ -12,7 +12,7 @@ export abstract class ImageTransform {
     {
       if (param_width === "parent") {
         const parentWidth = (parentRect ?? ele.parentElement?.getBoundingClientRect())?.width;
-        if (parentWidth === undefined || parentWidth === 0) {
+        if (parentWidth !== undefined && parentWidth > 0) {
           param_width = parentWidth;
         } else {
           param_width = "auto";
@@ -26,7 +26,7 @@ export abstract class ImageTransform {
     {
       if (param_height === "parent") {
         const parentHeight = (parentRect ?? ele.parentElement?.getBoundingClientRect())?.height;
-        if (parentHeight === undefined || parentHeight === 0) {
+        if (parentHeight !== undefined && parentHeight > 0) {
           param_height = parentHeight;
         } else {
           param_height = "auto";
