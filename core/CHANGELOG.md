@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.10.0
+
+### Minor Changes
+
+- `<bn-image>` export prop `proxySrc`
+
 ## 1.9.1
 
 ### Patch Changes
