@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.11.0
+
+### Minor Changes
+
+- `<bn-image>` add attr `cross-origin`, rename prop `proxySrc` to `currentSrc`
+
 ## 1.10.0
 
 ### Minor Changes
