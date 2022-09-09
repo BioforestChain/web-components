@@ -13,6 +13,7 @@ export const Base_Usage = bnImageKit.storyFactory(
   {
     src: "https://localhost:6006/assets/flower.png",
     alt: "花朵图片",
+    crossOrigin: "anonymous",
   },
 );
 

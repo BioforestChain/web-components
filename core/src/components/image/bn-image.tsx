@@ -27,32 +27,34 @@ export class BnImage implements ComponentInterface {
   @Prop({ reflect: true }) loading?: "lazy" | "auto" | "eager";
   @Prop({ reflect: true }) alt?: string;
   @Prop({ reflect: true }) src?: string;
+  @Prop({ reflect: true }) crossOrigin?: "anonymous" | "use-credentials";
 
-  @Prop({ mutable: true }) proxySrc: string = "";
-  private _setTfSrc(proxy_src: string = "") {
-    this.proxySrc = proxy_src;
+  /**当前显示图片的url，随着data属性的变更与provider的变更，currentSrc会发生变化 */
+  @Prop({ mutable: true }) currentSrc: string = "";
+  private _setCurrentSrc(current_src: string = "") {
+    this.currentSrc = current_src;
     for (const ele of manyQuerySelectorAll<HTMLImageElement>(this._slotEles, "img")) {
-      ele.src = proxy_src;
+      ele.src = current_src;
     }
   }
   @Watch("src")
   async watchSrc(src?: string) {
-    return this._setTfSrc(src && (await this._getTfSrc(src)));
+    return this._setCurrentSrc(src && (await this._getCurrentSrc(src)));
   }
-  private _getTfSrc(src: string) {
+  private _getCurrentSrc(src: string) {
     return imageProvider.transformFromElement(toHref(src), this.hostEle);
   }
 
   @State() private status: "loading" | "success" | "error" = "loading";
   private _onError = () => {
-    this.console.warn("fail to load image:", this.proxySrc);
+    this.console.warn("fail to load image:", this.currentSrc);
 
     this.status = "error";
     /// 网络发生变更的时候，触发重新绑定
     this._onOnlineHellper.bind();
   };
   private _onLoad = () => {
-    this.console.info("success to load image:", this.proxySrc);
+    this.console.info("success to load image:", this.currentSrc);
 
     this.status = "success";
     /// 加载成功，结果已经渲染，不需要绑定网络变更
@@ -69,11 +71,11 @@ export class BnImage implements ComponentInterface {
   /**刷新加载 */
   @Method()
   async refresh(force?: boolean) {
-    const proxy_src = force && this.src ? this._getTfSrc(this.src) : this.proxySrc;
-    this._setTfSrc(undefined);
+    const current_src = force && this.src ? this._getCurrentSrc(this.src) : this.currentSrc;
+    this._setCurrentSrc(undefined);
     await new Promise<void>(resolve =>
       requestAnimationFrame(async () => {
-        this._setTfSrc(await proxy_src);
+        this._setCurrentSrc(await current_src);
         this.status = "loading";
         resolve();
       }),
@@ -103,26 +105,27 @@ export class BnImage implements ComponentInterface {
   private _slotEles = new Set<HTMLElement>();
   private _imgSlotHelper = new SlotChangeHelper(this.hostEle, "img").onChange(eles => {
     this._slotEles = eles;
-    this._setTfSrc(this.proxySrc);
+    this._setCurrentSrc(this.currentSrc);
   });
 
   render() {
     const width = parseWH(this.width);
     const height = parseWH(this.height);
     const { loading } = this;
-    this.console.info("image src:", this.src, "=>", this.proxySrc);
+    this.console.info("image src:", this.src, "=>", this.currentSrc);
     return (
       <Host>
         <slot name="img">
           <img
             part="img"
             class={"img " + this.status}
-            src={this.proxySrc}
+            src={this.currentSrc}
             onError={this._onError}
             onLoad={this._onLoad}
             alt={this.alt}
             style={{ width, height }}
             loading={loading}
+            cross-origin={this.crossOrigin}
           />
         </slot>
         <div part="error" class={"slotter error" + (this.status === "error" ? " show" : "")}>

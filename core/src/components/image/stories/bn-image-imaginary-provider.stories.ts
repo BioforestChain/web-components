@@ -9,32 +9,63 @@ export default {
 const GEN_IMG_NUM_INPUT = (id: string, label: string, value = 0, min = 0, max = 500, step = 10) => {
   return html` <label for="${id}">
     ${label}:
-    <input id="${id}" type="number" step="${step}" value="${value}" min="${min}" max="${max}" />
+    <input id="${id}" type="range" step="${1}" value="${value}" min="${min}" max="${max}" />
   </label>`;
 };
 
+const enum ImaginaryService {
+  REMOTE = "remote",
+  LOCALE = "locale",
+}
+const ImaginaryServiceCtrl = {
+  get() {
+    let val = localStorage.getItem("imaginary-service") as ImaginaryService | null;
+    if (val === null) {
+      val = ImaginaryService.REMOTE;
+      localStorage.setItem("imaginary-service", val);
+    }
+    return val;
+  },
+  set(v: ImaginaryService) {
+    localStorage.setItem("imaginary-service", v);
+  },
+  // toggle() {
+  //   ImaginaryService.set(!ImaginaryService.get());
+  // },
+};
+
+const CTRL_INPUT_IMAGE = {
+  [ImaginaryService.LOCALE]: "https://avatars.githubusercontent.com/u/2151644",
+  [ImaginaryService.REMOTE]:
+    "https://storage-qacarbonstorage.p.googleapis.com/qa-carbon/qa-carbon/2auIo33K/09ab7f9a48ab067cebaff8f08c3b69eb.jpeg",
+};
 const CTRL_HTML = html`
   <blockquote>你需要配置自己的 imaginary 服务器到 origin 中才能进行测试</blockquote>
   <section>
     <h3>Set Test Image</h3>
-    <input id="input-image" value="https://avatars.githubusercontent.com/u/2151644" />
+    <!-- <input id="input-image" value="https://avatars.githubusercontent.com/u/2151644" /> -->
+    <label>
+      图像链接：
+      <input id="input-image" type="url" value="${CTRL_INPUT_IMAGE[ImaginaryServiceCtrl.get()]}" />
+    </label>
+    <label>
+      切换开关：
+      <label>
+        <input name="imaginary-service" value="${ImaginaryService.LOCALE}" type="radio" />
+        ：使用本地服务（需要自己部署imaginary服务）
+      </label>
+      <label>
+        <input name="imaginary-service" value="${ImaginaryService.REMOTE}" type="radio" />
+        ：使用远程服务
+      </label>
+    </label>
   </section>
 `;
-const CTRL_STYLE = `
-blockquote {
-  color: rgba(0,0,0, 0.5);
-  border-left: 1em solid rgb(30 167 253 / 68%);
-  margin-left: 0;
-  padding-left: 1em;
-  background: linear-gradient(45deg, rgb(30 167 253 / 16%), transparent);
-}
-section {
-  background: #eee;
-  padding: 0.5em 1em;
-  border-radius: 0.5em;
-  margin-bottom: 1em;
-}
-`;
+const CTRL_ORIGIN = {
+  [ImaginaryService.LOCALE]: `https://172.30.90.240:9000/`,
+  [ImaginaryService.REMOTE]: `https://qaimg.tansocc.com/`,
+};
+
 const CTRL_JS = (frag: DocumentFragment) => {
   const bnimgs = frag.querySelectorAll("bn-image");
   const bnImageForeach = (callback: (ele: HTMLBnImageElement) => unknown) => {
@@ -61,9 +92,22 @@ const CTRL_JS = (frag: DocumentFragment) => {
     const bindValue = () => {
       bnImageForeach(ele => bind(ele, inputImageEle.value));
     };
-    inputImageEle.onchange = bindValue;
+    // inputImageEle.onchange = bindValue;
+    inputImageEle.oninput = bindValue;
     bindValue();
   };
+  {
+    const curValue = ImaginaryServiceCtrl.get();
+    for (const ele of frag.querySelectorAll<HTMLInputElement>(`[name='imaginary-service']`)) {
+      ele.checked = ele.value === curValue;
+      ele.onchange = () => {
+        if (ele.checked) {
+          ImaginaryServiceCtrl.set(ele.value as ImaginaryService);
+          location.reload();
+        }
+      };
+    }
+  }
   //src
   numberInput("input-image", (ele, val) => (ele.src = val));
   // width
@@ -74,9 +118,31 @@ const CTRL_JS = (frag: DocumentFragment) => {
   numberInput("img-areawidth-input", (ele, val) => (ele.dataset.areawidth = +val ? val : undefined));
   numberInput("img-areaheight-input", (ele, val) => (ele.dataset.areaheight = +val ? val : undefined));
 };
+
+const CTRL_STYLE = `
+blockquote {
+  color: rgba(0,0,0, 0.5);
+  border-left: 1em solid rgb(30 167 253 / 68%);
+  margin-left: 0;
+  padding-left: 1em;
+  background: linear-gradient(45deg, rgb(30 167 253 / 16%), transparent);
+}
+section {
+  background: #eee;
+  padding: 0.5em 1em;
+  border-radius: 0.5em;
+  margin-bottom: 1em;
+}
+label {
+  display: block;
+}
+input[type="url"] {
+  width: 100%;
+}
+`;
 const CtrlTpl = bnImageImaginaryProviderKit
   .storyFactory(() => html``, {
-    origin: "https://172.30.90.240:9000/",
+    origin: CTRL_ORIGIN[ImaginaryServiceCtrl.get()],
   })
   .addHtmlTpl(CTRL_HTML)
   .addStyle(CTRL_STYLE)
