@@ -22,7 +22,7 @@
    ```json
    {
      "glob": "*",
-     "input": "node_modules/@bnqkl/web-component/assets",
+     "input": "node_modules/@bnqkl/web-component/dist/bnqkl-web-component/assets",
      "output": "assets/bnqkl-web-component"
    }
    ```

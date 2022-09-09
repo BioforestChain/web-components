@@ -35,6 +35,8 @@
       defineCustomElements();
       ```
 
+   1. assets 文件夹在 `node_modules/@bnqkl/web-component/dist/bnqkl-web-component/assets` 中
+
 1. 在项目中使用标签
 
    ```html

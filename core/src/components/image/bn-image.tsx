@@ -28,11 +28,11 @@ export class BnImage implements ComponentInterface {
   @Prop({ reflect: true }) alt?: string;
   @Prop({ reflect: true }) src?: string;
 
-  @State() private tf_src: string = "";
-  private _setTfSrc(tf_src: string = "") {
-    this.tf_src = tf_src;
+  @Prop({ mutable: true }) proxySrc: string = "";
+  private _setTfSrc(proxy_src: string = "") {
+    this.proxySrc = proxy_src;
     for (const ele of manyQuerySelectorAll<HTMLImageElement>(this._slotEles, "img")) {
-      ele.src = tf_src;
+      ele.src = proxy_src;
     }
   }
   @Watch("src")
@@ -45,14 +45,14 @@ export class BnImage implements ComponentInterface {
 
   @State() private status: "loading" | "success" | "error" = "loading";
   private _onError = () => {
-    this.console.warn("fail to load image:", this.tf_src);
+    this.console.warn("fail to load image:", this.proxySrc);
 
     this.status = "error";
     /// 网络发生变更的时候，触发重新绑定
     this._onOnlineHellper.bind();
   };
   private _onLoad = () => {
-    this.console.info("success to load image:", this.tf_src);
+    this.console.info("success to load image:", this.proxySrc);
 
     this.status = "success";
     /// 加载成功，结果已经渲染，不需要绑定网络变更
@@ -69,11 +69,11 @@ export class BnImage implements ComponentInterface {
   /**刷新加载 */
   @Method()
   async refresh(force?: boolean) {
-    const tf_src = force && this.src ? this._getTfSrc(this.src) : this.tf_src;
+    const proxy_src = force && this.src ? this._getTfSrc(this.src) : this.proxySrc;
     this._setTfSrc(undefined);
     await new Promise<void>(resolve =>
       requestAnimationFrame(async () => {
-        this._setTfSrc(await tf_src);
+        this._setTfSrc(await proxy_src);
         this.status = "loading";
         resolve();
       }),
@@ -103,21 +103,21 @@ export class BnImage implements ComponentInterface {
   private _slotEles = new Set<HTMLElement>();
   private _imgSlotHelper = new SlotChangeHelper(this.hostEle, "img").onChange(eles => {
     this._slotEles = eles;
-    this._setTfSrc(this.tf_src);
+    this._setTfSrc(this.proxySrc);
   });
 
   render() {
     const width = parseWH(this.width);
     const height = parseWH(this.height);
     const { loading } = this;
-    this.console.info("image src:", this.src, "=>", this.tf_src);
+    this.console.info("image src:", this.src, "=>", this.proxySrc);
     return (
       <Host>
         <slot name="img">
           <img
             part="img"
             class={"img " + this.status}
-            src={this.tf_src}
+            src={this.proxySrc}
             onError={this._onError}
             onLoad={this._onLoad}
             alt={this.alt}
