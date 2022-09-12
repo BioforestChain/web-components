@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.12.1
+
+### Patch Changes
+
+- `<bn-blur-ground-image>` add `update` event
+
 ## 1.12.0
 
 ### Minor Changes
