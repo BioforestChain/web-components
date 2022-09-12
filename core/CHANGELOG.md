@@ -1,5 +1,12 @@
 # @bnqkl/web-component
 
+## 1.12.0
+
+### Minor Changes
+
+- add new component: <bn-blur-ground-image />.
+  wrap <img/> element, add blur background in container.
+
 ## 1.11.0
 
 ### Minor Changes
