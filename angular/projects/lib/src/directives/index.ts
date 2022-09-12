@@ -3,6 +3,7 @@ import * as d from './proxies';
 
 export const DIRECTIVES = [
   d.BnAnimationIcon,
+  d.BnBlurGroundImage,
   d.BnCollectButton,
   d.BnConfigUtil,
   d.BnDislikeButton,

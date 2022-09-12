@@ -1,4 +1,4 @@
-# bn-image-imaginary-provider
+# bn-blur-background-image
 
 
 

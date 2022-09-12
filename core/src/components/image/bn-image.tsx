@@ -1,6 +1,6 @@
 import { Component, ComponentInterface, Element, h, Host, Method, Prop, State, Watch } from "@stencil/core";
 import { imageProvider } from "../../utils/imageProvider";
-import { Logger, manyQuerySelectorAll } from "../../utils/utils";
+import { createElements, Logger, manyQuerySelectorAll } from "../../utils/utils";
 import { EventBindingHelper } from "../util/eventBinding.helper";
 import { SlotChangeHelper } from "../util/slotChange.helper";
 
@@ -102,7 +102,7 @@ export class BnImage implements ComponentInterface {
     this._imgSlotHelper.componentDidLoad();
   }
 
-  private _slotEles = new Set<HTMLElement>();
+  private _slotEles = createElements<HTMLElement>([]);
   private _imgSlotHelper = new SlotChangeHelper(this.hostEle, "img").onChange(eles => {
     this._slotEles = eles;
     this._setCurrentSrc(this.currentSrc);

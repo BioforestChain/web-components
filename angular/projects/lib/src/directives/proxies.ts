@@ -30,6 +30,26 @@ export class BnAnimationIcon {
 }
 
 
+export declare interface BnBlurGroundImage extends Components.BnBlurGroundImage {}
+
+@ProxyCmp({
+  defineCustomElementFn: undefined,
+  methods: ['getActiveImageElement', 'toBlob', 'toDataURL']
+})
+@Component({
+  selector: 'bn-blur-ground-image',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>'
+})
+export class BnBlurGroundImage {
+  protected el: HTMLElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+  }
+}
+
+
 export declare interface BnCollectButton extends Components.BnCollectButton {
   /**
    *  

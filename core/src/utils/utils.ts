@@ -621,3 +621,83 @@ export const nullProtoObj = <T extends {}>(obj: T) => {
   Object.setPrototypeOf(obj, null);
   return obj;
 };
+
+export const multiApply = <F extends (...args: any) => any>(
+  funs: Iterable<F>,
+  args: Parameters<F>,
+  ctx: ThisParameterType<F> = null as never,
+) => {
+  const results: (ReturnType<F> | Promise<never>)[] = [];
+  for (const fun of funs) {
+    try {
+      const res = fun.apply(ctx, args);
+      results.push(res);
+    } catch (err) {
+      results.push(Promise.reject(err));
+    }
+  }
+
+  let promise: Promise<Awaited<ReturnType<F>>[]> | undefined;
+  let then: NonNullable<typeof promise>["then"] | undefined;
+  const pr: typeof results & {
+    promise: NonNullable<typeof promise>;
+    then: NonNullable<typeof then>;
+  } = Object.create(results, {
+    promise: {
+      get() {
+        return (promise ??= Promise.all(results));
+      },
+    },
+    then: {
+      get() {
+        return (then ??= pr.promise.then.bind(promise));
+      },
+    },
+  });
+
+  return pr;
+};
+
+export type $Elements<T extends HTMLElement> = ReadonlyArray<T> & {
+  first: T | undefined;
+  last: T | undefined;
+  findByTagName: <T extends keyof HTMLElementTagNameMap>(tag: T) => HTMLElementTagNameMap[T] | undefined;
+  filterByTagName: <T extends keyof HTMLElementTagNameMap>(tag: T) => Array<HTMLElementTagNameMap[T]>;
+};
+export const createElements = <T extends HTMLElement = HTMLElement>(eles: Iterable<T>) => {
+  const elements: $Elements<T> = Object.create(Object.freeze([...eles]), {
+    first: {
+      get() {
+        return elements[0];
+      },
+    },
+    last: {
+      get() {
+        return elements[elements.length - 1];
+      },
+    },
+    findByTagName: {
+      value: <T extends keyof HTMLElementTagNameMap>(tag: T) => {
+        const tagName = tag.toUpperCase();
+        for (const ele of elements) {
+          if (ele.tagName === tagName) {
+            return ele as unknown as HTMLElementTagNameMap[T];
+          }
+        }
+      },
+    },
+    filterByTagName: {
+      value: <T extends keyof HTMLElementTagNameMap>(tag: T) => {
+        const tagName = tag.toUpperCase();
+        const result: Array<HTMLElementTagNameMap[T]> = [];
+        for (const ele of elements) {
+          if (ele.tagName === tagName) {
+            result.push(ele as unknown as HTMLElementTagNameMap[T]);
+          }
+        }
+        return result;
+      },
+    },
+  });
+  return elements;
+};
