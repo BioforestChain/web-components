@@ -11,7 +11,7 @@ export const Base_Usage = bnBlurGroundImageKit
   .storyFactory(
     () =>
       // push some child element
-      html`<img slot="img" src="/assets/flower.png" />`,
+      html`<img slot="img" src="/assets/demo-texture.jpg" />`,
     {},
   )
   .addHtmlTpl(

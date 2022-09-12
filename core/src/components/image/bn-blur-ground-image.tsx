@@ -1,4 +1,4 @@
-import { Component, ComponentInterface, Element, h, Host, Method } from "@stencil/core";
+import { Component, ComponentInterface, Element, h, Host, Method, Prop } from "@stencil/core";
 import { Logger } from "../../utils/utils";
 import { once } from "../util/event.helper";
 import { QueryHelper } from "../util/query.helper";
@@ -16,6 +16,9 @@ import { SlotChangeHelper } from "../util/slotChange.helper";
 export class BnBlurdGroundImage implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
+
+  @Prop({ reflect: true })
+  blurRatio = 20;
 
   private _canvasEle!: HTMLCanvasElement;
   private _canvas2dCtx!: CanvasRenderingContext2D;
@@ -65,7 +68,13 @@ export class BnBlurdGroundImage implements ComponentInterface {
       }
 
       /// 绘制模糊背景
-      const blurSize = Math.sqrt(naturalWidth ** 2 + naturalHeight ** 2) * imageScale * 0.1;
+      let { blurRatio } = this;
+      if (Number.isNaN(blurRatio) || Number.isFinite(blurRatio) === false || blurRatio < 0) {
+        blurRatio = 20;
+      }
+
+      const blurSize = Math.sqrt(naturalWidth ** 2 + naturalHeight ** 2) * (1 / blurRatio);
+
       ctx.filter = `blur(${blurSize * imageScale}px)`;
       ctx.drawImage(
         imgEle,
@@ -83,7 +92,7 @@ export class BnBlurdGroundImage implements ComponentInterface {
       ctx.filter = "none";
       ctx.drawImage(imgEle, dx, dy, imageWidth, imageHeight);
 
-      this.console.log(canvas.width, canvas.height, blurSize);
+      this.console.log("canvas width:", canvas.width, "canvas height:", canvas.height, "blur size:", blurSize);
     } else {
       canvas.width = 1;
       canvas.height = 1;
@@ -118,6 +127,11 @@ export class BnBlurdGroundImage implements ComponentInterface {
         quality,
       ),
     );
+  }
+
+  @Method()
+  async toObjectURL(type?: string, quality?: any) {
+    return URL.createObjectURL(await this.toBlob(type, quality));
   }
 
   @Method()

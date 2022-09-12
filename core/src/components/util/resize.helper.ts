@@ -46,7 +46,6 @@ export class ResizeHelper {
   }
   private _init_states = new Map<Element, { width: number; height: number } | null>();
   private _resizeOb = new ResizeObserver(enties => {
-    console.log(enties);
     for (const entry of enties) {
       const ele = entry.target;
       const init_state = this._init_states.get(ele);

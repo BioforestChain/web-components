@@ -34,12 +34,14 @@ export declare interface BnBlurGroundImage extends Components.BnBlurGroundImage 
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  methods: ['getActiveImageElement', 'toBlob', 'toDataURL']
+  inputs: ['blurRatio'],
+  methods: ['getActiveImageElement', 'toBlob', 'toObjectURL', 'toDataURL']
 })
 @Component({
   selector: 'bn-blur-ground-image',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: '<ng-content></ng-content>'
+  template: '<ng-content></ng-content>',
+  inputs: ['blurRatio']
 })
 export class BnBlurGroundImage {
   protected el: HTMLElement;
