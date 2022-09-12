@@ -30,7 +30,13 @@ export class BnAnimationIcon {
 }
 
 
-export declare interface BnBlurGroundImage extends Components.BnBlurGroundImage {}
+export declare interface BnBlurGroundImage extends Components.BnBlurGroundImage {
+  /**
+   *  
+   */
+  update: EventEmitter<CustomEvent<any>>;
+
+}
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
@@ -48,6 +54,7 @@ export class BnBlurGroundImage {
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
+    proxyOutputs(this, this.el, ['update']);
   }
 }
 

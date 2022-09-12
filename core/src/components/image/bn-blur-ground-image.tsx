@@ -1,4 +1,4 @@
-import { Component, ComponentInterface, Element, h, Host, Method, Prop } from "@stencil/core";
+import { Component, ComponentInterface, Element, h, Host, Method, Prop, Event, EventEmitter } from "@stencil/core";
 import { Logger } from "../../utils/utils";
 import { once } from "../util/event.helper";
 import { QueryHelper } from "../util/query.helper";
@@ -16,6 +16,8 @@ import { SlotChangeHelper } from "../util/slotChange.helper";
 export class BnBlurdGroundImage implements ComponentInterface {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
+  @Event({ eventName: "update" })
+  readonly onUpdate!: EventEmitter;
 
   @Prop({ reflect: true })
   blurRatio = 20;
@@ -37,7 +39,7 @@ export class BnBlurdGroundImage implements ComponentInterface {
     this._drawCanvas();
   });
 
-  private async _drawCanvas() {
+  private async _drawCanvas() {debugger
     const imgEle = this._sourceImgEle;
     const { _canvasEle: canvas, _canvas2dCtx: ctx } = this;
     if (imgEle) {
@@ -98,6 +100,7 @@ export class BnBlurdGroundImage implements ComponentInterface {
       canvas.height = 1;
       ctx.clearRect(0, 0, 1, 1);
     }
+    this.onUpdate.emit();
   }
 
   @Method()

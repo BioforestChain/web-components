@@ -16,6 +16,7 @@ export const Base_Usage = bnBlurGroundImageKit
   )
   .addHtmlTpl(
     html`
+      <hr />
       <label>
         Width:
         <input id="img-width" type="range" min="10" value="100" max="500" step="1" />
