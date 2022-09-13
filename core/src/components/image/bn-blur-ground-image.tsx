@@ -39,7 +39,7 @@ export class BnBlurdGroundImage implements ComponentInterface {
     this._drawCanvas();
   });
 
-  private async _drawCanvas() {debugger
+  private async _drawCanvas() {
     const imgEle = this._sourceImgEle;
     const { _canvasEle: canvas, _canvas2dCtx: ctx } = this;
     if (imgEle) {
