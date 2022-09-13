@@ -571,7 +571,6 @@ export class ImaginaryTransform extends ImageTransform {
       url.searchParams.set(key, valStr);
     }
     url.searchParams.set("url", source_url);
-    debugger;
     return url.href;
   }
 }
