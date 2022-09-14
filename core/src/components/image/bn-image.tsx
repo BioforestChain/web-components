@@ -31,11 +31,19 @@ export class BnImage implements ComponentInterface {
 
   /**当前显示图片的url，随着data属性的变更与provider的变更，currentSrc会发生变化 */
   @Prop({ mutable: true }) currentSrc: string = "";
-  private _setCurrentSrc(current_src: string = "") {
+  private _setCurrentSrc(current_src: string = "", force = false) {
+    if (this.currentSrc === current_src && force === false) {
+      return false;
+    }
     this.currentSrc = current_src;
     for (const ele of manyQuerySelectorAll<HTMLImageElement>(this._slotEles, "img")) {
       ele.src = current_src;
     }
+    /** 这个状态始终要跟着内部的img的属性走 */
+    if (this.currentSrc !== current_src) {
+      this.status = "loading";
+    }
+    return true;
   }
   @Watch("src")
   async watchSrc(src?: string) {
@@ -76,22 +84,25 @@ export class BnImage implements ComponentInterface {
     await new Promise<void>(resolve =>
       requestAnimationFrame(async () => {
         this._setCurrentSrc(await current_src);
-        this.status = "loading";
         resolve();
       }),
     );
   }
 
-  private _initSrc = async () => {
-    await this.watchSrc(this.src);
-    this.status = "loading";
+  private _initSrc = () => {
+    return this.watchSrc(this.src);
   };
   /**监听配置属性变更 */
-  private _datasetOb = new MutationObserver(this._initSrc);
+  private _datasetOb = new MutationObserver(enties => {
+    const datasetChanged = enties.some(e => e.type === "attributes" && e.attributeName!.startsWith("data-"));
+    if (datasetChanged) {
+      void this._initSrc();
+    }
+  });
 
   connectedCallback() {
-    void this._initSrc();
     this._datasetOb.observe(this.hostEle, { attributes: true, attributeOldValue: false });
+    void this._initSrc();
   }
   disconnectedCallback() {
     this._onOnlineHellper.unbind();
@@ -105,7 +116,7 @@ export class BnImage implements ComponentInterface {
   private _slotEles = createElements<HTMLElement>([]);
   private _imgSlotHelper = new SlotChangeHelper(this.hostEle, "img").onChange(eles => {
     this._slotEles = eles;
-    this._setCurrentSrc(this.currentSrc);
+    this._setCurrentSrc(this.currentSrc, true);
   });
 
   render() {

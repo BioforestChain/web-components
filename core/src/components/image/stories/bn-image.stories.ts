@@ -53,7 +53,7 @@ export const CustomImage = bnImageKit.storyFactory(
     // push some child element
     html`
       <div slot="img">
-        <p>这是自定义图片,src与alt会自动被绑定:</p>
+        <p>这是自定义图片,src会自动被绑定:</p>
         <img />
       </div>
     `,
