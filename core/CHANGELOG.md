@@ -1,5 +1,11 @@
 # @bnqkl/web-component
 
+## 1.12.2
+
+### Patch Changes
+
+- optimal the performance of `<bn-image>` when init
+
 ## 1.12.1
 
 ### Patch Changes

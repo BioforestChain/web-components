@@ -1,6 +1,6 @@
 {
   "name": "@bnqkl/web-component",
-  "version": "1.12.1",
+  "version": "1.12.2",
   "description": "Bnqkl Web Component",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
