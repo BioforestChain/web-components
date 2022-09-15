@@ -1,6 +1,6 @@
 import { html } from "lit-html";
 import { bnSliderTabsKit } from "./autogen";
-import { BASE_HTML, BASE_STYLE } from "./bn-slider-tabs.const";
+import { BASE_HTML, BASE_STYLE } from "./bn-slider-tabs.util";
 
 export default {
   title: "Component/Slider/Slider Tabs",

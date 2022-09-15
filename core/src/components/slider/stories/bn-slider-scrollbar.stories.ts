@@ -1,7 +1,7 @@
 import { html } from "lit-html";
 import { bnSliderKit, bnSliderScrollbarKit, bnSliderTabsKit } from "./autogen";
-import * as SLIDER_TABS_CONST from "./bn-slider-tabs.const";
-import * as SLIDER_CONST from "./bn-slider.const";
+import * as SLIDER_TABS_CONST from "./bn-slider-tabs.util";
+import * as SLIDER_CONST from "./bn-slider.util";
 
 export default {
   title: "Component/Slider/Slider Scrollbar",

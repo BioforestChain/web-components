@@ -1,6 +1,6 @@
 import { html, TemplateResult } from "lit-html";
 import { bnSliderKit } from "./autogen";
-import { DEMO_HTML, DEMO_STYLE, TABS_HTML, TABS_STYLE } from "./bn-slider.const";
+import { DEMO_HTML, DEMO_STYLE, TABS_HTML, TABS_STYLE } from "./bn-slider.util";
 
 export default {
   title: "Component/Slider/Slider",
