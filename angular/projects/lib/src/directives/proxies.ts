@@ -149,7 +149,8 @@ false: hide
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  inputs: ['clampLine', 'lineHeight', 'open', 'text']
+  inputs: ['clampLine', 'lineHeight', 'open', 'text'],
+  methods: ['toggleMore', 'showMore', 'hideMore']
 })
 @Component({
   selector: 'bn-has-more-text',

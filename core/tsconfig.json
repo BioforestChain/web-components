@@ -1,32 +1,36 @@
 {
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "declaration": true,
+    "experimentalDecorators": true,
     "composite": true,
     "lib": [
-      "es2021"
+      "dom",
+      "es2017"
     ],
-    "module": "CommonJS",
-    "target": "es2021",
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
+    "module": "esnext",
+    "target": "es2017",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "resolveJsonModule": true,
+    "jsx": "react",
+    "jsxFactory": "h",
     "strict": true,
-    "noEmit": true,
-    "allowJs": true,
-    "types": [
-      "node"
-    ]
   },
-  "files": [
-    "./stencil.config.ts"
-  ],
   "include": [
-    "*.json",
-    ".*.json",
-    "./scripts/**/*.cjs"
+    "src",
+    "src/**/*.json"
+  ],
+  "exclude": [
+    "node_modules",
+    // stories 文件夹中的是包含自动生成的代码，不能包含进去，否则会编译时出错，导致自动生成的代码也无法执行
+    "src/**/stories"
   ],
   "references": [
     {
-      "path": "./tsconfig.components.json"
+      "path": "./tsconfig.stencil.json"
     }
   ]
 }

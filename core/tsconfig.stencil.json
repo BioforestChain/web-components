@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "lib": [
+      "es2021"
+    ],
+    "module": "CommonJS",
+    "target": "es2021",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "noEmit": false,
+    "outDir": "./dist/tmp",
+    "allowJs": true,
+    "types": [
+      "node"
+    ]
+  },
+  "files": [
+    "./stencil.config.ts"
+  ],
+  "include": [
+    "*.json",
+    ".*.json",
+    "./scripts/**/*.cjs"
+  ],
+  "exclude": [
+    "src"
+  ],
+  "references": []
+}

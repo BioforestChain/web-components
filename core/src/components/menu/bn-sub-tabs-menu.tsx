@@ -1,5 +1,5 @@
 import { Component, ComponentInterface, Element, h, Host, Method, Prop, State } from "@stencil/core";
-import { Logger, querySelector, throttle } from "../../utils/utils";
+import { Logger, throttle } from "../../utils/utils";
 import { $BnLayout, $BnSliderFollower } from "../slider/bn-slider.const";
 import { QueryHelper } from "../util/query.helper";
 

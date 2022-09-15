@@ -22,12 +22,48 @@
 | `openChanged` | visibility state true: open false: hide | `CustomEvent<boolean>` |
 
 
+## Methods
+
+### `hideMore() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+### `showMore() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+### `toggleMore(open?: boolean) => Promise<boolean>`
+
+
+
+#### Returns
+
+Type: `Promise<boolean>`
+
+
+
+
 ## Shadow Parts
 
 | Part         | Description |
 | ------------ | ----------- |
+| `"btn-text"` |             |
+| `"fold"`     |             |
 | `"has-more"` |             |
 | `"text"`     |             |
+| `"unfold"`   |             |
 
 
 ----------------------------------------------
