@@ -18,18 +18,26 @@
   // 样式
   width: 100%;
   display: inline-block;
+  contain: strict;
+  will-change: left, width;
 
   // 动画
-  --cursor-duration: 200ms;
+  --cursor-duration: 100ms;
   --cursor-left-in-easing: cubic-bezier(0.22, 0.61, 0.36, 1); // Out · Cubic
   --cursor-left-out-easing: cubic-bezier(0.55, 0.06, 0.68, 0.19); // In · Cubic
   --cursor-right-in-easing: cubic-bezier(0.22, 0.61, 0.36, 1);
   --cursor-right-out-easing: cubic-bezier(0.55, 0.06, 0.68, 0.19);
   animation-fill-mode: forwards;
+  /// 这里的 animation-duration 不是给 cursor 自己使用的，是给 ani-item 用的
   animation-duration: var(--cursor-duration);
+
+  /// 这里独立地配置了 transition-duration ，可以有效提高帧率
+  transition-duration: 300ms;
+  transition-timing-function: ease-out;
+  transform-origin: left;
   > .spirit {
     height: 100%;
-    // contain: strict;
+    contain: strict;
 
     --cursor-start-color: #1e80f7;
     --cursor-end-color: #3fbdfc;
@@ -47,6 +55,10 @@
   flex-grow: 0;
   .ani-item {
     position: absolute;
+    contain: strict;
+    will-change: top;
+    width: 1px;
+    height: 1px;
   }
   // .left-in {
   //   animation-duration: var(--cursor-left-in-easing);

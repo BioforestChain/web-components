@@ -433,9 +433,10 @@ export class BnSlider implements ComponentInterface, $BnSlider {
     if (event && event.target !== this.hostEle) {
       return;
     }
+    debugger;
 
     this._scrolling = { startTime: event.timeStamp };
-    this._updateSliderStates();
+    this._updateSliderStates(this.calcLayoutInfo((event.target as any)!.scrollLeft, true));
 
     /// 如果不是在最后的scrollinto的控制中，那么需要持续监测滚动状况
     if (this._inScrollInto === false) {

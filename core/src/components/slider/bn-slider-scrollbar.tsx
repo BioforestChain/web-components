@@ -89,14 +89,21 @@ export class BnSliderScrollbar implements ComponentInterface {
     }
     const reason = await ele.getReason();
     // if (reason === "user") {
-    return this._followSliderElement(ele, `reason: ${reason} ${event.type}`);
+    return this._followSliderElement(ele, `(reason: ${reason} ${event.type})`);
     // }
   };
   private async _followSliderElement(ele: $BnSlider.HTMLBnSliderElement, _reason?: unknown) {
     const scrollProgress = await ele.getScrollProgress();
     const aniProgress = this._scrollProgressToAniProgress(scrollProgress);
     this._playAnimations(aniProgress);
-    this.console.log("follow slider", _reason, scrollProgress, aniProgress);
+    this.console.lazyLog(() => [
+      "follow slider",
+      _reason,
+      "scroll-progress:",
+      +scrollProgress.toFixed(3),
+      "animation-progress:",
+      +aniProgress.toFixed(3),
+    ]);
   }
   //#endregion
 
@@ -231,52 +238,40 @@ export class BnSliderScrollbar implements ComponentInterface {
       ani.pause();
       this._anis.push(ani);
     };
+    const keyframes: PropertyIndexedKeyframes = {
+      transform: [`scale(1)`, `scale(101)`],
+    };
+    // const keyframes: PropertyIndexedKeyframes = {
+    //   top: ["0px", "1000px"],
+    // };
 
-    generateAnimation(
-      eles.leftIn,
-      {
-        top: ["0px", "1000px"],
-      },
-      {
-        easing: leftInEasing,
-        duration: cursorAniDuration,
-        fill: "forwards",
-      },
-    );
-    generateAnimation(
-      eles.leftOut,
-      {
-        top: ["0px", "1000px"],
-      },
-      {
-        easing: leftOutEasing,
-        duration: cursorAniDuration,
-        fill: "forwards",
-      },
-    );
-    generateAnimation(
-      eles.rightIn,
-      {
-        top: ["0px", "1000px"],
-      },
-      {
-        easing: rightInEasing,
-        duration: cursorAniDuration,
-        fill: "forwards",
-      },
-    );
-    generateAnimation(
-      eles.rightOut,
-      {
-        top: ["0px", "1000px"],
-      },
-      {
-        easing: rightOutEasing,
-        duration: cursorAniDuration,
-        fill: "forwards",
-      },
-    );
+    generateAnimation(eles.leftIn, keyframes, {
+      easing: leftInEasing,
+      duration: cursorAniDuration,
+      fill: "forwards",
+    });
+    generateAnimation(eles.leftOut, keyframes, {
+      easing: leftOutEasing,
+      duration: cursorAniDuration,
+      fill: "forwards",
+    });
+    generateAnimation(eles.rightIn, keyframes, {
+      easing: rightInEasing,
+      duration: cursorAniDuration,
+      fill: "forwards",
+    });
+    generateAnimation(eles.rightOut, keyframes, {
+      easing: rightOutEasing,
+      duration: cursorAniDuration,
+      fill: "forwards",
+    });
   }
+  private _getAniProgress(ele: HTMLElement) {
+    return (ele.getBoundingClientRect().width - 1) / 100;
+  }
+  // private _getAniProgress(ele: HTMLElement) {
+  //   return ele.offsetTop / 1000;
+  // }
 
   private _scrollProgressToAniProgress(scrollProgress: number) {
     if (this._cursorList.length > 0) {
@@ -334,7 +329,8 @@ export class BnSliderScrollbar implements ComponentInterface {
 
     /// 先注销原先的所有动画钩子
     if (this._playFrameId !== undefined) {
-      cancelAnimationFrame(this._playFrameId);
+      // this.console.verbose("cancel play animation");
+      // cancelAnimationFrame(this._playFrameId);
     }
 
     /// 计算出动画目标
@@ -363,8 +359,8 @@ export class BnSliderScrollbar implements ComponentInterface {
 
     const doFinishAni = () => {
       this._anis.forEach(ani => ani.pause());
-      cursorStyle.left = toLeft + "px";
-      cursorStyle.width = totalWidth - toLeft - toRight + "px";
+      const widthPx = totalWidth - toLeft - toRight;
+      cursorStyle.cssText = `left:${toLeft}px; width:${widthPx}px;`;
     };
 
     let leftAni: Animation;
@@ -399,25 +395,6 @@ export class BnSliderScrollbar implements ComponentInterface {
       return;
     }
 
-    /// 开始根据双向动画跟进渲染
-    const doPlayAni = () => {
-      if (leftAni.playState === "finished") {
-        this._playFrameId = undefined;
-      } else {
-        this._playFrameId = requestAnimationFrame(doPlayAni);
-      }
-      const progress = (leftAni.currentTime ?? 0) / baseAniDuration;
-      this._aniProgress = fromAniProgress + (toAniProgress - fromAniProgress) * progress;
-
-      const leftProgress = leftEle.offsetTop / 1000;
-      const leftPx = fromLeft + (toLeft - fromLeft) * leftProgress;
-      cursorStyle.left = leftPx + "px";
-
-      const rightProgress = rightEle.offsetTop / 1000;
-      const rightPx = fromRight + (toRight - fromRight) * rightProgress;
-      cursorStyle.width = totalWidth - leftPx - rightPx + "px";
-    };
-
     const playbackRate = (baseAniDuration / duration) * playbackBaseRate;
 
     for (const ani of this._anis) {
@@ -430,8 +407,8 @@ export class BnSliderScrollbar implements ComponentInterface {
         }
         /// 否则重新开始动画
         else {
-          ani.currentTime = 0;
           ani.playbackRate = playbackRate;
+          ani.currentTime = 0;
           ani.play();
         }
       } else {
@@ -439,8 +416,80 @@ export class BnSliderScrollbar implements ComponentInterface {
       }
     }
 
-    this._playFrameId = requestAnimationFrame(doPlayAni);
+    /// 开始根据双向动画跟进渲染
+    this._doPlayAniStates = {
+      leftAni,
+      baseAniDuration,
+      fromAniProgress,
+      toAniProgress,
+      leftEle,
+      fromLeft,
+      toLeft,
+      cursorStyle,
+      rightEle,
+      fromRight,
+      toRight,
+      totalWidth,
+    };
+    if (this._playFrameId === undefined) {
+      this._playFrameId = requestAnimationFrame(this._doPlayAni);
+    }
   }
+  private _doPlayAniStates?: {
+    leftAni: Animation;
+    baseAniDuration: number;
+    fromAniProgress: number;
+    toAniProgress: number;
+    leftEle: HTMLElement;
+    fromLeft: number;
+    toLeft: number;
+    rightEle: HTMLElement;
+    fromRight: number;
+    toRight: number;
+    cursorStyle: CSSStyleDeclaration;
+    totalWidth: number;
+  };
+  private _doPlayAni = () => {
+    const states = this._doPlayAniStates;
+    if (!states) {
+      return;
+    }
+    const {
+      leftAni,
+      baseAniDuration,
+      fromAniProgress,
+      toAniProgress,
+      leftEle,
+      fromLeft,
+      toLeft,
+      cursorStyle,
+      rightEle,
+      fromRight,
+      toRight,
+      totalWidth,
+    } = states;
+    let progress: number;
+    if (leftAni.playState === "finished") {
+      this._playFrameId = undefined;
+      progress = 1;
+    } else {
+      this._playFrameId = requestAnimationFrame(this._doPlayAni);
+      progress = (leftAni.currentTime ?? 0) / baseAniDuration;
+    }
+    // const progress = (leftAni.currentTime ?? 0) / baseAniDuration;
+    this._aniProgress = fromAniProgress + (toAniProgress - fromAniProgress) * progress;
+
+    const leftProgress = this._getAniProgress(leftEle);
+    const leftPx = fromLeft + (toLeft - fromLeft) * leftProgress;
+
+    const rightProgress = this._getAniProgress(rightEle);
+    const rightPx = fromRight + (toRight - fromRight) * rightProgress;
+    const widthPx = totalWidth - leftPx - rightPx;
+
+    cursorStyle.cssText = `left:${leftPx}px; width:${widthPx}px`;
+
+    this.console.verbose("play animation frame!", "progress:", +(progress * 100).toFixed(2));
+  };
 
   async componentDidLoad() {
     const eles = (this._eles = {
