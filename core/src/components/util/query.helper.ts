@@ -24,9 +24,38 @@ export class QueryHelper<E extends HTMLElement = HTMLElement> {
     this._found_many_cbs.add(cb);
     return this;
   }
+  private _doFindOne = false;
+  private _lastOne?: E;
+  private _doFindMany = false;
+  private _lastMany?: E[];
+  private _findOne() {
+    this._doFindOne = true;
+    return (this._lastOne = querySelector<E>(this.hostEle.shadowRoot, this.selector));
+  }
+  private _findMany() {
+    this._doFindOne = true;
+    this._doFindMany = true;
+    const res = (this._lastMany = querySelectorAll<E>(this.hostEle.shadowRoot, this.selector));
+    this._lastOne = res[0];
+    return res;
+  }
+  get lastOne() {
+    if (this._doFindOne === false) {
+      return this._findOne();
+    }
+    return this._lastOne;
+  }
+  get lastMany() {
+    if (this._doFindMany === false) {
+      return this._findMany();
+    }
+    return this._lastMany;
+  }
   doFound() {
+    this._doFindOne = false;
+    this._doFindMany = false;
     if (this._found_many_cbs.size > 0) {
-      const eles = querySelectorAll<E>(this.hostEle.shadowRoot, this.selector);
+      const eles = this._findMany();
       const manyRes = multiApply(this._found_many_cbs, [eles]);
       const ele = eles[0];
       if (ele !== undefined) {
@@ -38,7 +67,7 @@ export class QueryHelper<E extends HTMLElement = HTMLElement> {
       }
       return manyRes;
     } else if (this._found_one_cbs.size > 0) {
-      const ele = querySelector<E>(this.hostEle.shadowRoot, this.selector);
+      const ele = this._findOne();
       if (ele !== undefined) {
         return multiApply(this._found_one_cbs, [ele]);
       } else {

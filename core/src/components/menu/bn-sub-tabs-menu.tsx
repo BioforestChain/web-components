@@ -1,6 +1,7 @@
 import { Component, ComponentInterface, Element, h, Host, Method, Prop, State } from "@stencil/core";
 import { Logger, querySelector, throttle } from "../../utils/utils";
 import { $BnLayout, $BnSliderFollower } from "../slider/bn-slider.const";
+import { QueryHelper } from "../util/query.helper";
 
 @Component({
   tag: "bn-sub-tabs-menu",
@@ -14,22 +15,31 @@ export class BnSubTabsMenu implements ComponentInterface, $BnSliderFollower {
   @Prop({}) forSlider?: string;
   @Method()
   async bindSliderElement(ele?: HTMLElement | null) {
-    this._tabsEle.bindSliderElement(ele);
+    this._tabsEle?.bindSliderElement(ele);
   }
 
   @State() enableMask = false;
   @State() enableStartMask = false;
   @State() enableEndMask = false;
 
-  private _tabsEle!: $BnLayout.HTMLBnLayoutElement & $BnSliderFollower;
+  private _tabsQueryHelper = new QueryHelper<$BnLayout.HTMLBnLayoutElement & $BnSliderFollower>(
+    this.hostEle,
+    ":scope > .tabs",
+  );
+  private get _tabsEle() {
+    return this._tabsQueryHelper.lastOne;
+  }
   async componentDidLoad() {
-    this._tabsEle = querySelector(this.hostEle.shadowRoot, ":scope > .tabs")!;
+    this._tabsQueryHelper.componentDidLoad();
     this._updateMaskState();
   }
 
   @throttle(500)
   private _updateMaskState(/* tabsLayoutInfo = this._tabsLayoutInfo */) {
     const tabsEle = this._tabsEle;
+    if (!tabsEle) {
+      return;
+    }
 
     this.console.log("updateMaskState");
     const { offsetWidth, scrollWidth } = tabsEle;
@@ -59,11 +69,11 @@ export class BnSubTabsMenu implements ComponentInterface, $BnSliderFollower {
 
   scrollToStart = () => {
     const tabsEle = this._tabsEle;
-    tabsEle.scrollTo({ left: tabsEle.scrollLeft - tabsEle.offsetWidth / 2, behavior: "smooth" });
+    tabsEle?.scrollTo({ left: tabsEle.scrollLeft - tabsEle.offsetWidth / 2, behavior: "smooth" });
   };
   scrollToEnd = () => {
     const tabsEle = this._tabsEle;
-    tabsEle.scrollTo({ left: tabsEle.scrollLeft + tabsEle.offsetWidth / 2, behavior: "smooth" });
+    tabsEle?.scrollTo({ left: tabsEle.scrollLeft + tabsEle.offsetWidth / 2, behavior: "smooth" });
   };
 
   render() {

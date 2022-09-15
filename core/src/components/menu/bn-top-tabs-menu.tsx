@@ -1,6 +1,7 @@
 import { Component, ComponentInterface, Element, h, Host, Method, Prop } from "@stencil/core";
 import { Logger, querySelector } from "../../utils/utils";
 import { $BnLayout, $BnSliderFollower } from "../slider/bn-slider.const";
+import { QueryHelper } from "../util/query.helper";
 
 let tabsIdAcc = 0;
 
@@ -10,21 +11,28 @@ let tabsIdAcc = 0;
   shadow: true,
 })
 export class BnTopTabsMenu implements ComponentInterface, $BnSliderFollower {
+  @Element() hostEle!: HTMLElement;
+  readonly console = new Logger(this.hostEle);
+
   private readonly _tabs_id = `top-tabs-menu-${tabsIdAcc++}`;
   @Prop() forSlider?: string;
 
   @Method()
   async bindSliderElement(ele?: HTMLElement | null) {
-    this._tabsEle.bindSliderElement(ele);
+    this._tabsEle?.bindSliderElement(ele);
   }
 
-  private _tabsEle!: $BnLayout.HTMLBnLayoutElement & $BnSliderFollower;
+  private _tabsQueryHelper = new QueryHelper<$BnLayout.HTMLBnLayoutElement & $BnSliderFollower>(
+    this.hostEle,
+    ":scope > .tabs",
+  );
+
+  private get _tabsEle() {
+    return this._tabsQueryHelper.lastOne;
+  }
   async componentDidLoad() {
-    this._tabsEle = querySelector(this.hostEle.shadowRoot, ":scope > .tabs")!;
+    this._tabsQueryHelper.componentDidLoad();
   }
-
-  @Element() hostEle!: HTMLElement;
-  readonly console = new Logger(this.hostEle);
 
   render() {
     return (
