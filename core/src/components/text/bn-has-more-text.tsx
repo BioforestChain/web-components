@@ -41,20 +41,12 @@ export class BnHasMoreText implements ComponentInterface {
     return this._has_more;
   }
 
-  toggleOpen = () => {
+  private _toggleOpen = () => {
     this.open = !this.open;
   };
   @Method()
-  async toggleMore(open = this.open) {
+  async toggleOpen(open = !this.open) {
     return (this.open = open);
-  }
-  @Method()
-  async showMore() {
-    this.open = true;
-  }
-  @Method()
-  async hideMore() {
-    this.open = false;
   }
 
   private _updateHasMore() {
@@ -119,7 +111,7 @@ export class BnHasMoreText implements ComponentInterface {
             }}
           >
             <span class="dot">{this.open ? "" : "... "}</span>
-            <button class="has-more" onClick={this.toggleOpen} part="has-more">
+            <button class="has-more" onClick={this._toggleOpen} part="has-more">
               <span class="unfold btn-text" part="unfold btn-text">
                 <slot name="unfold">展开</slot>
               </span>
