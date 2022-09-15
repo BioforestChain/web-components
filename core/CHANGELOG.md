@@ -1,5 +1,13 @@
 # @bnqkl/web-component
 
+## 1.13.0
+
+### Minor Changes
+
+- ⚡ imporve `<bn-slider>` and `<bn-slider-scrollbar>` performance
+  💪 fix `<bn-top/sub-tabs-memu>` will missing `tabsEle` error
+  ✨ `<bn-has-more-text>` add some toggle methods
+
 ## 1.12.2
 
 ### Patch Changes
