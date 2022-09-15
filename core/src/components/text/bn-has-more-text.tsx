@@ -1,4 +1,15 @@
-import { Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Prop, State } from "@stencil/core";
+import {
+  Component,
+  ComponentInterface,
+  Element,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+  State,
+  Method,
+} from "@stencil/core";
 import { Logger, querySelector } from "../../utils/utils";
 
 @Component({
@@ -33,6 +44,18 @@ export class BnHasMoreText implements ComponentInterface {
   toggleOpen = () => {
     this.open = !this.open;
   };
+  @Method()
+  async toggleMore(open = this.open) {
+    return (this.open = open);
+  }
+  @Method()
+  async showMore() {
+    this.open = true;
+  }
+  @Method()
+  async hideMore() {
+    this.open = false;
+  }
 
   private _updateHasMore() {
     const textContainerEle = this._text_ele!;
@@ -97,10 +120,10 @@ export class BnHasMoreText implements ComponentInterface {
           >
             <span class="dot">{this.open ? "" : "... "}</span>
             <button class="has-more" onClick={this.toggleOpen} part="has-more">
-              <span class="unfold btn-text">
+              <span class="unfold btn-text" part="unfold btn-text">
                 <slot name="unfold">展开</slot>
               </span>
-              <span class="fold btn-text">
+              <span class="fold btn-text" part="fold btn-text">
                 <slot name="fold">收起</slot>
               </span>
             </button>
