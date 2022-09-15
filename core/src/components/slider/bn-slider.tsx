@@ -98,6 +98,7 @@ export class BnSlider implements ComponentInterface, $BnSlider {
       return;
     }
     // 进行布局计算，并更新状态
+    this.console.verbose("updateSliderStates by <sliderSlotChange>");
     this._updateSliderStates();
   });
 
@@ -119,6 +120,7 @@ export class BnSlider implements ComponentInterface, $BnSlider {
       this.console.log("componentDidLoad", "!! scroll into defaultIndex", this.defaultActivedIndex);
       this._scrollToIndex(this.defaultActivedIndex, "set" /* 初始化的时候减少动画 */);
       // 这里确保 this._activedIndex 等状态值立刻变动到对应的值上来，避免接下来可能会立刻触发其它的更新，读取了 this._activedIndex 的原来的默认值
+      this.console.verbose("updateSliderStates by <componentDidLoad>");
       this._updateSliderStates();
     } else {
       this.console.log("componentDidLoad", "!! scroll into activedIndex", this._activedIndex);
@@ -329,6 +331,7 @@ export class BnSlider implements ComponentInterface, $BnSlider {
   async update() {
     this._querySliders();
     // 进行布局计算，并更新状态
+    this.console.verbose("updateSliderStates by <@Method:update>");
     this._updateSliderStates();
   }
 
@@ -346,12 +349,26 @@ export class BnSlider implements ComponentInterface, $BnSlider {
     list: [],
     activedIndex: this.defaultActivedIndex,
   };
+
+  private _runningUpdateTick = -1;
+  private _throttleUpdateSliderStates() {
+    if (this._runningUpdateTick < 0) {
+      this.console.verbose("updateSliderStates by <throttle>");
+      this._updateSliderStates();
+      this._runningUpdateTick = 6; // 6 in 60fps ~= 100ms
+      const tick = () => {
+        if (this._runningUpdateTick-- > 0) {
+          requestAnimationFrame(tick);
+        }
+      };
+      tick();
+    }
+  }
   /**
    * 通知slider-ele的状态变更
    * 更新activedIndex的值变更
    * 触发activedSliderChange事件
    */
-  // @throttle()
   private _updateSliderStates(layoutInfo = this.calcLayoutInfo()) {
     this.console.lazyInfo(() => ["updateSliderStates", "reasons:", this._reasons, this._reason, { ...layoutInfo }]);
     const { closestSlider } = layoutInfo;
@@ -433,10 +450,9 @@ export class BnSlider implements ComponentInterface, $BnSlider {
     if (event && event.target !== this.hostEle) {
       return;
     }
-    debugger;
 
     this._scrolling = { startTime: event.timeStamp };
-    this._updateSliderStates(this.calcLayoutInfo((event.target as any)!.scrollLeft, true));
+    this._throttleUpdateSliderStates();
 
     /// 如果不是在最后的scrollinto的控制中，那么需要持续监测滚动状况
     if (this._inScrollInto === false) {
@@ -456,6 +472,7 @@ export class BnSlider implements ComponentInterface, $BnSlider {
     this._inScrollInto = false;
 
     /// 尝试触发事件
+    this.console.verbose("updateSliderStates by <scrollEnd>");
     this._updateSliderStates();
 
     this._reasons.delete("mousewheel");

@@ -83,6 +83,10 @@ export class BnSliderScrollbar implements ComponentInterface {
   };
 
   private _for_onEleScroll = async (event: Event) => {
+    /// 减少计算，使得动画尽可能平顺
+    if (this._preProgress < 0.5) {
+      return;
+    }
     const ele = event.target as $BnSlider.HTMLBnSliderElement;
     if (ele !== this._sliderEle) {
       return;
@@ -300,7 +304,10 @@ export class BnSliderScrollbar implements ComponentInterface {
   }
 
   private _playFrameId?: number;
+  /**滚动动画的进度 */
   private _aniProgress: number = 0;
+  /**当前动画控制器的进度 */
+  private _preProgress = 0;
   private _playAnimations(toAniProgress: number, duration = this._aniDuration) {
     if (this._anis.length === 0) {
       return;
@@ -329,8 +336,8 @@ export class BnSliderScrollbar implements ComponentInterface {
 
     /// 先注销原先的所有动画钩子
     if (this._playFrameId !== undefined) {
-      // this.console.verbose("cancel play animation");
-      // cancelAnimationFrame(this._playFrameId);
+      this.console.verbose("cancel play animation");
+      cancelAnimationFrame(this._playFrameId);
     }
 
     /// 计算出动画目标
@@ -394,6 +401,30 @@ export class BnSliderScrollbar implements ComponentInterface {
     } else {
       return;
     }
+    const doPlayAni = () => {
+      let progress: number;
+      if (leftAni.playState === "finished") {
+        this._playFrameId = undefined;
+        progress = 1;
+      } else {
+        this._playFrameId = requestAnimationFrame(doPlayAni);
+        progress = (leftAni.currentTime ?? 0) / baseAniDuration;
+      }
+      // const progress = (leftAni.currentTime ?? 0) / baseAniDuration;
+      this._aniProgress = fromAniProgress + (toAniProgress - fromAniProgress) * progress;
+      this._preProgress = progress;
+
+      const leftProgress = this._getAniProgress(leftEle);
+      const leftPx = fromLeft + (toLeft - fromLeft) * leftProgress;
+
+      const rightProgress = this._getAniProgress(rightEle);
+      const rightPx = fromRight + (toRight - fromRight) * rightProgress;
+      const widthPx = totalWidth - leftPx - rightPx;
+
+      cursorStyle.cssText = `left:${leftPx}px; width:${widthPx}px`;
+
+      this.console.verbose("play animation frame!", "progress:", +(progress * 100).toFixed(2));
+    };
 
     const playbackRate = (baseAniDuration / duration) * playbackBaseRate;
 
@@ -417,79 +448,9 @@ export class BnSliderScrollbar implements ComponentInterface {
     }
 
     /// 开始根据双向动画跟进渲染
-    this._doPlayAniStates = {
-      leftAni,
-      baseAniDuration,
-      fromAniProgress,
-      toAniProgress,
-      leftEle,
-      fromLeft,
-      toLeft,
-      cursorStyle,
-      rightEle,
-      fromRight,
-      toRight,
-      totalWidth,
-    };
-    if (this._playFrameId === undefined) {
-      this._playFrameId = requestAnimationFrame(this._doPlayAni);
-    }
+    this._preProgress = 0;
+    this._playFrameId = requestAnimationFrame(doPlayAni);
   }
-  private _doPlayAniStates?: {
-    leftAni: Animation;
-    baseAniDuration: number;
-    fromAniProgress: number;
-    toAniProgress: number;
-    leftEle: HTMLElement;
-    fromLeft: number;
-    toLeft: number;
-    rightEle: HTMLElement;
-    fromRight: number;
-    toRight: number;
-    cursorStyle: CSSStyleDeclaration;
-    totalWidth: number;
-  };
-  private _doPlayAni = () => {
-    const states = this._doPlayAniStates;
-    if (!states) {
-      return;
-    }
-    const {
-      leftAni,
-      baseAniDuration,
-      fromAniProgress,
-      toAniProgress,
-      leftEle,
-      fromLeft,
-      toLeft,
-      cursorStyle,
-      rightEle,
-      fromRight,
-      toRight,
-      totalWidth,
-    } = states;
-    let progress: number;
-    if (leftAni.playState === "finished") {
-      this._playFrameId = undefined;
-      progress = 1;
-    } else {
-      this._playFrameId = requestAnimationFrame(this._doPlayAni);
-      progress = (leftAni.currentTime ?? 0) / baseAniDuration;
-    }
-    // const progress = (leftAni.currentTime ?? 0) / baseAniDuration;
-    this._aniProgress = fromAniProgress + (toAniProgress - fromAniProgress) * progress;
-
-    const leftProgress = this._getAniProgress(leftEle);
-    const leftPx = fromLeft + (toLeft - fromLeft) * leftProgress;
-
-    const rightProgress = this._getAniProgress(rightEle);
-    const rightPx = fromRight + (toRight - fromRight) * rightProgress;
-    const widthPx = totalWidth - leftPx - rightPx;
-
-    cursorStyle.cssText = `left:${leftPx}px; width:${widthPx}px`;
-
-    this.console.verbose("play animation frame!", "progress:", +(progress * 100).toFixed(2));
-  };
 
   async componentDidLoad() {
     const eles = (this._eles = {
