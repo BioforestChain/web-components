@@ -1,6 +1,6 @@
 import { html } from "lit-html";
 import allIcons from "../assets/bnqkl-icon.json";
-import type { $BnIconName } from "../bn-icon.name";
+import type { $BnIconName } from "../bn-icon.const";
 import { bnIconKit } from "./autogen";
 
 export default {

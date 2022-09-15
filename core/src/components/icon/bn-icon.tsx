@@ -1,8 +1,7 @@
 import { Component, ComponentInterface, Event, EventEmitter, h, Host, Prop, State, Watch } from "@stencil/core";
 import { assets } from "../../utils/assets";
 import bnIconMetadata from "./assets/bnqkl-icon.json";
-import type { $Direction } from "./bn-icon.const";
-import type { $BnIconName } from "./bn-icon.name";
+import type { $Direction, $BnIconName } from "./bn-icon.const";
 
 let gloablStyle: HTMLStyleElement | undefined;
 
