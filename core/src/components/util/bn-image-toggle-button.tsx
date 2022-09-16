@@ -1,5 +1,4 @@
-import { Component, ComponentInterface, Event, EventEmitter, h, Prop, Watch } from "@stencil/core";
-import { bindThis } from "../../utils/utils";
+import { Component, ComponentInterface, Event, EventEmitter, h, Prop } from "@stencil/core";
 import { $ImageToggleButton } from "./bn-image-toggle-button.const";
 
 @Component({
@@ -21,25 +20,24 @@ export class BnImageToggleButton implements ComponentInterface {
 
   @Prop({ reflect: true, mutable: true }) checked = false;
   @Event() checkedChange!: EventEmitter<boolean>;
-  @Watch("checked")
-  watchCheckedHanlder() {
-    this.checkedChange.emit(this.checked);
-  }
 
-  @bindThis
-  private toggleChecked() {
+  private _toggleChecked = () => {
     if (this.disabled) {
       return;
     }
-    this.checked = !this.checked;
-  }
+    const newValue = !this.checked;
+    const event = this.checkedChange.emit(newValue);
+    if (event.defaultPrevented === false) {
+      this.checked = newValue;
+    }
+  };
 
   render() {
     return (
       <button
         class={`host ${this.direction}`}
         style={{ "--checked-color": this.checkedColor }}
-        onClick={this.toggleChecked}
+        onClick={this._toggleChecked}
       >
         <bn-animation-icon
           part="icon"

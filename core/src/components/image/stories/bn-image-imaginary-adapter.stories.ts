@@ -1,9 +1,10 @@
 import { html } from "lit-html";
-import { bnImageImaginaryProviderKit } from "./autogen";
+import { querySelector } from "../../../utils/utils";
+import { bnImageImaginaryAdapterKit } from "./autogen";
 
 export default {
-  title: "Component/Image/Image Imaginary Provider",
-  argTypes: bnImageImaginaryProviderKit.argsFactory.toArgTypes(),
+  title: "Component/Image/Image Imaginary Adapter",
+  argTypes: bnImageImaginaryAdapterKit.argsFactory.toArgTypes(),
 };
 
 const GEN_IMG_NUM_INPUT = (id: string, label: string, value = 0, min = 0, max = 500, step = 10) => {
@@ -29,9 +30,6 @@ const ImaginaryServiceCtrl = {
   set(v: ImaginaryService) {
     localStorage.setItem("imaginary-service", v);
   },
-  // toggle() {
-  //   ImaginaryService.set(!ImaginaryService.get());
-  // },
 };
 
 const CTRL_INPUT_IMAGE = {
@@ -140,9 +138,20 @@ input[type="url"] {
   width: 100%;
 }
 `;
-const CtrlTpl = bnImageImaginaryProviderKit
+
+const CtrlTpl = bnImageImaginaryAdapterKit
   .storyFactory(() => html``, {
     origin: CTRL_ORIGIN[ImaginaryServiceCtrl.get()],
+  })
+  .addHtmlTpl(html`<bn-image-provider id="provider"></bn-image-provider>`)
+  .onMount((flag, ele) => {
+    ele.slot = "adapter";
+    const providerEle = querySelector(flag, "#provider")!;
+    providerEle.append(ele);
+    const imgEle = querySelector<HTMLBnImageElement>(flag, "#img")!;
+    providerEle.addEventListener("adapterChange", () => {
+      imgEle.refresh();
+    });
   })
   .addHtmlTpl(CTRL_HTML)
   .addStyle(CTRL_STYLE)

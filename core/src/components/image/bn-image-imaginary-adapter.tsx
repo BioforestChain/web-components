@@ -1,14 +1,14 @@
 import { Component, ComponentInterface, Element, h, Host, Method, Prop, State, Watch } from "@stencil/core";
-import { imageProvider } from "../../utils/imageProvider";
 import { Logger, nullProtoObj } from "../../utils/utils";
-import { ImaginaryTransform } from "./bn-image-imaginary-provider.const";
+import { ImaginaryTransform } from "./bn-image-imaginary-adapter.const";
+import { $BnImageProvider } from "./bn-image-provider.const";
 
 @Component({
-  tag: "bn-image-imaginary-provider",
-  styleUrl: "bn-image-imaginary-provider.scss",
+  tag: "bn-image-imaginary-adapter",
+  styleUrl: "bn-image-imaginary-adapter.scss",
   shadow: true,
 })
-export class BnImageImaginaryProvider implements ComponentInterface {
+export class BnImageImaginaryAdapter implements ComponentInterface, $BnImageProvider.BnImageAdapterBase {
   @Element() hostEle!: HTMLElement;
   readonly console = new Logger(this.hostEle);
 
@@ -43,26 +43,18 @@ export class BnImageImaginaryProvider implements ComponentInterface {
     return transform!;
   }
 
+  @Method()
+  async getTransfrom() {
+    return this._getTransform();
+  }
+
   connectedCallback() {
     this.watchRedirection(this.redirection);
   }
-  disconnectedCallback() {
-    imageProvider.unregistryTransform(this.hostEle);
-  }
 
-  @Method()
-  async transform(src: string, params: { [key: string]: unknown }, config?: { pixelRatio?: number }) {
-    const pixelRatio = config?.pixelRatio ?? devicePixelRatio;
-    return this._getTransform().transform(src, params, { pixelRatio });
-  }
-  @Method()
-  async transformFromElement(src: string, ele: HTMLElement) {
-    return this._getTransform().transformFromElement(src, ele);
-  }
+  @Prop({}) readonly pixelRatio?: number;
 
   render() {
-    const transform = this._getTransform();
-    imageProvider.registryTransform(this.hostEle, transform);
     return <Host></Host>;
   }
 }

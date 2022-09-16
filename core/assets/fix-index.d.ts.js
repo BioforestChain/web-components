@@ -5,9 +5,8 @@ const resolveTo = createResolveTo(__dirname);
 
 exports.inject = () => {
   let inject = "";
-  debugger;
-  const componentsTypeDir = resolveTo("../dist/types/components");
-  const componentsSrcDir = resolveTo("../src/components");
+  const componentsTypeDir = resolveTo("../dist/types/");
+  const componentsSrcDir = resolveTo("../src/");
   for (const filepath of walkFiles(componentsSrcDir)) {
     if (filepath.endsWith(".const.ts") || filepath.endsWith(".const.tsx")) {
       const destFilepath = path.join(componentsTypeDir, path.relative(componentsSrcDir, filepath));

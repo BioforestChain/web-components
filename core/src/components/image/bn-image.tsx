@@ -78,7 +78,7 @@ export class BnImage implements ComponentInterface {
 
   /**刷新加载 */
   @Method()
-  async refresh(force?: boolean) {
+  async refresh(force: boolean = true) {
     const current_src = force && this.src ? this._getCurrentSrc(this.src) : this.currentSrc;
     this._setCurrentSrc(undefined);
     await new Promise<void>(resolve =>

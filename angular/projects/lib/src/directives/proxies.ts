@@ -150,7 +150,7 @@ false: hide
 @ProxyCmp({
   defineCustomElementFn: undefined,
   inputs: ['clampLine', 'lineHeight', 'open', 'text'],
-  methods: ['toggleMore', 'showMore', 'hideMore']
+  methods: ['toggleOpen']
 })
 @Component({
   selector: 'bn-has-more-text',
@@ -218,24 +218,73 @@ export class BnImage {
 }
 
 
-export declare interface BnImageImaginaryProvider extends Components.BnImageImaginaryProvider {}
+export declare interface BnImageCustomAdapter extends Components.BnImageCustomAdapter {}
 
 @ProxyCmp({
   defineCustomElementFn: undefined,
-  inputs: ['origin', 'redirection'],
-  methods: ['transform', 'transformFromElement']
+  inputs: ['pixelRatio'],
+  methods: ['getTransfrom']
 })
 @Component({
-  selector: 'bn-image-imaginary-provider',
+  selector: 'bn-image-custom-adapter',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
-  inputs: ['origin', 'redirection']
+  inputs: ['pixelRatio']
 })
-export class BnImageImaginaryProvider {
+export class BnImageCustomAdapter {
   protected el: HTMLElement;
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
+  }
+}
+
+
+export declare interface BnImageImaginaryAdapter extends Components.BnImageImaginaryAdapter {}
+
+@ProxyCmp({
+  defineCustomElementFn: undefined,
+  inputs: ['origin', 'pixelRatio', 'redirection'],
+  methods: ['getTransfrom']
+})
+@Component({
+  selector: 'bn-image-imaginary-adapter',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>',
+  inputs: ['origin', 'pixelRatio', 'redirection']
+})
+export class BnImageImaginaryAdapter {
+  protected el: HTMLElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+  }
+}
+
+import type { ImageTransform as IBnImageProviderImageTransform } from '@bnqkl/web-component';
+export declare interface BnImageProvider extends Components.BnImageProvider {
+  /**
+   *  
+   */
+  adapterChange: EventEmitter<CustomEvent<IBnImageProviderImageTransform>>;
+
+}
+
+@ProxyCmp({
+  defineCustomElementFn: undefined,
+  methods: ['transform', 'transformFromElement']
+})
+@Component({
+  selector: 'bn-image-provider',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>'
+})
+export class BnImageProvider {
+  protected el: HTMLElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+    proxyOutputs(this, this.el, ['adapterChange']);
   }
 }
 

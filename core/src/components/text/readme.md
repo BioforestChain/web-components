@@ -24,27 +24,7 @@
 
 ## Methods
 
-### `hideMore() => Promise<void>`
-
-
-
-#### Returns
-
-Type: `Promise<void>`
-
-
-
-### `showMore() => Promise<void>`
-
-
-
-#### Returns
-
-Type: `Promise<void>`
-
-
-
-### `toggleMore(open?: boolean) => Promise<boolean>`
+### `toggleOpen(open?: boolean) => Promise<boolean>`
 
 
 

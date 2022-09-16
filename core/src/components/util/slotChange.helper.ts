@@ -1,7 +1,7 @@
 import { ComponentInterface } from "@stencil/core";
 import { multiApply, querySelector, throttleWrapper, $Elements, createElements } from "../../utils/utils";
 
-export type $SlotChangeCallback = <T extends HTMLElement = HTMLElement>(
+export type $SlotChangeCallback<T extends HTMLElement = HTMLElement> = (
   elements: $Elements<T>,
   nodes: Set<Node>,
 ) => unknown;
@@ -17,7 +17,7 @@ export class SlotChangeHelper implements ComponentInterface {
     }
   }
 
-  onChange(cb: $SlotChangeCallback) {
+  onChange<T extends HTMLElement = HTMLElement>(cb: $SlotChangeCallback<T>) {
     this._change_cbs.add(cb);
     return this;
   }
@@ -28,7 +28,7 @@ export class SlotChangeHelper implements ComponentInterface {
     return this;
   }
 
-  private _change_cbs = new Set<$SlotChangeCallback>();
+  private _change_cbs = new Set<$SlotChangeCallback<any>>();
   private _toggle_cbs = new Set<$SlotToggleCallback>();
   private _emitCallback(eles: Set<HTMLElement>, nodes: Set<Node>) {
     /// change
