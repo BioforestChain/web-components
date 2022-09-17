@@ -1,5 +1,12 @@
 # @bnqkl/web-component
 
+## 1.14.0
+
+### Minor Changes
+
+- the event `checkedChange` in `<bn-image-toggle-button>` now is Preventable and no-composed
+  refactor the `<bn-image-provider>`, and add `<bn-image-imaginary-adapter>`/`<bn-image-custom-adapter>`
+
 ## 1.13.0
 
 ### Minor Changes
