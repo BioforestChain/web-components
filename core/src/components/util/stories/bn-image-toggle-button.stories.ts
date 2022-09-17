@@ -6,12 +6,4 @@ export default {
   argTypes: bnImageToggleButtonKit.argsFactory.toArgTypes(),
 };
 
-export const Base_Usage = bnImageToggleButtonKit.storyFactory(
-  () =>
-    // push some child element
-    html``,
-  {
-    // init property/attribute
-    // data: 0,
-  },
-);
+export const Base_Usage = bnImageToggleButtonKit.storyFactory(() => html``, {});

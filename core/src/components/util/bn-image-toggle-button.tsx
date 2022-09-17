@@ -19,7 +19,7 @@ export class BnImageToggleButton implements ComponentInterface {
   @Prop({ reflect: true }) direction: $ImageToggleButton.Direction = "lr";
 
   @Prop({ reflect: true, mutable: true }) checked = false;
-  @Event() checkedChange!: EventEmitter<boolean>;
+  @Event({ composed: false }) checkedChange!: EventEmitter<boolean>;
 
   private _toggleChecked = () => {
     if (this.disabled) {
