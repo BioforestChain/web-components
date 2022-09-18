@@ -1,4 +1,4 @@
-import { h } from "@stencil/core";
+import { FunctionalComponent, h } from "@stencil/core";
 
 export interface $ImageToggleButton {
   checked: boolean;
@@ -13,23 +13,21 @@ export namespace $ImageToggleButton {
   export type Direction = "tb" | "lr";
 }
 
-export const imageToggleButtonRender = (
-  aniConfig: {
-    src: string;
-    frames: number;
-    duration: string;
-    checkedColor: string;
-  },
-  button: $ImageToggleButton,
-  slotRender: () => unknown,
-) => {
+export const ImageToggleButtonRender: FunctionalComponent<{
+  src: string;
+  frames: number;
+  duration: string;
+  checkedColor: string;
+  button: $ImageToggleButton;
+}> = (props, children) => {
+  const { button } = props;
   return (
     <bn-image-toggle-button
       class="icon"
-      src={aniConfig.src}
-      frames={aniConfig.frames}
-      duration={aniConfig.duration}
-      checkedColor={aniConfig.checkedColor}
+      src={props.src}
+      frames={props.frames}
+      duration={props.duration}
+      checkedColor={props.checkedColor}
       direction={button.direction}
       color={button.color}
       disabled={button.disabled}
@@ -37,7 +35,7 @@ export const imageToggleButtonRender = (
       checked={button.checked}
       onCheckedChange={button.onChange}
     >
-      {slotRender()}
+      {children}
     </bn-image-toggle-button>
   );
 };

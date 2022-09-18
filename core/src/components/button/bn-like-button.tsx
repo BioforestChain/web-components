@@ -1,7 +1,7 @@
 import { Component, ComponentInterface, Event, EventEmitter, h, Prop, State, Watch } from "@stencil/core";
 import { assets } from "../../utils/assets";
 import { bindThis } from "../../utils/utils";
-import { $ImageToggleButton, imageToggleButtonRender } from "../util/bn-image-toggle-button.const";
+import { $ImageToggleButton, ImageToggleButtonRender } from "../util/bn-image-toggle-button.const";
 
 @Component({
   tag: "bn-like-button",
@@ -46,15 +46,14 @@ export class BnButtonLike implements ComponentInterface {
   }
 
   render() {
-    return imageToggleButtonRender(
-      {
-        src: assets.get("./like.webp"),
-        frames: 48,
-        duration: "1.6s",
-        checkedColor: `#549deb`,
-      },
-      this,
-      () => (
+    return (
+      <ImageToggleButtonRender
+        src={assets.get("./like.webp")}
+        frames={48}
+        duration="1.6s"
+        checkedColor="#549deb"
+        button={this}
+      >
         <div slot="label" class={`ani-count ${this.direction}`}>
           <span class={{ count: true, top: true, checked: !this.checked }}>
             <slot name="uncheck">{this.count_uncheck}</slot>
@@ -63,7 +62,7 @@ export class BnButtonLike implements ComponentInterface {
             <slot name="checked">{this.count_checked}</slot>
           </span>
         </div>
-      ),
+      </ImageToggleButtonRender>
     );
   }
 }
